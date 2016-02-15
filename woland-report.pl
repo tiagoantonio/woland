@@ -297,6 +297,9 @@ sub SCRatioGroup{
 		$totalSC=$SC_0+$SC_1+$SC_m1;
 		$nConcordance=$SC_0/$totalSC;
 		$nDiscordance=($SC_1+$SC_m1)/$totalSC;
+			if ($nDiscordance==0){
+				$nDiscordance=1;
+			}
 		$ratioConcordanceDiscordance=$nConcordance/$nDiscordance;
 
 		push @{ $HofA{$n} } , $ratioConcordanceDiscordance;
