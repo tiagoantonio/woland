@@ -295,6 +295,9 @@ sub SCRatioGroup{
 		}
 
 		$totalSC=$SC_0+$SC_1+$SC_m1;
+			if ($totalSC==0){
+				$totalSC=1;
+			}
 		$nConcordance=$SC_0/$totalSC;
 		$nDiscordance=($SC_1+$SC_m1)/$totalSC;
 			if ($nDiscordance==0){
