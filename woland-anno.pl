@@ -1331,7 +1331,7 @@ open (OUTPUTbiasoxoG, ">>results-$inputRawSNV/WOLAND-bias_oxoG-$inputRawSNV");
 open (OUTPUTbiasUV, ">>results-$inputRawSNV/WOLAND-bias_UV-lambda-$inputRawSNV");
 open (OUTPUTbiasUVsolar, ">>results-$inputRawSNV/WOLAND-bias_UVsolar-$inputRawSNV");
 open (OUTPUTbiassixfour, ">>results-$inputRawSNV/WOLAND-bias_sixfour-$inputRawSNV");
-open (OUTPUTbiasenu, ">>results-$inputRawSNV/WOLAND-bias_enu-$inputRawSNV");
+#open (OUTPUTbiasenu, ">>results-$inputRawSNV/WOLAND-bias_enu-$inputRawSNV");
 
 # Open Context Sequences generated
 
@@ -1792,7 +1792,7 @@ for my $ienu (0..$#enu){
 	if ($strand_count >= 1){
 	 $strand_transcript=$strand_plus_count/$strand_count;
      $strand_score=$strand_transcript - ($strand_value);
-     print OUTPUTbiasenu "$chrSt[$ienu]\t$coord[$ienu]\t$strand_score\n";
+     #print OUTPUTbiasenu "$chrSt[$ienu]\t$coord[$ienu]\t$strand_score\n";
 	
 	$strand_transcript=0;
     $strand_plus_count=0;

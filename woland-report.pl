@@ -279,7 +279,7 @@ foreach $item (@Group) {
 ##Parsing Grouped Files
 
 open (CONCORDANCEDISCORDANCERATIO, ">>report-$inputTable/SC_concordance_ratio-$inputTable.tmp");
-print CONCORDANCEDISCORDANCERATIO "X\tSN1\tDNApol\t8-oxoG\tUVlambda\tSixFour\tENU\tUV-solar\n";
+print CONCORDANCEDISCORDANCERATIO "X\tSN1\tDNApol\t8-oxoG\tUVlambda\tSixFour\tUV-solar\n";
 
 $input = 6;
 $HofA = ();
@@ -345,11 +345,11 @@ sub SCRatioGroup{
 &SCRatioGroup ("oxoG");
 &SCRatioGroup ("UV-lambda");
 &SCRatioGroup ("sixfour");
-&SCRatioGroup ("enu");
+#&SCRatioGroup ("enu");
 &SCRatioGroup ("UVsolar");
 
 for my $i (0 .. $#Group){
-	print CONCORDANCEDISCORDANCERATIO "$Group[$i]\t$HofA{0}[$i]\t$HofA{1}[$i]\t$HofA{2}[$i]\t$HofA{3}[$i]\t$HofA{4}[$i]\t$HofA{5}[$i]\t$HofA{6}[$i]\n";
+	print CONCORDANCEDISCORDANCERATIO "$Group[$i]\t$HofA{0}[$i]\t$HofA{1}[$i]\t$HofA{2}[$i]\t$HofA{3}[$i]\t$HofA{4}[$i]\t$HofA{5}[$i]\n";
 }
 
 @i=0;
@@ -465,7 +465,7 @@ sub GaussGraphPlot{
 &GaussGraphPlot("sixfour");
 &GaussGraphPlot("DNApoln");
 &GaussGraphPlot("oxoG");
-&GaussGraphPlot("enu");
+#&GaussGraphPlot("enu");
 &GaussGraphPlot("UVsolar");
 &GaussGraphPlot("SN1");
 
