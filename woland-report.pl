@@ -13,12 +13,33 @@
 #! /usr/bin/perl
 
 use Statistics::R; # module for the bridge between Perl and R.
+use strict;
+use warnings;
 
 ## variables
 
 my ($inputTable, $inputTableLine, @inputTableArray);
-my ($i);
-my (@Group, @sampleName);
+
+my ($i, $i2, $i3, $i4); my (@i, @i2, @i3); #variables for indices
+
+my (@Group, @sampleName, $sampleNameLine);
+
+my ($inputChromosomeProfile, $inputChromosomeProfileArrayLine, @inputChromosomeProfileArray);
+
+my ($inputSampleBaseChange, @CHR_P, @MUT_P, @inputSampleBaseChangeArray, @AT,@AG,@AC,@CG,@CT,@CA,@ATF,@AGF,@ACF,@CGF,@CTF,@CAF);
+
+my ($TransversionF, $TransitionF, @TransversionF, @TransitionF);
+
+my ($inputSampleMotif, $inputSampleMotifArray, @inputSampleMotifArray);
+
+my ($inputSampleHotSpot, $inputSampleHotSpotArrayLine, $item, @SN1,@DNApol,@oxoG,@UV,@SixFour,@ENU,@UVAsolar,@SN1F,@DNApolF,@oxoGF,@UVF,@SixFourF,@ENUF,@UVAsolarF);
+
+my ($uniqueGroup, $input, $HofA, @inputSampleHotSpotArray, @geneClass, @GeneName, @CHR, @BP, @HotspotCount, @uniqgroup);
+
+my ($inputStrandScoreArrayLine, $inputStrandScore, $SC_0, $SC_1,$SC_m1,$SC_SC,$totalSC,$nConcordance,$nDiscordance,$ratioConcordanceDiscordance,$n, @inputStrandScoreArray, @CHR_SC, @BP_SC, @SC_SC, @colorGauss);
+
+my ($R, $colorGausspick, $uniqGroupLine, $pick, $legendltyV, $legendlwdV, $lastgroup, @legendname, @legendlty, @legendlwd, @legendcol);
+
 
 ## main Warning
 
@@ -57,19 +78,19 @@ for my $i3 (0..$#sampleName){
 	@inputChromosomeProfileArray=<inputChromosomeProfile>;
 
 	foreach $inputChromosomeProfileArrayLine (@inputChromosomeProfileArray){
-		@i = split (/\t/, $inputChromosomeProfileArrayLine);
-		chomp (@i);
-		push (@CHR_P, "$i[0]");
-		push (@MUT_P, "$i[2]");
+		@i2 = split (/\t/, $inputChromosomeProfileArrayLine);
+		chomp (@i2);
+		push (@CHR_P, "$i2[0]");
+		push (@MUT_P, "$i2[2]");
 	}
 
 	open (MUTFREQ, ">>report-$inputTable/mutfreq-$inputTable.tmp");
 
-	for my $i2 (1..$#CHR_P){
-		print MUTFREQ "$CHR_P[$i2]\t$MUT_P[$i2]\t$Group[$i3]\n";
+	for my $i (1..$#CHR_P){
+		print MUTFREQ "$CHR_P[$i]\t$MUT_P[$i]\t$Group[$i3]\n";
 	}
 
-	$i2=0;
+	$i=0;
 
 	close (MUTFREQ);
 	$inputChromosomeProfile=0;
@@ -247,7 +268,7 @@ $i3=0;
 
 ## Parsing unique group names for Hotspots
 
-%uniqueGroup = ();
+my %uniqueGroup = ();
 
 foreach $item (@Group) {
 	push(@uniqgroup, $item) unless $uniqueGroup{$item}++;
@@ -260,9 +281,10 @@ foreach $item (@Group) {
 open (CONCORDANCEDISCORDANCERATIO, ">>report-$inputTable/SC_concordance_ratio-$inputTable.tmp");
 print CONCORDANCEDISCORDANCERATIO "X\tSN1\tDNApol\t8-oxoG\tUVlambda\tSixFour\tENU\tUV-solar\n";
 
-my $input = 6;
-my $HofA = ();
+$input = 6;
+$HofA = ();
 
+my %HofA=();
 for (0..$input) {
    $HofA{$_} = [];
 }
@@ -337,7 +359,7 @@ $i3=0;
 
 ### R bridge
 
-my $R = Statistics::R->new() ;
+$R = Statistics::R->new() ;
 $R->start_sharedR ;
 $R->send('library (reshape2)');
 $R->send('library (ggplot2)');
@@ -395,7 +417,7 @@ sub GaussGraphPlot{
 			xlim=c(-1.25, 1.25),
 			ylim = c(0,5))'
 			);
-
+	$pick=0;
 	foreach $uniqGroupLine(@uniqgroup){
 
 		$colorGausspick=$colorGauss[$pick];
