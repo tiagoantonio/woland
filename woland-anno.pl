@@ -1867,7 +1867,7 @@ for $a2 (0..$#targetSequence){
 }
 
 #### PRINTING OF NORMALIZED MUTABLE MOTIFS FILE #####
-print "\nSaving normalized mutational motifs";
+print "\nSaving normalized mutational motifs\n";
 	print NMOTIFS "$inputRawSNV\tSN1\tDNApol\t8-oxoG\tUV-lambda\tSixFour\tENU\tUVA-solar\n";
 	print NMOTIFS "Number of Total SNPs\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\n";
 	print NMOTIFS "Total Raw Number of Motifs Found\t$SN1counts\t$DNApolncounts\t$oxoGcounts\t$UVlambdacounts\t$sixfourcounts\t$enucounts\t$UVsolarcounts\n";
