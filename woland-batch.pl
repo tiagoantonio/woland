@@ -27,7 +27,7 @@ use warnings;
 my $inputTable; my @inputTableArray; my $inputTableLine; 
 my @i; my $i;
 my @Group; my @sampleName;
-my ($profile, $hotspot);
+my ($profile, $hotspot, $genome_version);
 my $abc;
 my ($pm,$pid, $MAX_PROCESSES);
 my @ARGS;
@@ -36,7 +36,7 @@ my @ARGS;
 ## main Warning
 
 unless (@ARGV){
-	die "\nERROR : Usage: $0 woland.input.table chromosome_profile_file hotspot_window_length \n";	
+	die "\nERROR : Usage: $0 <woland.input.table> <chromosome_profile_file> <hotspot_window_length> <genome_version> \n";	
 }
 
 
@@ -59,11 +59,13 @@ foreach $inputTableLine (@inputTableArray){ #two arrays for each category (group
 
 $profile= $ARGV[1];
 $hotspot= $ARGV[2];
+$genome_version = $ARGV[3];
 
 for my $abc (0..$#sampleName){
 	push (@ARGS, $sampleName[$abc]);
 	push (@ARGS, $profile);
 	push (@ARGS, $hotspot);
+	push (@ARGS, $genome_version);
 	
 	$pm = Parallel::ForkManager->new($MAX_PROCESSES);
 	$pid=$pm->start and next;
