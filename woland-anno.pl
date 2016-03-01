@@ -40,7 +40,7 @@ use strict;
 # variables
 
  
-my $inputRawSNV; my $chrLengthProfile; my $hotspotWindowLength; my $contextSequenceLength;
+my $inputRawSNV; my $chrLengthProfile; my $hotspotWindowLength; my $contextSequenceLength; my $genome_version;
 my $datestring; 
 my $rawLine; our $i; my $i2; my $i3;
 
@@ -119,7 +119,7 @@ our $readContextSeqAnno;
 # main Warning
 
 unless (@ARGV){
-	die "\nERROR : Usage: $0 <tabular_snp_file> <chromosome_length_profile> <hotspot_window_length> \n";	
+	die "\nERROR : Usage: $0 <tabular_snp_file> <chromosome_length_profile> <hotspot_window_length> <genome_version> \n";	
 }
 
 # loading files and parameters
@@ -141,6 +141,11 @@ unless (@config){
 $hotspotWindowLength = $ARGV[2]; #<hotspot_window_length>
 unless ($hotspotWindowLength){
 	die "\nERROR : Please specify a natural number >0 for <hotspot_window_length>\n";
+}
+
+$genome_version = $ARGV[3]; #<genome_version>
+unless ($genome_version){
+	die "\nERROR : Please specify a genome version in genomes\/folder for <genome_version>\n";
 }
 
 $contextSequenceLength=3; #<context_sequence_length> #default=3nt downstream & 3nt upstream
@@ -1001,7 +1006,7 @@ for my $t1 (0 .. $#hsChrM){
 
 print "\nExtracting context sequences and saving weblogo-$inputRawSNV ..\n";
 
-$db = Bio::DB::Fasta->new('genome.fa');
+$db = Bio::DB::Fasta->new("genomes/genome_$genome_version.fa");
 
 for my $a1 (0..$#hsChr1){
 	my $a2=$hsChr1[$a1]-$contextSequenceLength;
@@ -1219,7 +1224,7 @@ for my $a1 (0..$#hsChrM){
 
 print "\nExtracting context sequences and saving extracted_sequences-$inputRawSNV ..\n";
 
-$db1 = Bio::DB::Fasta->new('genome.fa');
+$db1 = Bio::DB::Fasta->new("genomes/genome_$genome_version.fa");
 
 for my $a1 (0..$#hsChr1){
 	my $a2=$hsChr1[$a1]-$contextSequenceLength;
@@ -1511,11 +1516,11 @@ foreach $chrRaw (@chrRaw){
 
 ############################# STRAND BIAS REFSEQ #############################################
 
-$refSeqRaw = 'refseq.txt';
+$refSeqRaw = "genomes/refseq_$genome_version.txt";
 open (REFSEQRAW, $refSeqRaw);
 @refSeq=<REFSEQRAW>;
 unless (@refSeq){
-	die "\nERROR : Could not load <refseq.txt>\n";
+	die "\nERROR : Could not load <refseq_$genome_version.txt>\n";
 }
 
 foreach $refSeqline (@refSeq){
@@ -1678,7 +1683,7 @@ for my $ioxoG (0..$#oxoG){
 		$i4=0;
 		if ($strand_count >= 1){
 			$strand_transcript=$strand_plus_count/$strand_count;
-			strand_score=$strand_transcript - ($strand_value);
+			$strand_score=$strand_transcript - ($strand_value);
 			print OUTPUTbiasoxoG "$chrSt[$ioxoG]\t$coord[$ioxoG]\t$strand_score\n";
 			$strand_transcript=0;
 			$strand_plus_count=0;
