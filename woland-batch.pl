@@ -46,13 +46,13 @@ $inputTable = $ARGV[0]; #<woland.input.table>
 open (inputTable, $inputTable);
 @inputTableArray=<inputTable>;
 
-foreach $inputTableLine (@inputTableArray) #two arrays for each category (group & sample results folder)
-	{
+foreach $inputTableLine (@inputTableArray){ #two arrays for each category (group & sample results folder)
 	@i = split (/\t/, $inputTableLine);
 	chomp (@i);
 	push (@Group, "$i[0]"); # array for group definition
 	push (@sampleName, "$i[1]"); # array for sample folder definition
-	}
+}
+
 @i=0;
 
 #executing batch woland_annopl:
@@ -65,22 +65,16 @@ for my $abc (0..$#sampleName){
 	push (@ARGS, $profile);
 	push (@ARGS, $hotspot);
 	
-$pm = Parallel::ForkManager->new($MAX_PROCESSES);
-
-$pid=$pm->start and next;
-
-system ($^X, "woland-anno.pl", @ARGS);
-
-$pm->finish;
-@ARGS=();
+	$pm = Parallel::ForkManager->new($MAX_PROCESSES);
+	$pid=$pm->start and next;
+	system ($^X, "woland-anno.pl", @ARGS);
+	$pm->finish;
+	@ARGS=();
 }
 
 $pm = Parallel::ForkManager->new($MAX_PROCESSES);
-
 $pid=$pm-> start and next;
-
 system ($^X, "woland-report.pl", $ARGV[0]);
-
 $pm->finish;
 
 exit;
