@@ -149,19 +149,12 @@ $contextSequenceLength=3; #<context_sequence_length> #default=3nt downstream & 3
 mkdir("results-$inputRawSNV", 0755) || die "Cannot mkdir results-$inputRawSNV";
 
 open (BASECHANGE, ">>results-$inputRawSNV/WOLAND-basechange-$inputRawSNV");
-
 open (MUTFREQ, ">>results-$inputRawSNV/WOLAND-mutfreq-$inputRawSNV");
-
 open (CONTEXTSEQ, ">>results-$inputRawSNV/WOLAND-contextsequences-$inputRawSNV");
-
 open (CONTEXTSEQANNO, ">>results-$inputRawSNV/WOLAND-contextsequencesanno-$inputRawSNV");
-
 open (HOTSPOTS, ">>results-$inputRawSNV/WOLAND-hotspots-$inputRawSNV");
-
 open (MOTIFS, ">>results-$inputRawSNV/WOLAND-motifs-$inputRawSNV");
-
 open (NMOTIFS, ">>results-$inputRawSNV/WOLAND-norm_motifs-$inputRawSNV");
-
 open (LOG, ">>results-$inputRawSNV/WOLAND-log-$inputRawSNV");
 
 # Start Screen & LOG file
@@ -188,14 +181,13 @@ print LOG "Strand Bias of SN1 Motifs:                 WOLAND-bias_uv-lambda-$inp
 print LOG "Strand Bias of DNApoln Motifs:             WOLAND-bias_DNApoln-$inputRawSNV\n";
 print LOG "Strand Bias of 8-oxoG Motifs:              WOLAND-bias_oxoG-$inputRawSNV\n";
 print LOG "Strand Bias of UV-lambda Motifs:           WOLAND-bias_uv-lambda-$inputRawSNV\n";
-print LOG "Strand Bias of UV Solar Motifs:             WOLAND-bias_UVsolar-$inputRawSNV\n";
+print LOG "Strand Bias of UV Solar Motifs:            WOLAND-bias_UVsolar-$inputRawSNV\n";
 print LOG "Strand Bias of 6-4 Motifs:                 WOLAND-bias_sixfour-$inputRawSNV\n";
 print LOG "Strand Bias of ENU Motifs:                 WOLAND-bias_enu-$inputRawSNV\n";
 
 # Conversion of each column in a dedicated array
 
-foreach $rawLine (@rawFile)
-	{
+foreach $rawLine (@rawFile){
 	@i = split (/\t/, $rawLine);
 	chomp (@i);
 	push (@geneClass, "$i[0]");
@@ -205,33 +197,30 @@ foreach $rawLine (@rawFile)
 	push (@pos, $i[4]);
 	push (@ref, "$i[5]");
 	push (@alt, "$i[6]");
-	}
+}
 	
 # Array for chr/position of each SNP - @chrpos
 
-	for my $i3 (0 .. $#chrStart){
-		push @chrpos, "$chrStart[$i3]_$pos[$i3]";
-	}
+for my $i3 (0 .. $#chrStart){
+	push @chrpos, "$chrStart[$i3]_$pos[$i3]";
+}
 	
 # Hashe posref & posalt for information of each position - ALT e REF alelles
 
-	for my $i3 (0 .. $#chrpos){
-		$posref{"$chrpos[$i3]_$i3"} .= "$ref[$i3]";
-	}
-	for my $i3 (0 .. $#chrpos){
-		$posalt{"$chrpos[$i3]_$i3"} .= "$alt[$i3]";
-	}
-	
-#
-# 
+for my $i3 (0 .. $#chrpos){
+	$posref{"$chrpos[$i3]_$i3"} .= "$ref[$i3]";
+}
+for my $i3 (0 .. $#chrpos){
+	$posalt{"$chrpos[$i3]_$i3"} .= "$alt[$i3]";
+}
 
 print "\nCalculating general mutation statistics and saving basechange-$inputRawSNV ...\n";
 
 # Array for a single entry for each SNP containing a single REFALT string value. Considering  A->T # & T->A; A->G & T->C; A->C & T->G; C->G & G->C; C->T & G->A; C->A & G->T.
 
-	foreach my $key (sort keys %posref){
-  	push @refalt,"$posref{$key}$posalt{$key}";
-	}
+foreach my $key (sort keys %posref){
+	push @refalt,"$posref{$key}$posalt{$key}";
+}
 
 
 # Counting of changes.
@@ -242,19 +231,26 @@ $ACTG=0;
 $CGGC=0;
 $CTGA=0;
 $CAGT=0;
-	foreach $refalt (@refalt){
+
+foreach $refalt (@refalt){
 	if ($refalt eq "AT" || $refalt eq "TA"){
-		$ATTA++;}
+		$ATTA++;
+	}
 	if ($refalt eq "AG" || $refalt eq "TC"){
-		$AGTC++;}
+		$AGTC++;
+	}
 	if ($refalt eq "AC" || $refalt eq "TG"){
-		$ACTG++;}
+		$ACTG++;
+	}
 	if ($refalt eq "CG" || $refalt eq "GC"){
-		$CGGC++;}
+		$CGGC++;
+	}
 	if ($refalt eq "CT" || $refalt eq "GA"){
-		$CTGA++;}
+		$CTGA++;
+	}
 	if ($refalt eq "CA" || $refalt eq "GT"){
-		$CAGT++;}
+		$CAGT++;
+	}
 }
 
 # Frequency of changes considering total amount of changes.
@@ -262,7 +258,9 @@ $CAGT=0;
 $SOMA=$ATTA+$AGTC+$ACTG+$CGGC+$CTGA+$CAGT;
 
 foreach $refalt(@refalt){
-$count++;}
+	$count++;
+}
+
 print LOG "\nTotal SNPs valid=$count\n";
 $notValid=$count-$SOMA;
 print LOG "Total not valid SNPs=$notValid\n";
@@ -274,13 +272,10 @@ $AVGCGGC=$CGGC/$SOMA;
 $AVGCTGA=$CTGA/$SOMA;
 $AVGCAGT=$CAGT/$SOMA;
 
-
 # Transitions & Transversion
 
 $transition=($AGTC+$CTGA)/$SOMA;
 $transversion=($ATTA+$ACTG+$CGGC+$CAGT)/$SOMA;
-
-
 
 # Frequency per chromosome target
 
@@ -297,92 +292,164 @@ $chr10=0;$chr21=0;
 $chr11=0;$chr22=0;
 $chrX=0;$chrY=0;
 $chrM=0;
-	for my $i6 (0 .. $#chrStart){
-			if ($chrStart[$i6] eq "chr1"){
-			++$chr1;}}
-	for my $i7 (0 .. $#chrStart){
-			if ($chrStart[$i7] eq "chr2"){
-			++$chr2;}}
-	for my $i8 (0 .. $#chrStart){
-			if ($chrStart[$i8] eq "chr3"){
-			++$chr3;}}
-	for my $i9 (0 .. $#chrStart){
-			if ($chrStart[$i9] eq "chr4"){
-			++$chr4;}}
-	for my $i10 (0 .. $#chrStart){
-			if ($chrStart[$i10] eq "chr5"){
-			++$chr5;}}
-	for my $i11 (0 .. $#chrStart){
-			if ($chrStart[$i11] eq "chr6"){
-			++$chr6;}}
-	for my $i12 (0 .. $#chrStart){
-			if ($chrStart[$i12] eq "chr7"){
-			++$chr7;}}
-	for my $i13 (0 .. $#chrStart){
-			if ($chrStart[$i13] eq "chr8"){
-			++$chr8;}}
-	for my $i14 (0 .. $#chrStart){
-			if ($chrStart[$i14] eq "chr9"){
-			++$chr9;}}
-	for my $i15 (0 .. $#chrStart){
-			if ($chrStart[$i15] eq "chr10"){
-			++$chr10;}}
-	for my $i16 (0 .. $#chrStart){
-			if ($chrStart[$i16] eq "chr11"){
-			++$chr11;}}
-	for my $i17 (0 .. $#chrStart){
-			if ($chrStart[$i17] eq "chr12"){
-			++$chr12;}}
-	for my $i18 (0 .. $#chrStart){
-			if ($chrStart[$i18] eq "chr13"){
-			++$chr13;}}
-	for my $i19 (0 .. $#chrStart){
-			if ($chrStart[$i19] eq "chr14"){
-			++$chr14;}}
-	for my $i20 (0 .. $#chrStart){
-			if ($chrStart[$i20] eq "chr15"){
-			++$chr15;}}
-	for my $i21 (0 .. $#chrStart){
-			if ($chrStart[$i21] eq "chr16"){
-			++$chr16;}}
-	for my $i22 (0 .. $#chrStart){
-			if ($chrStart[$i22] eq "chr17"){
-			++$chr17;}}
-	for my $i23 (0 .. $#chrStart){
-			if ($chrStart[$i23] eq "chr18"){
-			++$chr18;}}
-	for my $i24 (0 .. $#chrStart){
-			if ($chrStart[$i24] eq "chr19"){
-			++$chr19;}}
-	for my $i25 (0 .. $#chrStart){
-			if ($chrStart[$i25] eq "chr20"){
-			++$chr20;}}
-	for my $i26 (0 .. $#chrStart){
-			if ($chrStart[$i26] eq "chr21"){
-			++$chr21;}}
-	for my $i27 (0 .. $#chrStart){
-			if ($chrStart[$i27] eq "chr22"){
-			++$chr22;}}
-	for my $i28 (0 .. $#chrStart){
-			if ($chrStart[$i28] eq "chrX"){
-			++$chrX;}}
-	for my $i29 (0 .. $#chrStart){
-			if ($chrStart[$i29] eq "chrY"){
-			++$chrY;}}
-	for my $i30 (0 .. $#chrStart){
-			if ($chrStart[$i30] eq "chrM"){
-			++$chrM;}}
 
+for my $i6 (0 .. $#chrStart){
+	if ($chrStart[$i6] eq "chr1"){
+		++$chr1;
+	}
+}
+for my $i7 (0 .. $#chrStart){
+	if ($chrStart[$i7] eq "chr2"){
+		++$chr2;
+	}
+}
+for my $i8 (0 .. $#chrStart){
+	if ($chrStart[$i8] eq "chr3"){
+		++$chr3;
+	}
+}
+
+for my $i9 (0 .. $#chrStart){
+	if ($chrStart[$i9] eq "chr4"){
+		++$chr4;
+	}
+}
+
+for my $i10 (0 .. $#chrStart){
+	if ($chrStart[$i10] eq "chr5"){
+		++$chr5;
+	}
+}
+
+for my $i11 (0 .. $#chrStart){
+	if ($chrStart[$i11] eq "chr6"){
+		++$chr6;
+	}
+}
+
+for my $i12 (0 .. $#chrStart){
+	if ($chrStart[$i12] eq "chr7"){
+		++$chr7;
+	}
+}
+
+for my $i13 (0 .. $#chrStart){
+	if ($chrStart[$i13] eq "chr8"){
+		++$chr8;
+	}
+}
+
+for my $i14 (0 .. $#chrStart){
+	if ($chrStart[$i14] eq "chr9"){
+		++$chr9;
+	}
+}
+
+for my $i15 (0 .. $#chrStart){
+	if ($chrStart[$i15] eq "chr10"){
+		++$chr10;
+	}
+}
+
+for my $i16 (0 .. $#chrStart){
+	if ($chrStart[$i16] eq "chr11"){
+		++$chr11;
+	}
+}
+
+for my $i17 (0 .. $#chrStart){
+	if ($chrStart[$i17] eq "chr12"){
+		++$chr12;
+	}
+}
+
+for my $i18 (0 .. $#chrStart){
+	if ($chrStart[$i18] eq "chr13"){
+		++$chr13;
+	}
+}
+
+for my $i19 (0 .. $#chrStart){
+	if ($chrStart[$i19] eq "chr14"){
+		++$chr14;
+	}
+}
+
+for my $i20 (0 .. $#chrStart){
+	if ($chrStart[$i20] eq "chr15"){
+		++$chr15;
+	}
+}
+
+for my $i21 (0 .. $#chrStart){
+	if ($chrStart[$i21] eq "chr16"){
+		++$chr16;
+	}
+}
+
+for my $i22 (0 .. $#chrStart){
+	if ($chrStart[$i22] eq "chr17"){
+		++$chr17;
+	}
+}
+
+for my $i23 (0 .. $#chrStart){
+	if ($chrStart[$i23] eq "chr18"){
+		++$chr18;
+	}
+}
+
+for my $i24 (0 .. $#chrStart){
+	if ($chrStart[$i24] eq "chr19"){
+		++$chr19;
+	}
+}
+
+for my $i25 (0 .. $#chrStart){
+	if ($chrStart[$i25] eq "chr20"){
+		++$chr20;
+	}
+}
+
+for my $i26 (0 .. $#chrStart){
+	if ($chrStart[$i26] eq "chr21"){
+		++$chr21;
+	}
+}
+
+for my $i27 (0 .. $#chrStart){
+	if ($chrStart[$i27] eq "chr22"){
+		++$chr22;
+	}
+}
+
+for my $i28 (0 .. $#chrStart){
+	if ($chrStart[$i28] eq "chrX"){
+		++$chrX;
+	}
+}
+
+for my $i29 (0 .. $#chrStart){
+	if ($chrStart[$i29] eq "chrY"){
+		++$chrY;
+	}
+}
+
+for my $i30 (0 .. $#chrStart){
+	if ($chrStart[$i30] eq "chrM"){
+		++$chrM;
+	}
+}
 
 # Frequency of mutation considering chromosome length as present in chromosome_profile file.
 
 print "\nCalculating mutation frequency and saving basechange-$inputRawSNV ...\n";
 
-foreach $config (@config)
-	{
+foreach $config (@config){
 	@i = split (/\t/, $config);
 	chomp (@i);
-	push (@chrLength, "$i[1]");}
+	push (@chrLength, "$i[1]");
+}
 
 $chrNorm1=$chr1/$chrLength[0];
 $chrNorm2=$chr2/$chrLength[1];
@@ -403,19 +470,31 @@ $chrNorm16=$chr16/$chrLength[15];
 $chrNorm17=$chr17/$chrLength[16];
 $chrNorm18=$chr18/$chrLength[17];
 $chrNorm19=$chr19/$chrLength[18];
-if($chrLength[19] == 0){$chrNorm20="Cromossomo inexistente";
-	}else{
-	$chrNorm20=$chr20/$chrLength[19];}
-if($chrLength[20] == 0){$chrNorm21="Cromossomo inexistente";
-	}else{
-	$chrNorm21=$chr21/$chrLength[20];}
-if($chrLength[21] == 0){$chrNorm22="Cromossomo inexistente";
-	}else{
-	$chrNorm22=$chr22/$chrLength[21];}
+
+if($chrLength[19] == 0){
+	$chrNorm20="Cromossomo inexistente";
+} 
+else {
+	$chrNorm20=$chr20/$chrLength[19];
+}
+
+if($chrLength[20] == 0){
+	$chrNorm21="Cromossomo inexistente";
+}
+else {
+	$chrNorm21=$chr21/$chrLength[20];
+}
+
+if($chrLength[21] == 0){
+	$chrNorm22="Cromossomo inexistente";
+}
+else{
+	$chrNorm22=$chr22/$chrLength[21];
+}
+
 $chrNormX=$chrX/$chrLength[22];
 $chrNormY=$chrY/$chrLength[23];
 $chrNormM=$chrM/$chrLength[24];
-
 
 ##### BASECHANGE Printing Format ####
 print BASECHANGE "$inputRawSNV\tA>T\tA>G\tA>C\tC>G\tC>T\tC>A\n";
@@ -458,106 +537,132 @@ print "\nCalculating hotspots and saving hotspots-$inputRawSNV.txt ...\n";
 # One array of each chromosome.
 
 for my $hs_a (0..$#chrStart){
+
 	if ($chrStart[$hs_a] eq "chr1"){
 		push @hsChr1, $pos[$hs_a];
 		push @geneClasschr1, $geneClass[$hs_a];
-		push @geneNamechr1, $geneName[$hs_a];}
+		push @geneNamechr1, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr2"){
 		push @hsChr2, $pos[$hs_a];
 		push @geneClasschr2, $geneClass[$hs_a];
-		push @geneNamechr2, $geneName[$hs_a];}
+		push @geneNamechr2, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr3"){
 		push @hsChr3, $pos[$hs_a];
 		push @geneClasschr3, $geneClass[$hs_a];
-		push @geneNamechr3, $geneName[$hs_a];}
+		push @geneNamechr3, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr4"){
 		push @hsChr4, $pos[$hs_a];
 		push @geneClasschr4, $geneClass[$hs_a];
-		push @geneNamechr4, $geneName[$hs_a];}
+		push @geneNamechr4, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr5"){
 		push @hsChr5, $pos[$hs_a];
 		push @geneClasschr5, $geneClass[$hs_a];
-		push @geneNamechr5, $geneName[$hs_a];}
+		push @geneNamechr5, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr6"){
 		push @hsChr6, $pos[$hs_a];
 		push @geneClasschr6, $geneClass[$hs_a];
-		push @geneNamechr6, $geneName[$hs_a];}
+		push @geneNamechr6, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr7"){
 		push @hsChr7, $pos[$hs_a];
 		push @geneClasschr7, $geneClass[$hs_a];
-		push @geneNamechr7, $geneName[$hs_a];}
+		push @geneNamechr7, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr8"){
 		push @hsChr8, $pos[$hs_a];
 		push @geneClasschr8, $geneClass[$hs_a];
-		push @geneNamechr8, $geneName[$hs_a];}
+		push @geneNamechr8, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr9"){
 		push @hsChr9, $pos[$hs_a];
 		push @geneClasschr9, $geneClass[$hs_a];
-		push @geneNamechr9, $geneName[$hs_a];}
+		push @geneNamechr9, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr10"){
 		push @hsChr10, $pos[$hs_a];
 		push @geneClasschr10, $geneClass[$hs_a];
-		push @geneNamechr10, $geneName[$hs_a];}
+		push @geneNamechr10, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr11"){
 		push @hsChr11, $pos[$hs_a];
 		push @geneClasschr11, $geneClass[$hs_a];
-		push @geneNamechr11, $geneName[$hs_a];}
+		push @geneNamechr11, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr12"){
 		push @hsChr12, $pos[$hs_a];
 		push @geneClasschr12, $geneClass[$hs_a];
-		push @geneNamechr12, $geneName[$hs_a];}
+		push @geneNamechr12, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr13"){
 		push @hsChr13, $pos[$hs_a];
 		push @geneClasschr13, $geneClass[$hs_a];
-		push @geneNamechr13, $geneName[$hs_a];}
+		push @geneNamechr13, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr14"){
 		push @hsChr14, $pos[$hs_a];
 		push @geneClasschr14, $geneClass[$hs_a];
-		push @geneNamechr14, $geneName[$hs_a];}
+		push @geneNamechr14, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr15"){
 		push @hsChr15, $pos[$hs_a];
 		push @geneClasschr15, $geneClass[$hs_a];
-		push @geneNamechr15, $geneName[$hs_a];}
+		push @geneNamechr15, $geneName[$hs_a];
+	}
 		if ($chrStart[$hs_a] eq "chr16"){
 		push @hsChr16, $pos[$hs_a];
 		push @geneClasschr16, $geneClass[$hs_a];
-		push @geneNamechr16, $geneName[$hs_a];}
+		push @geneNamechr16, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr17"){
 		push @hsChr17, $pos[$hs_a];
 		push @geneClasschr17, $geneClass[$hs_a];
-		push @geneNamechr17, $geneName[$hs_a];}
+		push @geneNamechr17, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr18"){
 		push @hsChr18, $pos[$hs_a];
 		push @geneClasschr18, $geneClass[$hs_a];
-		push @geneNamechr18, $geneName[$hs_a];}
+		push @geneNamechr18, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr19"){
 		push @hsChr19, $pos[$hs_a];
 		push @geneClasschr19, $geneClass[$hs_a];
-		push @geneNamechr19, $geneName[$hs_a];}
+		push @geneNamechr19, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr20"){
 		push @hsChr20, $pos[$hs_a];
 		push @geneClasschr20, $geneClass[$hs_a];
-		push @geneNamechr20, $geneName[$hs_a];}
+		push @geneNamechr20, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr21"){
 		push @hsChr21, $pos[$hs_a];
 		push @geneClasschr21, $geneClass[$hs_a];
-		push @geneNamechr21, $geneName[$hs_a];}
+		push @geneNamechr21, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chr22"){
 		push @hsChr22, $pos[$hs_a];
 		push @geneClasschr22, $geneClass[$hs_a];
-		push @geneNamechr22, $geneName[$hs_a];}
+		push @geneNamechr22, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chrX"){
 		push @hsChrX, $pos[$hs_a];
 		push @geneClasschrX, $geneClass[$hs_a];
-		push @geneNamechrX, $geneName[$hs_a];}
+		push @geneNamechrX, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chrY"){
 		push @hsChrY, $pos[$hs_a];
 		push @geneClasschrY, $geneClass[$hs_a];
-		push @geneNamechrY, $geneName[$hs_a];}
+		push @geneNamechrY, $geneName[$hs_a];
+	}
 	if ($chrStart[$hs_a] eq "chrM"){
 		push @hsChrM, $pos[$hs_a];
 		push @geneClasschrM, $geneClass[$hs_a];
-		push @geneNamechrM, $geneName[$hs_a];}
+		push @geneNamechrM, $geneName[$hs_a];
+	}
 }
 
 # Counting of Hotspots using one array for each chromosome.
@@ -816,55 +921,80 @@ for my $hotspotSNV (0..$#hsChrM){
 ##### HOTSPOTS Printing Format ####
 print HOTSPOTS "geneClass\tGeneName\tCHR\tBP\tHotspotCount\n";
 for my $t1 (0 .. $#hsChr1){
-print HOTSPOTS "$geneClasschr1[$t1]\t$geneNamechr1[$t1]\t1\t$hsChr1[$t1]\t$hs_counts_chr1[$t1]\n";}
+	print HOTSPOTS "$geneClasschr1[$t1]\t$geneNamechr1[$t1]\t1\t$hsChr1[$t1]\t$hs_counts_chr1[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr2){
-print HOTSPOTS "$geneClasschr2[$t1]\t$geneNamechr2[$t1]\t2\t$hsChr2[$t1]\t$hs_counts_chr2[$t1]\n";}
+	print HOTSPOTS "$geneClasschr2[$t1]\t$geneNamechr2[$t1]\t2\t$hsChr2[$t1]\t$hs_counts_chr2[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr3){
-print HOTSPOTS "$geneClasschr3[$t1]\t$geneNamechr3[$t1]\t3\t$hsChr3[$t1]\t$hs_counts_chr3[$t1]\n";}
+	print HOTSPOTS "$geneClasschr3[$t1]\t$geneNamechr3[$t1]\t3\t$hsChr3[$t1]\t$hs_counts_chr3[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr4){
-print HOTSPOTS "$geneClasschr4[$t1]\t$geneNamechr4[$t1]\t4\t$hsChr4[$t1]\t$hs_counts_chr4[$t1]\n";}
+	print HOTSPOTS "$geneClasschr4[$t1]\t$geneNamechr4[$t1]\t4\t$hsChr4[$t1]\t$hs_counts_chr4[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr5){
-print HOTSPOTS "$geneClasschr5[$t1]\t$geneNamechr5[$t1]\t5\t$hsChr5[$t1]\t$hs_counts_chr5[$t1]\n";}
+	print HOTSPOTS "$geneClasschr5[$t1]\t$geneNamechr5[$t1]\t5\t$hsChr5[$t1]\t$hs_counts_chr5[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr6){
-print HOTSPOTS "$geneClasschr6[$t1]\t$geneNamechr6[$t1]\t6\t$hsChr6[$t1]\t$hs_counts_chr6[$t1]\n";}
+	print HOTSPOTS "$geneClasschr6[$t1]\t$geneNamechr6[$t1]\t6\t$hsChr6[$t1]\t$hs_counts_chr6[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr7){
-print HOTSPOTS "$geneClasschr7[$t1]\t$geneNamechr7[$t1]\t7\t$hsChr7[$t1]\t$hs_counts_chr7[$t1]\n";}
+	print HOTSPOTS "$geneClasschr7[$t1]\t$geneNamechr7[$t1]\t7\t$hsChr7[$t1]\t$hs_counts_chr7[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr8){
-print HOTSPOTS "$geneClasschr8[$t1]\t$geneNamechr8[$t1]\t8\t$hsChr8[$t1]\t$hs_counts_chr8[$t1]\n";}
+	print HOTSPOTS "$geneClasschr8[$t1]\t$geneNamechr8[$t1]\t8\t$hsChr8[$t1]\t$hs_counts_chr8[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr9){
-print HOTSPOTS "$geneClasschr9[$t1]\t$geneNamechr9[$t1]\t9\t$hsChr9[$t1]\t$hs_counts_chr9[$t1]\n";}
+	print HOTSPOTS "$geneClasschr9[$t1]\t$geneNamechr9[$t1]\t9\t$hsChr9[$t1]\t$hs_counts_chr9[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr10){
-print HOTSPOTS "$geneClasschr10[$t1]\t$geneNamechr10[$t1]\t10\t$hsChr10[$t1]\t$hs_counts_chr10[$t1]\n";}
+	print HOTSPOTS "$geneClasschr10[$t1]\t$geneNamechr10[$t1]\t10\t$hsChr10[$t1]\t$hs_counts_chr10[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr11){
-print HOTSPOTS "$geneClasschr11[$t1]\t$geneNamechr11[$t1]\t11\t$hsChr11[$t1]\t$hs_counts_chr11[$t1]\n";}
+	print HOTSPOTS "$geneClasschr11[$t1]\t$geneNamechr11[$t1]\t11\t$hsChr11[$t1]\t$hs_counts_chr11[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr12){
-print HOTSPOTS "$geneClasschr12[$t1]\t$geneNamechr12[$t1]\t12\t$hsChr12[$t1]\t$hs_counts_chr12[$t1]\n";}
+	print HOTSPOTS "$geneClasschr12[$t1]\t$geneNamechr12[$t1]\t12\t$hsChr12[$t1]\t$hs_counts_chr12[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr13){
-print HOTSPOTS "$geneClasschr13[$t1]\t$geneNamechr13[$t1]\t13\t$hsChr13[$t1]\t$hs_counts_chr13[$t1]\n";}
+	print HOTSPOTS "$geneClasschr13[$t1]\t$geneNamechr13[$t1]\t13\t$hsChr13[$t1]\t$hs_counts_chr13[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr14){
-print HOTSPOTS "$geneClasschr14[$t1]\t$geneNamechr14[$t1]\t14\t$hsChr14[$t1]\t$hs_counts_chr14[$t1]\n";}
+	print HOTSPOTS "$geneClasschr14[$t1]\t$geneNamechr14[$t1]\t14\t$hsChr14[$t1]\t$hs_counts_chr14[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr15){
-print HOTSPOTS "$geneClasschr15[$t1]\t$geneNamechr15[$t1]\t15\t$hsChr15[$t1]\t$hs_counts_chr15[$t1]\n";}
+	print HOTSPOTS "$geneClasschr15[$t1]\t$geneNamechr15[$t1]\t15\t$hsChr15[$t1]\t$hs_counts_chr15[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr16){
-print HOTSPOTS "$geneClasschr16[$t1]\t$geneNamechr16[$t1]\t16\t$hsChr16[$t1]\t$hs_counts_chr16[$t1]\n";}
+	print HOTSPOTS "$geneClasschr16[$t1]\t$geneNamechr16[$t1]\t16\t$hsChr16[$t1]\t$hs_counts_chr16[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr17){
-print HOTSPOTS "$geneClasschr17[$t1]\t$geneNamechr17[$t1]\t17\t$hsChr17[$t1]\t$hs_counts_chr17[$t1]\n";}
+	print HOTSPOTS "$geneClasschr17[$t1]\t$geneNamechr17[$t1]\t17\t$hsChr17[$t1]\t$hs_counts_chr17[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr18){
-print HOTSPOTS "$geneClasschr18[$t1]\t$geneNamechr18[$t1]\t18\t$hsChr18[$t1]\t$hs_counts_chr18[$t1]\n";}
+	print HOTSPOTS "$geneClasschr18[$t1]\t$geneNamechr18[$t1]\t18\t$hsChr18[$t1]\t$hs_counts_chr18[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr19){
-print HOTSPOTS "$geneClasschr19[$t1]\t$geneNamechr19[$t1]\t19\t$hsChr19[$t1]\t$hs_counts_chr19[$t1]\n";}
+	print HOTSPOTS "$geneClasschr19[$t1]\t$geneNamechr19[$t1]\t19\t$hsChr19[$t1]\t$hs_counts_chr19[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr20){
-print HOTSPOTS "$geneClasschr20[$t1]\t$geneNamechr20[$t1]\t20\t$hsChr20[$t1]\t$hs_counts_chr20[$t1]\n";}
+	print HOTSPOTS "$geneClasschr20[$t1]\t$geneNamechr20[$t1]\t20\t$hsChr20[$t1]\t$hs_counts_chr20[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr21){
-print HOTSPOTS "$geneClasschr21[$t1]\t$geneNamechr21[$t1]\t21\t$hsChr21[$t1]\t$hs_counts_chr21[$t1]\n";}
+	print HOTSPOTS "$geneClasschr21[$t1]\t$geneNamechr21[$t1]\t21\t$hsChr21[$t1]\t$hs_counts_chr21[$t1]\n";
+}
 for my $t1 (0 .. $#hsChr22){
-print HOTSPOTS "$geneClasschr22[$t1]\t$geneNamechr22[$t1]\t22\t$hsChr22[$t1]\t$hs_counts_chr22[$t1]\n";}
+	print HOTSPOTS "$geneClasschr22[$t1]\t$geneNamechr22[$t1]\t22\t$hsChr22[$t1]\t$hs_counts_chr22[$t1]\n";
+}
 for my $t1 (0 .. $#hsChrX){
-print HOTSPOTS "$geneClasschrX[$t1]\t$geneNamechrX[$t1]\t23\t$hsChrX[$t1]\t$hs_counts_chrX[$t1]\n";}
+	print HOTSPOTS "$geneClasschrX[$t1]\t$geneNamechrX[$t1]\t23\t$hsChrX[$t1]\t$hs_counts_chrX[$t1]\n";
+}
 for my $t1 (0 .. $#hsChrY){
-print HOTSPOTS "$geneClasschrY[$t1]\t$geneNamechrY[$t1]\t24\t$hsChrY[$t1]\t$hs_counts_chrY[$t1]\n";}
+	print HOTSPOTS "$geneClasschrY[$t1]\t$geneNamechrY[$t1]\t24\t$hsChrY[$t1]\t$hs_counts_chrY[$t1]\n";
+}
 for my $t1 (0 .. $#hsChrM){
-print HOTSPOTS "$geneClasschrM[$t1]\t$geneNamechrM[$t1]\t25\t$hsChrM[$t1]\t$hs_counts_chrM[$t1]\n";}
+	print HOTSPOTS "$geneClasschrM[$t1]\t$geneNamechrM[$t1]\t25\t$hsChrM[$t1]\t$hs_counts_chrM[$t1]\n";
+}
 
 
 ### Bioperl module for extraction of context sequences in reference genomes of each SNP.
@@ -1309,15 +1439,10 @@ for my $a1 (0..$#hsChrM){
 ## closing of outputs
 
 close (">>results-$inputRawSNV/WOLAND-basechange-$inputRawSNV");
-
 close (">>results-$inputRawSNV/WOLAND-mutfreq-$inputRawSNV");
-
 close (">>results-$inputRawSNV/WOLAND-contextsequences-$inputRawSNV");
-
 close (">>results-$inputRawSNV/WOLAND-hotspots-$inputRawSNV");
-
 close (">>results-$inputRawSNV/WOLAND-log-$inputRawSNV");
-
 close (">>results-$inputRawSNV/WOLAND-contextsequencesanno-$inputRawSNV");
 
 
@@ -1340,50 +1465,52 @@ open CONTEXTSEQANNO, "<results-$inputRawSNV/WOLAND-contextsequencesanno-$inputRa
 
 # Array processing
 
-foreach $fastaContext (@fastaContext)
-	{
+foreach $fastaContext (@fastaContext){
 	@i7=0;
 	@i7 = split (/\t/, "$fastaContext");
 	chomp (@i7);
 	push (@fastaContextMS, "$i7[0]");
 	push (@geneClassMS, "$i7[1]");
 	push (@geneNameMS, "$i7[2]");
-	}
+}
 
 foreach $geneClassMS (@geneClassMS){
 	if ($geneClassMS =~ /[\S]/){
-	push (@geneClass1, $geneClassMS);}
+		push (@geneClass1, $geneClassMS);
+	}
 }
 
 foreach $geneNameMS (@geneNameMS){
 	if ($geneNameMS =~ /[\S]/){
-	push (@geneName1, $geneNameMS);}
+		push (@geneName1, $geneNameMS);
+	}
 }
 	
 foreach $fastaContextMS (@fastaContextMS){
 	if ($fastaContextMS=~ /^>+/){
-	chomp (@fastaContextMS);
-	push (@id, $fastaContextMS);}
-	else{
-	push (@targetSequence, $fastaContextMS);}
+		chomp (@fastaContextMS);
+		push (@id, $fastaContextMS);
 	}
+	else{
+		push (@targetSequence, $fastaContextMS);
+	}
+}
 
-foreach $id (@id)
-	{
+foreach $id (@id){
 	@i2 = split (/_/, $id);
 	chomp (@i2);
 	push (@chrRaw, "$i2[0]");
 	push (@coord, "$i2[1]");
-	}
+}
 
-foreach $chrRaw (@chrRaw)
-	{
+foreach $chrRaw (@chrRaw){
 	@i3 = split (/>/, $chrRaw);
 	chomp (@i3);
 	push (@chrSt, "$i3[1]");
-	}
+}
 
 ############################# STRAND BIAS REFSEQ #############################################
+
 $refSeqRaw = 'refseq.txt';
 open (REFSEQRAW, $refSeqRaw);
 @refSeq=<REFSEQRAW>;
@@ -1391,15 +1518,14 @@ unless (@refSeq){
 	die "\nERROR : Could not load <refseq.txt>\n";
 }
 
-foreach $refSeqline (@refSeq)
-	{
+foreach $refSeqline (@refSeq){
 	@irefSeq = split (/\t/, $refSeqline);
 	chomp (@irefSeq);
 	push (@chrRefSeq, "$irefSeq[2]");
 	push (@strandRefSeq, "$irefSeq[3]");
 	push (@txstartRefSeq, $irefSeq[4]);
 	push (@txtendRefSeq, "$irefSeq[5]");
-	}
+}
 
 
 # Search for Mutable Motifs
@@ -1410,17 +1536,20 @@ print "\nSearching for mutable motifs\n";
 
 foreach $targetSequence (@targetSequence){
 	if ($targetSequence =~ "..AG..." || $targetSequence =~ "..GG..."|| $targetSequence =~ "...CT.."|| $targetSequence =~ "...CC.."){
-		push (@SN1, "1");}
+		push (@SN1, "1");
+	}
 	else {
 		push (@SN1, "0");
 	}
 	if ($targetSequence =~ "..AG..." || $targetSequence =~ "..GG..."){
-		push (@SN1plus, "1");}
+		push (@SN1plus, "1");
+	}
 	else {
 		push (@SN1plus, "0")
 	}
 	if ($targetSequence =~ "...CT.."|| $targetSequence =~ "...CC.."){
-		push (@SN1minus, "1");}
+		push (@SN1minus, "1");
+	}
 	else {
 		push (@SN1minus, "0")
 	}
@@ -1431,52 +1560,49 @@ foreach $targetSequence (@targetSequence){
 for my $iSN1 (0..$#SN1){
 	if ($SN1[$iSN1] eq "1"){
 		$strand_value=$SN1plus[$iSN1];
-	$query_chr=$chrSt[$iSN1];
-	$query_coord=$coord[$iSN1];
-	$strand_plus_count=0;
-    $strand_count=0;
-	for my $i4 (0 .. $#chrRefSeq){
+		$query_chr=$chrSt[$iSN1];
+		$query_coord=$coord[$iSN1];
+		$strand_plus_count=0;
+    	$strand_count=0;
+		for my $i4 (0 .. $#chrRefSeq){
 			if ($chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
-				++$strand_count;}
+				++$strand_count;
+			}
 			if ($strandRefSeq[$i4] eq "+" && $chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
-				++$strand_plus_count;} 
-
-	}
-	
-	$i4=0;
-	if ($strand_count >= 1){
-	 $strand_transcript=$strand_plus_count/$strand_count;
-     $strand_score=$strand_transcript - ($strand_value);
-     print OUTPUTbiasSN1 "$chrSt[$iSN1]\t$coord[$iSN1]\t$strand_score\n";
-
-
-	$strand_transcript=0;
-    $strand_plus_count=0;
-    $strand_count=0;
-    $strand_score=0;
-	}
-   
-    
-   
-                     }
- 
-	}
+				++$strand_plus_count;
+			} 
+		}
+		$i4=0;
+		if ($strand_count >= 1){
+			$strand_transcript=$strand_plus_count/$strand_count;
+    		$strand_score=$strand_transcript - ($strand_value);
+    		print OUTPUTbiasSN1 "$chrSt[$iSN1]\t$coord[$iSN1]\t$strand_score\n";
+			$strand_transcript=0;
+    		$strand_plus_count=0;
+    		$strand_count=0;
+    		$strand_score=0;
+		}
+	} 
+}
 
 ## DNA POL ETA MOTIF
 
 foreach $targetSequence (@targetSequence){
 	if ($targetSequence =~ "..AA..." || $targetSequence =~ "..TA..."|| $targetSequence =~ "...TT.."|| $targetSequence =~ "...TA.."){
-		push (@DNApoln, "1");}
+		push (@DNApoln, "1");
+	}
 	else {
 		push (@DNApoln, "0");
 	}
-		if ($targetSequence =~ "..AA..." || $targetSequence =~ "..TA..."){
-		push (@DNApolnplus, "1");}
+	if ($targetSequence =~ "..AA..." || $targetSequence =~ "..TA..."){
+		push (@DNApolnplus, "1");
+	}
 	else {
 		push (@DNApolnplus, "0")
 	}
 	if ($targetSequence =~ "...TT.."|| $targetSequence =~ "...TA.."){
-		push (@DNApolnminus, "1");}
+		push (@DNApolnminus, "1");
+	}
 	else {
 		push (@DNApolnminus, "0")
 	}
@@ -1486,39 +1612,31 @@ foreach $targetSequence (@targetSequence){
 
 for my $iDNApoln (0..$#DNApoln){
 	if ($DNApoln[$iDNApoln] eq "1"){
-		$strand_value=$DNApolnplus[$iDNApoln];
+	$strand_value=$DNApolnplus[$iDNApoln];
 	$query_chr=$chrSt[$iDNApoln];
 	$query_coord=$coord[$iDNApoln];
 	$strand_plus_count=0;
-    $strand_count=0;
+	$strand_count=0;
 	for my $i4 (0 .. $#chrRefSeq){
-			if ($chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
-				++$strand_count;}
-			if ($strandRefSeq[$i4] eq "+" && $chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
-				++$strand_plus_count;} 
-
+		if ($chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
+			++$strand_count;
+		}
+		if ($strandRefSeq[$i4] eq "+" && $chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
+			++$strand_plus_count;
+		} 
 	}
-	
 	$i4=0;
-	if ($strand_count >= 1){
-	 $strand_transcript=$strand_plus_count/$strand_count;
-     $strand_score=$strand_transcript - ($strand_value);
-     print OUTPUTbiasDNApoln "$chrSt[$iDNApoln]\t$coord[$iDNApoln]\t$strand_score\n";
-
-
-	$strand_transcript=0;
-    $strand_plus_count=0;
-    $strand_count=0;
-    $strand_score=0;
+		if ($strand_count >= 1){
+			$strand_transcript=$strand_plus_count/$strand_count;
+			$strand_score=$strand_transcript - ($strand_value);
+			print OUTPUTbiasDNApoln "$chrSt[$iDNApoln]\t$coord[$iDNApoln]\t$strand_score\n";
+			$strand_transcript=0;
+			$strand_plus_count=0;
+			$strand_count=0;
+    		$strand_score=0;
+		}
 	}
-   
-    
-   
-                     }
- 
-	}
-
-
+}
 
 ## OXO G MOTIF
 
@@ -1545,59 +1663,56 @@ foreach $targetSequence (@targetSequence){
 for my $ioxoG (0..$#oxoG){
 	if ($oxoG[$ioxoG] eq "1"){
 		$strand_value=$oxoGplus[$ioxoG];
-	$query_chr=$chrSt[$ioxoG];
-	$query_coord=$coord[$ioxoG];
-	$strand_plus_count=0;
-    $strand_count=0;
-	for my $i4 (0 .. $#chrRefSeq){
+		$query_chr=$chrSt[$ioxoG];
+		$query_coord=$coord[$ioxoG];
+		$strand_plus_count=0;
+    	$strand_count=0;
+		for my $i4 (0 .. $#chrRefSeq){
 			if ($chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
-				++$strand_count;}
+				++$strand_count;
+			}
 			if ($strandRefSeq[$i4] eq "+" && $chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
-				++$strand_plus_count;} 
-
+				++$strand_plus_count;
+			} 
+		}
+		$i4=0;
+		if ($strand_count >= 1){
+			$strand_transcript=$strand_plus_count/$strand_count;
+			strand_score=$strand_transcript - ($strand_value);
+			print OUTPUTbiasoxoG "$chrSt[$ioxoG]\t$coord[$ioxoG]\t$strand_score\n";
+			$strand_transcript=0;
+			$strand_plus_count=0;
+			$strand_count=0;
+			$strand_score=0;
+		}
 	}
-	$i4=0;
-	if ($strand_count >= 1){
-	 $strand_transcript=$strand_plus_count/$strand_count;
-     $strand_score=$strand_transcript - ($strand_value);
-     print OUTPUTbiasoxoG "$chrSt[$ioxoG]\t$coord[$ioxoG]\t$strand_score\n";
-	
-	$strand_transcript=0;
-    $strand_plus_count=0;
-    $strand_count=0;
-    $strand_score=0;
-	}
-   
-    
-   
-                     }
- 
-	}
-
-
+}
 
 
 ## UV LAMBDA MOTIF
 
 foreach $targetSequence (@targetSequence){
-	if ($targetSequence =~ "...TC.." || $targetSequence =~ "..TC..." || $targetSequence =~ "...CT.." || $targetSequence =~ "..CT..." ||
-	    $targetSequence =~ "..TT..." || $targetSequence =~ "...TT.." || $targetSequence =~ "..CC..." || $targetSequence =~ "...CC.."|| 
-	    $targetSequence =~ "...GA.." || $targetSequence =~ "..GA..." || $targetSequence =~ "...AA.." || $targetSequence =~ "..AA..." ||
-	    $targetSequence =~ "...GG.." || $targetSequence =~ "..GG..." || $targetSequence =~ "..AG..." || $targetSequence =~ "...AG.."){
-		push (@UVlambda, "1");}
-	else {
+	if($targetSequence =~ "...TC.." || $targetSequence =~ "..TC..." || $targetSequence =~ "...CT.." || $targetSequence =~ "..CT..." ||
+		$targetSequence =~ "..TT..." || $targetSequence =~ "...TT.." || $targetSequence =~ "..CC..." || $targetSequence =~ "...CC.."|| 
+		$targetSequence =~ "...GA.." || $targetSequence =~ "..GA..." || $targetSequence =~ "...AA.." || $targetSequence =~ "..AA..." ||
+		$targetSequence =~ "...GG.." || $targetSequence =~ "..GG..." || $targetSequence =~ "..AG..." || $targetSequence =~ "...AG.."){
+		push (@UVlambda, "1");
+	}
+	else{
 		push (@UVlambda, "0");
 	}
-		if ($targetSequence =~ "...TC.." || $targetSequence =~ "..TC..." || $targetSequence =~ "...CT.." || $targetSequence =~ "..CT..." ||
-		    $targetSequence =~ "..TT..." || $targetSequence =~ "...TT.." || $targetSequence =~ "..CC..." || $targetSequence =~ "...CC.."){
-		push (@UVlambdaplus, "1");}
-	else {
+	if($targetSequence =~ "...TC.." || $targetSequence =~ "..TC..." || $targetSequence =~ "...CT.." || $targetSequence =~ "..CT..." ||
+		$targetSequence =~ "..TT..." || $targetSequence =~ "...TT.." || $targetSequence =~ "..CC..." || $targetSequence =~ "...CC.."){
+		push (@UVlambdaplus, "1");
+	}
+	else{
 		push (@UVlambdaplus, "0")
 	}
-		if ($targetSequence =~ "...GA.." || $targetSequence =~ "..GA..." || $targetSequence =~ "...AA.." || $targetSequence =~ "..AA..." ||
-		    $targetSequence =~ "...GG.." || $targetSequence =~ "..GG..." || $targetSequence =~ "..AG..." || $targetSequence =~ "...AG.."){
-		push (@UVlambdaminus, "1");}
-	else {
+	if ($targetSequence =~ "...GA.." || $targetSequence =~ "..GA..." || $targetSequence =~ "...AA.." || $targetSequence =~ "..AA..." ||
+		$targetSequence =~ "...GG.." || $targetSequence =~ "..GG..." || $targetSequence =~ "..AG..." || $targetSequence =~ "...AG.."){
+		push (@UVlambdaminus, "1");
+	}
+	else{
 		push (@UVlambdaminus, "0")
 	}
 }
@@ -1608,55 +1723,52 @@ foreach $targetSequence (@targetSequence){
 for my $iuv (0..$#UVlambda){
 	if ($UVlambda[$iuv] eq "1"){
 		$strand_value=$UVlambdaplus[$iuv];
-	$query_chr=$chrSt[$iuv];
-	$query_coord=$coord[$iuv];
-	$strand_plus_count=0;
-   $strand_count=0;
-	for my $i5 (0 .. $#chrRefSeq){
+		$query_chr=$chrSt[$iuv];
+		$query_coord=$coord[$iuv];
+		$strand_plus_count=0;
+		$strand_count=0;
+		for my $i5 (0 .. $#chrRefSeq){
 			if ($chrRefSeq[$i5] eq $query_chr and (($query_coord <= $txstartRefSeq[$i5] and $query_coord >= $txtendRefSeq[$i5]) or ($query_coord >= $txstartRefSeq[$i5] and $query_coord <= $txtendRefSeq[$i5]))){
-				++$strand_count;}
+				++$strand_count;
+			}
 			if ($strandRefSeq[$i5] eq "+" && $chrRefSeq[$i5] eq $query_chr and (($query_coord <= $txstartRefSeq[$i5] and $query_coord >= $txtendRefSeq[$i5]) or ($query_coord >= $txstartRefSeq[$i5] and $query_coord <= $txtendRefSeq[$i5]))){
-				++$strand_plus_count;} 
-
+				++$strand_plus_count;
+			} 
+		}
+		$i5=0;
+		if ($strand_count >= 1){
+		$strand_transcript=$strand_plus_count/$strand_count;
+		$strand_score=$strand_transcript - ($strand_value);
+		print OUTPUTbiasUV "$chrSt[$iuv]\t$coord[$iuv]\t$strand_score\n";
+		$strand_transcript=0;
+		$strand_plus_count=0;
+		$strand_count=0;
+		$strand_score=0;
+		}
 	}
-	$i5=0;
-	if ($strand_count >= 1){
-	 $strand_transcript=$strand_plus_count/$strand_count;
-     $strand_score=$strand_transcript - ($strand_value);
-     print OUTPUTbiasUV "$chrSt[$iuv]\t$coord[$iuv]\t$strand_score\n";
-	
-	$strand_transcript=0;
-    $strand_plus_count=0;
-    $strand_count=0;
-    $strand_score=0;
-	}
-   
-    
-   
-                     }
- 
-	}
+}
 
 ## UV SOLAR UVA-1
 
-
 foreach $targetSequence (@targetSequence){
 	if ($targetSequence =~ "..TCG.."  || $targetSequence =~ "...TCG."|| $targetSequence =~ ".TCG..." || $targetSequence =~ "..CCG.." ||$targetSequence =~ "...CCG." || $targetSequence =~ ".CCG..." || 
-	    $targetSequence =~ "..CGA.." || $targetSequence =~ "...CGA."|| $targetSequence =~ ".CGA..." || $targetSequence =~ "..CGG.." || $targetSequence =~ "...CGG."|| $targetSequence =~ ".CGG..."){
-		push (@UVsolar, "1");}
-	else {
+		$targetSequence =~ "..CGA.." || $targetSequence =~ "...CGA."|| $targetSequence =~ ".CGA..." || $targetSequence =~ "..CGG.." || $targetSequence =~ "...CGG."|| $targetSequence =~ ".CGG..."){
+		push (@UVsolar, "1");
+	}
+	else{
 		push (@UVsolar, "0");
 	}
-	
 	if ($targetSequence =~ "..TCG.."  || $targetSequence =~ "...TCG."|| $targetSequence =~ ".TCG..." || 
 		    $targetSequence =~ "..CCG.." ||$targetSequence =~ "...CCG." || $targetSequence =~ ".CCG..."){
-		push (@UVsolarplus, "1");}
+		push (@UVsolarplus, "1");
+	}
 	else {
 		push (@UVsolarplus, "0")
 	}
 		if ($targetSequence =~ "..CGA.." || $targetSequence =~ "...CGA."|| $targetSequence =~ ".CGA..." ||
-		    $targetSequence =~ "..CGG.." || $targetSequence =~ "...CGG."|| $targetSequence =~ ".CGG...") {
-		push (@UVsolarminus, "1");}
+			$targetSequence =~ "..CGG.." || $targetSequence =~ "...CGG."|| $targetSequence =~ ".CGG...") {
+		push (@UVsolarminus, "1");
+	}
 	else {
 		push (@UVsolarminus, "0")
 	}
@@ -1667,51 +1779,50 @@ foreach $targetSequence (@targetSequence){
 for my $iUVsolar (0..$#UVsolar){
 	if ($UVsolar[$iUVsolar] eq "1"){
 		$strand_value=$UVsolarplus[$iUVsolar];
-	$query_chr=$chrSt[$iUVsolar];
-	$query_coord=$coord[$iUVsolar];
-	$strand_plus_count=0;
-    $strand_count=0;
-	for my $i4 (0 .. $#chrRefSeq){
+		$query_chr=$chrSt[$iUVsolar];
+		$query_coord=$coord[$iUVsolar];
+		$strand_plus_count=0;
+		$strand_count=0;
+		for my $i4 (0 .. $#chrRefSeq){
 			if ($chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
-				++$strand_count;}
+				++$strand_count;
+			}
 			if ($strandRefSeq[$i4] eq "+" && $chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
-				++$strand_plus_count;} 
-
-	}
-	$i4=0;
-	if ($strand_count >= 1){
-	 $strand_transcript=$strand_plus_count/$strand_count;
-     $strand_score=$strand_transcript - ($strand_value);
-     print OUTPUTbiasUVsolar "$chrSt[$iUVsolar]\t$coord[$iUVsolar]\t$strand_score\n";
-	
-	$strand_transcript=0;
-    $strand_plus_count=0;
-    $strand_count=0;
-    $strand_score=0;
-	}
-   
-    
-   
-                     }
- 
-	}
+				++$strand_plus_count;
+			} 
+		}
+		$i4=0;
+		if ($strand_count >= 1){
+			$strand_transcript=$strand_plus_count/$strand_count;
+			$strand_score=$strand_transcript - ($strand_value);
+			print OUTPUTbiasUVsolar "$chrSt[$iUVsolar]\t$coord[$iUVsolar]\t$strand_score\n";
+			$strand_transcript=0;
+    		$strand_plus_count=0;
+    		$strand_count=0;
+    		$strand_score=0;
+		}
+	} 
+}
 
 
 ## SIX FOUR MOTIF
 
 foreach $targetSequence (@targetSequence){
 	if ($targetSequence =~ "TTCA" || $targetSequence =~ "CTCA" || $targetSequence =~ "TGAA" || $targetSequence =~ "TGAG"){
-		push (@sixfour, "1");}
+		push (@sixfour, "1");
+	}
 	else {
 		push (@sixfour, "0");
 	}
 		if ($targetSequence =~ "TTCA" || $targetSequence =~ "CTCA"){
-		push (@sixfourplus, "1");}
+		push (@sixfourplus, "1");
+	}
 	else {
 		push (@sixfourplus, "0")
 	}
 		if ($targetSequence =~"TGAA" || $targetSequence =~ "TGAG") {
-		push (@sixfourminus, "1");}
+		push (@sixfourminus, "1");
+	}
 	else {
 		push (@sixfourminus, "0")
 	}
@@ -1722,54 +1833,52 @@ foreach $targetSequence (@targetSequence){
 for my $isixfour (0..$#sixfour){
 	if ($sixfour[$isixfour] eq "1"){
 		$strand_value=$sixfourplus[$isixfour];
-	$query_chr=$chrSt[$isixfour];
-	$query_coord=$coord[$isixfour];
-	$strand_plus_count=0;
-    $strand_count=0;
-	for my $i4 (0 .. $#chrRefSeq){
+		$query_chr=$chrSt[$isixfour];
+		$query_coord=$coord[$isixfour];
+		$strand_plus_count=0;
+    	$strand_count=0;
+		for my $i4 (0 .. $#chrRefSeq){
 			if ($chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
-				++$strand_count;}
+				++$strand_count;
+			}
 			if ($strandRefSeq[$i4] eq "+" && $chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
-				++$strand_plus_count;} 
-
+				++$strand_plus_count;
+			} 
+		}
+		$i4=0;
+		if ($strand_count >= 1){
+			$strand_transcript=$strand_plus_count/$strand_count;
+			$strand_score=$strand_transcript - ($strand_value);
+			print OUTPUTbiassixfour "$chrSt[$isixfour]\t$coord[$isixfour]\t$strand_score\n";
+			$strand_transcript=0;
+			$strand_plus_count=0;
+			$strand_count=0;
+			$strand_score=0;
+		}
 	}
-	$i4=0;
-	if ($strand_count >= 1){
-	 $strand_transcript=$strand_plus_count/$strand_count;
-     $strand_score=$strand_transcript - ($strand_value);
-     print OUTPUTbiassixfour "$chrSt[$isixfour]\t$coord[$isixfour]\t$strand_score\n";
-	
-	$strand_transcript=0;
-    $strand_plus_count=0;
-    $strand_count=0;
-    $strand_score=0;
-	}
-   
-    
-   
-                     }
- 
-	}
+}
 
 ## ENU MOTIF
 
 foreach $targetSequence (@targetSequence){
 	if ($targetSequence =~ "..CAG.." || $targetSequence =~ "..GAC.."|| $targetSequence =~ "..GAG.."|| $targetSequence =~ "..CAC.."|| $targetSequence =~ "..CTG.." || $targetSequence =~ "..GTC.."|| $targetSequence =~ "..GTG.."|| $targetSequence =~ "..CTC.."){
-		push (@enu, "1");}
+		push (@enu, "1");
+	}
 	else {
 		push (@enu, "0");
 	}
 			if ($targetSequence =~ "..CAG.." || $targetSequence =~ "..GAC.."|| $targetSequence =~ "..GAG.."|| $targetSequence =~ "..CAC.."){
-		push (@enuplus, "1");}
+		push (@enuplus, "1");
+	}
 	else {
 		push (@enuplus, "0")
 	}
 		if ($targetSequence =~ "..CTG.." || $targetSequence =~ "..GTC.."|| $targetSequence =~ "..GTG.."|| $targetSequence =~ "..CTC..") {
-		push (@enuminus, "1");}
+		push (@enuminus, "1");
+	}
 	else {
 		push (@enuminus, "0")
-	}
-	
+	}	
 }
 
 #### Strand Concordance Score ENU
@@ -1777,75 +1886,77 @@ foreach $targetSequence (@targetSequence){
 for my $ienu (0..$#enu){
 	if ($enu[$ienu] eq "1"){
 		$strand_value=$enuplus[$ienu];
-	$query_chr=$chrSt[$ienu];
-	$query_coord=$coord[$ienu];
-	$strand_plus_count=0;
-    $strand_count=0;
-	for my $i4 (0 .. $#chrRefSeq){
+		$query_chr=$chrSt[$ienu];
+		$query_coord=$coord[$ienu];
+		$strand_plus_count=0;
+    	$strand_count=0;
+		for my $i4 (0 .. $#chrRefSeq){
 			if ($chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
-				++$strand_count;}
+				++$strand_count;
+			}
 			if ($strandRefSeq[$i4] eq "+" && $chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
-				++$strand_plus_count;} 
-
+				++$strand_plus_count;
+			} 
+		}
+		$i4=0;
+		if ($strand_count >= 1){
+			$strand_transcript=$strand_plus_count/$strand_count;
+			$strand_score=$strand_transcript - ($strand_value);
+			#print OUTPUTbiasenu "$chrSt[$ienu]\t$coord[$ienu]\t$strand_score\n";
+			$strand_transcript=0;
+			$strand_plus_count=0;
+   			$strand_count=0;
+			$strand_score=0;
+		}
 	}
-	$i4=0;
-	if ($strand_count >= 1){
-	 $strand_transcript=$strand_plus_count/$strand_count;
-     $strand_score=$strand_transcript - ($strand_value);
-     #print OUTPUTbiasenu "$chrSt[$ienu]\t$coord[$ienu]\t$strand_score\n";
-	
-	$strand_transcript=0;
-    $strand_plus_count=0;
-    $strand_count=0;
-    $strand_score=0;
-	}
-   
-    
-   
-                     }
- 
-	}
+}
 
 ## CALCULATION OF NORMALIZED NUMBER OF MOTIFS FOUND
 
 for my $a1 (0 .. $#id){
-		++$SNPnumber;
-	}
+	++$SNPnumber;
+}
 
 foreach $SN1 (@SN1){
 	if ($SN1 eq "1"){
-		++$SN1counts;}
+		++$SN1counts;
+	}
 }
 
 foreach $DNApoln (@DNApoln){
 	if ($DNApoln eq "1"){
-		++$DNApolncounts;}
+		++$DNApolncounts;
+	}
 }
 
 foreach $oxoG (@oxoG){
 	if ($oxoG eq "1"){
-		++$oxoGcounts;}
+		++$oxoGcounts;
+	}
 }
 foreach $UVlambda (@UVlambda){
 	if ($UVlambda eq "1"){
-		++$UVlambdacounts;}
+		++$UVlambdacounts;
+	}
 }
 
 foreach $sixfour (@sixfour){
 	if ($sixfour eq "1"){
-		++$sixfourcounts;}
+		++$sixfourcounts;
+	}
 }
 
 foreach $enu (@enu){
 	if ($enu eq "1"){
-		++$enucounts;}
+		++$enucounts;
+	}
 }
 
 foreach $UVsolar (@UVsolar){
 	if ($UVsolar eq "1"){
-		++$UVsolarcounts;}
+		++$UVsolarcounts;
+	}
 }
-
 
 $normSN1=$SN1counts/$SNPnumber;
 $normDNApoln=$DNApolncounts/$SNPnumber;
@@ -1855,24 +1966,20 @@ $normsixfour=$sixfourcounts/$SNPnumber;
 $normenu=$enucounts/$SNPnumber;
 $normUVsolar=$UVsolarcounts/$SNPnumber;
 
-
-
-
 #### PRINTING OF RAW MUTABLE MOTIFS FILE #####
 
 print "\nSaving mutational motifs file\n";
-	print MOTIFS "Chr\tPos\ttargetSequence\tClass\tGene\tSN1\tDNApol\t8-oxoG\tUV-lambda\tSixFour\tENU\tUVA-solar\n";
+
+print MOTIFS "Chr\tPos\ttargetSequence\tClass\tGene\tSN1\tDNApol\t8-oxoG\tUV-lambda\tSixFour\tENU\tUVA-solar\n";
 for $a2 (0..$#targetSequence){
 	print MOTIFS "$chrSt[$a2]\t$coord[$a2]\t$targetSequence[$a2]\t$geneClass1[$a2]\t$geneName1[$a2]\t$SN1[$a2]\t$DNApoln[$a2]\t$oxoG[$a2]\t$UVlambda[$a2]\t$sixfour[$a2]\t$enu[$a2]\t$UVsolar[$a2]\n";
 }
 
 #### PRINTING OF NORMALIZED MUTABLE MOTIFS FILE #####
 print "\nSaving normalized mutational motifs\n";
-	print NMOTIFS "$inputRawSNV\tSN1\tDNApol\t8-oxoG\tUV-lambda\tSixFour\tENU\tUVA-solar\n";
-	print NMOTIFS "Number of Total SNPs\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\n";
-	print NMOTIFS "Total Raw Number of Motifs Found\t$SN1counts\t$DNApolncounts\t$oxoGcounts\t$UVlambdacounts\t$sixfourcounts\t$enucounts\t$UVsolarcounts\n";
-	print NMOTIFS "Normalized Number of Motifs Found\t$normSN1\t$normDNApoln\t$normoxoG\t$normUVlambda\t$normsixfour\t$normenu\t$normUVsolar";
+print NMOTIFS "$inputRawSNV\tSN1\tDNApol\t8-oxoG\tUV-lambda\tSixFour\tENU\tUVA-solar\n";
+print NMOTIFS "Number of Total SNPs\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\n";
+print NMOTIFS "Total Raw Number of Motifs Found\t$SN1counts\t$DNApolncounts\t$oxoGcounts\t$UVlambdacounts\t$sixfourcounts\t$enucounts\t$UVsolarcounts\n";
+print NMOTIFS "Normalized Number of Motifs Found\t$normSN1\t$normDNApoln\t$normoxoG\t$normUVlambda\t$normsixfour\t$normenu\t$normUVsolar";
 	
-	exit;
 exit;
-
