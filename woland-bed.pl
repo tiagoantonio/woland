@@ -22,6 +22,17 @@ use List::Util qw(sum); #module for sum of chromosome coordinates
 use strict;
 use warnings;
 
+# variables
+
+my @ARGV;
+my ($input, @rawfile);
+my $datestring;
+my ($rawline, @rawfile);
+my (@i, @i2);
+my (@chrbed, @pos1, @pos2);
+my (@res, @tam_1, @tam_2, @tam_3, @tam_4, @tam_5, @tam_6, @tam_7, @tam_8, @tam_9, @tam_10, @tam_11, @tam_12, @tam_13, @tam_14, @tam_15, @tam_16, @tam_17, @tam_18, @tam_19, @tam_20, @tam_21, @tam_22, @tam_X, @tam_Y, @tam_M);
+my ($total);
+
 # main Warning
 
 unless (@ARGV){
@@ -275,4 +286,3 @@ foreach $res (@res){
 	}
 }
 exit;
-
