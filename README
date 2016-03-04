@@ -103,7 +103,7 @@ Woland-1.0/refGene/<refGene.UCSC.txt> - Could be downloaded using UCSC annotatio
 
 <annovar.variant_function> : Annotated .variant_function file which can be obtained using annotate-variation.pl script from ANNOVAR.
 
-<chromosome_profile>       : Regular tabular file without header . First column is chromosome name in chr format (e.g. chr13). Second column is chromosome length sequenced. User can build this file with target .BED file using woland-bed-to-profile.pl
+<chromosome_profile>       : Regular tabular file without header . First column is chromosome name in chr format (e.g. chr13). Second column is chromosome length sequenced. User can build this file with 				     target .BED file using woland-bed-to-profile.pl
 
 <hotspot_window>           : A natural number N (N>1), for hotspot window length. Hotspot window corresponds to N nucleotides flanking each SNV.
 
