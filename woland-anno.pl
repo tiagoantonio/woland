@@ -180,7 +180,7 @@ print LOG "Strand Bias of ENU Motifs:                 WOLAND-bias_enu-$inputRawS
 
 # loading of outputs
 
-mkdir("results-$inputRawSNV", 0755) || die "Cannot mkdir results-$inputRawSNV";
+mkdir("results-$inputRawSNV", 0755) || die "Cannot mkdir results-$inputRawSNV - folder already exists, please delete it or change samplename";
 
 open (BASECHANGE, ">>results-$inputRawSNV/WOLAND-basechange-$inputRawSNV");
 open (MUTFREQ, ">>results-$inputRawSNV/WOLAND-mutfreq-$inputRawSNV");
