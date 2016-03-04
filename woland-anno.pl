@@ -150,9 +150,23 @@ unless ($genome_version){
 
 $contextSequenceLength=3; #<context_sequence_length> #default=3nt downstream & 3nt upstream
 
+# loading of outputs
+
+mkdir("results-$inputRawSNV", 0755) || die "Cannot mkdir results-$inputRawSNV - folder already exists, please delete it or change samplename";
+
+open (BASECHANGE, ">>results-$inputRawSNV/WOLAND-basechange-$inputRawSNV");
+open (MUTFREQ, ">>results-$inputRawSNV/WOLAND-mutfreq-$inputRawSNV");
+open (CONTEXTSEQ, ">>results-$inputRawSNV/WOLAND-contextsequences-$inputRawSNV");
+open (CONTEXTSEQANNO, ">>results-$inputRawSNV/WOLAND-contextsequencesanno-$inputRawSNV");
+open (HOTSPOTS, ">>results-$inputRawSNV/WOLAND-hotspots-$inputRawSNV");
+open (MOTIFS, ">>results-$inputRawSNV/WOLAND-motifs-$inputRawSNV");
+open (NMOTIFS, ">>results-$inputRawSNV/WOLAND-norm_motifs-$inputRawSNV");
+
 # Start Screen & LOG file
 
 $datestring = localtime();
+
+open (LOG, ">>results-$inputRawSNV/WOLAND-log-$inputRawSNV");
 
 print LOG "WOLAND BETA 0.9 - 02-02-2016\n";
 print LOG "Analysis started at $datestring\n";
@@ -161,7 +175,7 @@ print LOG "Chromosome Length Profile File: $chrLengthProfile\n";
 print LOG "Hotspot Window Length         : $hotspotWindowLength bases flanking SNP position in reference genome\n";
 print LOG "Context Sequence Length       : $contextSequenceLength bases flanking SNP position in reference genome\n";
 
-print "\n\nLoading SNP file...\n";
+print "\nLoading SNP file...\n";
 
 print LOG "\nOutputs:\n";
 print LOG "Mutation Statistics:                       WOLAND-basechange-$inputRawSNV\n";
@@ -177,20 +191,6 @@ print LOG "Strand Bias of UV-lambda Motifs:           WOLAND-bias_uv-lambda-$inp
 print LOG "Strand Bias of UV Solar Motifs:            WOLAND-bias_UVsolar-$inputRawSNV\n";
 print LOG "Strand Bias of 6-4 Motifs:                 WOLAND-bias_sixfour-$inputRawSNV\n";
 print LOG "Strand Bias of ENU Motifs:                 WOLAND-bias_enu-$inputRawSNV\n";
-
-# loading of outputs
-
-mkdir("results-$inputRawSNV", 0755) || die "Cannot mkdir results-$inputRawSNV - folder already exists, please delete it or change samplename";
-
-open (BASECHANGE, ">>results-$inputRawSNV/WOLAND-basechange-$inputRawSNV");
-open (MUTFREQ, ">>results-$inputRawSNV/WOLAND-mutfreq-$inputRawSNV");
-open (CONTEXTSEQ, ">>results-$inputRawSNV/WOLAND-contextsequences-$inputRawSNV");
-open (CONTEXTSEQANNO, ">>results-$inputRawSNV/WOLAND-contextsequencesanno-$inputRawSNV");
-open (HOTSPOTS, ">>results-$inputRawSNV/WOLAND-hotspots-$inputRawSNV");
-open (MOTIFS, ">>results-$inputRawSNV/WOLAND-motifs-$inputRawSNV");
-open (NMOTIFS, ">>results-$inputRawSNV/WOLAND-norm_motifs-$inputRawSNV");
-open (LOG, ">>results-$inputRawSNV/WOLAND-log-$inputRawSNV");
-
 
 
 # Conversion of each column in a dedicated array
@@ -264,6 +264,9 @@ foreach $refalt (@refalt){
 # Frequency of changes considering total amount of changes.
 
 $SOMA=$ATTA+$AGTC+$ACTG+$CGGC+$CTGA+$CAGT;
+if ($SOMA== 0){
+	die "Please review input file format";
+}
 
 foreach $refalt(@refalt){
 	$count++;
@@ -459,50 +462,182 @@ foreach $config (@config){
 	push (@chrLength, "$i[1]");
 }
 
-$chrNorm1=$chr1/$chrLength[0];
-$chrNorm2=$chr2/$chrLength[1];
-$chrNorm3=$chr3/$chrLength[2];
-$chrNorm4=$chr4/$chrLength[3];
-$chrNorm5=$chr5/$chrLength[4];
-$chrNorm6=$chr6/$chrLength[5];
-$chrNorm7=$chr7/$chrLength[6];
-$chrNorm8=$chr8/$chrLength[7];
-$chrNorm9=$chr9/$chrLength[8];
-$chrNorm10=$chr10/$chrLength[9];
-$chrNorm11=$chr11/$chrLength[10];
-$chrNorm12=$chr12/$chrLength[11];
-$chrNorm13=$chr13/$chrLength[12];
-$chrNorm14=$chr14/$chrLength[13];
-$chrNorm15=$chr15/$chrLength[14];
-$chrNorm16=$chr16/$chrLength[15];
-$chrNorm17=$chr17/$chrLength[16];
-$chrNorm18=$chr18/$chrLength[17];
-$chrNorm19=$chr19/$chrLength[18];
+if ($chrLength[0] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm1=$chr1/$chrLength[0];
+}
+
+if ($chrLength[1] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm2=$chr2/$chrLength[1];
+}
+
+if ($chrLength[2] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm3=$chr3/$chrLength[2];
+}
+
+if ($chrLength[3] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm4=$chr4/$chrLength[3];
+}
+
+if ($chrLength[4] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm5=$chr5/$chrLength[4];
+}
+
+if ($chrLength[5] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm6=$chr6/$chrLength[5];
+}
+
+if ($chrLength[6] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm7=$chr7/$chrLength[6];
+}
+
+if ($chrLength[7] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm8=$chr8/$chrLength[7];
+}
+
+if ($chrLength[8] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm9=$chr9/$chrLength[8];
+}
+
+if ($chrLength[9] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm10=$chr10/$chrLength[9];
+}
+
+if ($chrLength[10] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm11=$chr11/$chrLength[10];
+}
+
+if ($chrLength[11] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm12=$chr12/$chrLength[11];
+}
+
+if ($chrLength[12] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm13=$chr13/$chrLength[12];
+}
+
+if ($chrLength[13] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm14=$chr14/$chrLength[13];
+
+}
+if ($chrLength[14] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm15=$chr15/$chrLength[14];
+}
+
+if ($chrLength[15] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm16=$chr16/$chrLength[15];
+}
+
+if ($chrLength[16] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm17=$chr17/$chrLength[16];
+}
+
+if ($chrLength[17] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm18=$chr18/$chrLength[17];
+}
+
+if ($chrLength[18] == 0){
+	$chrNorm1="Chromosome not present";
+}
+else {
+	$chrNorm19=$chr19/$chrLength[18];
+}
+
 
 if($chrLength[19] == 0){
-	$chrNorm20="Cromossomo inexistente";
+	$chrNorm20="Chromosome not present";
 } 
 else {
 	$chrNorm20=$chr20/$chrLength[19];
 }
 
 if($chrLength[20] == 0){
-	$chrNorm21="Cromossomo inexistente";
+	$chrNorm21="Chromosome not present";
 }
 else {
 	$chrNorm21=$chr21/$chrLength[20];
 }
 
 if($chrLength[21] == 0){
-	$chrNorm22="Cromossomo inexistente";
+	$chrNorm22="Chromosome not present";
 }
 else{
 	$chrNorm22=$chr22/$chrLength[21];
 }
 
-$chrNormX=$chrX/$chrLength[22];
-$chrNormY=$chrY/$chrLength[23];
-$chrNormM=$chrM/$chrLength[24];
+if ($chrLength[22] == 0){
+	$chrNormX="Chromosome not present";
+}
+else {
+	$chrNormX=$chrX/$chrLength[22];
+}
+
+if ($chrLength[23] == 0){
+	$chrNormX="Chromosome not present";
+}
+else {
+	$chrNormY=$chrY/$chrLength[23];
+}
+
+if ($chrLength[24] == 0){
+	$chrNormX="Chromosome not present";
+}
+else {
+	$chrNormM=$chrM/$chrLength[24];
+}
+
 
 ##### BASECHANGE Printing Format ####
 print BASECHANGE "$inputRawSNV\tA>T\tA>G\tA>C\tC>G\tC>T\tC>A\n";
@@ -1589,7 +1724,7 @@ for my $iSN1 (0..$#SN1){
     		$strand_plus_count=0;
     		$strand_count=0;
     		$strand_score=0;
-		}
+    	}
 	} 
 }
 
@@ -1745,13 +1880,13 @@ for my $iuv (0..$#UVlambda){
 		}
 		$i5=0;
 		if ($strand_count >= 1){
-		$strand_transcript=$strand_plus_count/$strand_count;
-		$strand_score=$strand_transcript - ($strand_value);
-		print OUTPUTbiasUV "$chrSt[$iuv]\t$coord[$iuv]\t$strand_score\n";
-		$strand_transcript=0;
-		$strand_plus_count=0;
-		$strand_count=0;
-		$strand_score=0;
+			$strand_transcript=$strand_plus_count/$strand_count;
+			$strand_score=$strand_transcript - ($strand_value);
+			print OUTPUTbiasUV "$chrSt[$iuv]\t$coord[$iuv]\t$strand_score\n";
+			$strand_transcript=0;
+			$strand_plus_count=0;
+			$strand_count=0;
+			$strand_score=0;
 		}
 	}
 }
@@ -1925,41 +2060,49 @@ for my $a1 (0 .. $#id){
 	++$SNPnumber;
 }
 
+$SN1counts=0;
 foreach $SN1 (@SN1){
 	if ($SN1 eq "1"){
 		++$SN1counts;
 	}
 }
 
+$DNApolncounts=0;
 foreach $DNApoln (@DNApoln){
 	if ($DNApoln eq "1"){
 		++$DNApolncounts;
 	}
 }
 
+$oxoGcounts=0;
 foreach $oxoG (@oxoG){
 	if ($oxoG eq "1"){
 		++$oxoGcounts;
 	}
 }
+
+$UVlambdacounts=0;
 foreach $UVlambda (@UVlambda){
 	if ($UVlambda eq "1"){
 		++$UVlambdacounts;
 	}
 }
 
+$sixfourcounts=0;
 foreach $sixfour (@sixfour){
 	if ($sixfour eq "1"){
 		++$sixfourcounts;
 	}
 }
 
+$enucounts=0;
 foreach $enu (@enu){
 	if ($enu eq "1"){
 		++$enucounts;
 	}
 }
 
+$UVsolarcounts=0;
 foreach $UVsolar (@UVsolar){
 	if ($UVsolar eq "1"){
 		++$UVsolarcounts;
