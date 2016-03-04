@@ -41,7 +41,7 @@ use strict;
 
  
 my $inputRawSNV; my $chrLengthProfile; my $hotspotWindowLength; my $contextSequenceLength; my $genome_version;
-my $datestring; 
+my $datestring;
 my $rawLine; our $i; my $i2; my $i3;
 
 our $ATTA; our $AGTC; our $ACTG; our $CGGC; our $CTGA; our $CAGT; our $refalt; my $SOMA; our $AVGATTA; our $AVGAGTC; our $AVGACTG; our $AVGCGGC; our $AVGCTGA; our $AVGCAGT;
@@ -150,18 +150,6 @@ unless ($genome_version){
 
 $contextSequenceLength=3; #<context_sequence_length> #default=3nt downstream & 3nt upstream
 
-# loading of outputs
-mkdir("results-$inputRawSNV", 0755) || die "Cannot mkdir results-$inputRawSNV";
-
-open (BASECHANGE, ">>results-$inputRawSNV/WOLAND-basechange-$inputRawSNV");
-open (MUTFREQ, ">>results-$inputRawSNV/WOLAND-mutfreq-$inputRawSNV");
-open (CONTEXTSEQ, ">>results-$inputRawSNV/WOLAND-contextsequences-$inputRawSNV");
-open (CONTEXTSEQANNO, ">>results-$inputRawSNV/WOLAND-contextsequencesanno-$inputRawSNV");
-open (HOTSPOTS, ">>results-$inputRawSNV/WOLAND-hotspots-$inputRawSNV");
-open (MOTIFS, ">>results-$inputRawSNV/WOLAND-motifs-$inputRawSNV");
-open (NMOTIFS, ">>results-$inputRawSNV/WOLAND-norm_motifs-$inputRawSNV");
-open (LOG, ">>results-$inputRawSNV/WOLAND-log-$inputRawSNV");
-
 # Start Screen & LOG file
 
 $datestring = localtime();
@@ -189,6 +177,21 @@ print LOG "Strand Bias of UV-lambda Motifs:           WOLAND-bias_uv-lambda-$inp
 print LOG "Strand Bias of UV Solar Motifs:            WOLAND-bias_UVsolar-$inputRawSNV\n";
 print LOG "Strand Bias of 6-4 Motifs:                 WOLAND-bias_sixfour-$inputRawSNV\n";
 print LOG "Strand Bias of ENU Motifs:                 WOLAND-bias_enu-$inputRawSNV\n";
+
+# loading of outputs
+
+mkdir("results-$inputRawSNV", 0755) || die "Cannot mkdir results-$inputRawSNV";
+
+open (BASECHANGE, ">>results-$inputRawSNV/WOLAND-basechange-$inputRawSNV");
+open (MUTFREQ, ">>results-$inputRawSNV/WOLAND-mutfreq-$inputRawSNV");
+open (CONTEXTSEQ, ">>results-$inputRawSNV/WOLAND-contextsequences-$inputRawSNV");
+open (CONTEXTSEQANNO, ">>results-$inputRawSNV/WOLAND-contextsequencesanno-$inputRawSNV");
+open (HOTSPOTS, ">>results-$inputRawSNV/WOLAND-hotspots-$inputRawSNV");
+open (MOTIFS, ">>results-$inputRawSNV/WOLAND-motifs-$inputRawSNV");
+open (NMOTIFS, ">>results-$inputRawSNV/WOLAND-norm_motifs-$inputRawSNV");
+open (LOG, ">>results-$inputRawSNV/WOLAND-log-$inputRawSNV");
+
+
 
 # Conversion of each column in a dedicated array
 
@@ -1986,5 +1989,5 @@ print NMOTIFS "$inputRawSNV\tSN1\tDNApol\t8-oxoG\tUV-lambda\tSixFour\tENU\tUVA-s
 print NMOTIFS "Number of Total SNPs\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\n";
 print NMOTIFS "Total Raw Number of Motifs Found\t$SN1counts\t$DNApolncounts\t$oxoGcounts\t$UVlambdacounts\t$sixfourcounts\t$enucounts\t$UVsolarcounts\n";
 print NMOTIFS "Normalized Number of Motifs Found\t$normSN1\t$normDNApoln\t$normoxoG\t$normUVlambda\t$normsixfour\t$normenu\t$normUVsolar";
-	
+
 exit;

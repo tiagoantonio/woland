@@ -18,6 +18,7 @@
 
 use IPC::System::Simple qw(system capture);
 use Parallel::ForkManager;
+use File::Copy;
 use strict;
 use warnings;
 
@@ -25,12 +26,12 @@ use warnings;
 ## variables
 
 my $inputTable; my @inputTableArray; my $inputTableLine; 
-my @i; my $i;
+my @i; my $i; my $i2;
 my @Group; my @sampleName;
 my ($profile, $hotspot, $genome_version);
-my $abc;
 my ($pm,$pid, $MAX_PROCESSES);
 my @ARGS;
+my @time;
 
 
 ## main Warning
@@ -55,14 +56,19 @@ foreach $inputTableLine (@inputTableArray){ #two arrays for each category (group
 
 @i=0;
 
+@time=localtime;
+
+mkdir("results-batch-$inputTable-$time[0].$time[1].$time[2].$time[3].$time[4].$time[5]", 0755) || die "Cannot create results folder";
+mkdir("results-batch-$inputTable-$time[0].$time[1].$time[2].$time[3].$time[4].$time[5]/samples-$inputTable", 0755) || die "Cannot create results folder";
+
 #executing batch woland_annopl:
 
 $profile= $ARGV[1];
 $hotspot= $ARGV[2];
 $genome_version = $ARGV[3];
 
-for my $abc (0..$#sampleName){
-	push (@ARGS, $sampleName[$abc]);
+for my $i2 (0..$#sampleName){
+	push (@ARGS, $sampleName[$i2]);
 	push (@ARGS, $profile);
 	push (@ARGS, $hotspot);
 	push (@ARGS, $genome_version);
@@ -78,5 +84,11 @@ $pm = Parallel::ForkManager->new($MAX_PROCESSES);
 $pid=$pm-> start and next;
 system ($^X, "woland-report.pl", $ARGV[0]);
 $pm->finish;
+
+move ("report-$inputTable", "results-batch-$inputTable-$time[0].$time[1].$time[2].$time[3].$time[4].$time[5]/report-$inputTable");
+
+for my $i2 (0..$#inputTableArray){
+	move ("results-$sampleName[$i2]", "results-batch-$inputTable-$time[0].$time[1].$time[2].$time[3].$time[4].$time[5]/samples-$inputTable/results-$sampleName[$i2]");
+}
 
 exit;
