@@ -1608,13 +1608,18 @@ open CONTEXTSEQANNO, "<results-$inputRawSNV/WOLAND-contextsequencesanno-$inputRa
 
 # Array processing
 
-foreach $fastaContext (@fastaContext){
-	@i7=0;
-	@i7 = split (/\t/, "$fastaContext");
-	chomp (@i7);
-	push (@fastaContextMS, "$i7[0]");
-	push (@geneClassMS, "$i7[1]");
-	push (@geneNameMS, "$i7[2]");
+
+for my $i (0..$#fastaContext){
+	if ($fastaContext[$i] =~ /^>/){
+		@i7 = split (/\t/, "$fastaContext[$i+1]");
+		@i3 = split (/\n/, "$fastaContext[$i]");
+		chomp(@i7);
+		push (@fastaContextMS, "$i3[0]\n$i7[0]\n");
+		push (@geneClassMS, "$i7[1]");
+		push (@geneNameMS, "$i7[2]");
+		@i7=();
+		@i3=();
+	}
 }
 
 foreach $geneClassMS (@geneClassMS){
@@ -1628,15 +1633,11 @@ foreach $geneNameMS (@geneNameMS){
 		push (@geneName1, $geneNameMS);
 	}
 }
-	
+
 foreach $fastaContextMS (@fastaContextMS){
-	if ($fastaContextMS=~ /^>+/){
-		chomp (@fastaContextMS);
-		push (@id, $fastaContextMS);
-	}
-	else{
-		push (@targetSequence, $fastaContextMS);
-	}
+	@i3 = split (/\n/, "$fastaContextMS");
+	push (@id, $i3[0]);
+	push (@targetSequence, $i3[1]);
 }
 
 foreach $id (@id){
