@@ -48,6 +48,8 @@ unless (@ARGV){
 }
 
 
+print "\nGrouping samples and building reports\n";
+
 ## parsing input table
 
 $inputTable = $ARGV[0]; # <input.table>
@@ -396,7 +398,7 @@ sub BoxPlotGroup{
 foreach $uniqGroupLine (@uniqgroup){
 	$R->send(qq'WOLAND.hotspot.manhattan.$uniqGroupLine <- read.delim ("hotspot-$uniqGroupLine.tmp", comment.char="#", header=FALSE)');
 	$R->send(qq'pdf("manhattan.hotspot.$uniqGroupLine-$inputTable.pdf")');
-	$R->send(qq'manhattan.$uniqGroupLine <- manhattan(x = WOLAND.hotspot.manhattan.$uniqGroupLine, chr="V3", bp="V4", p = "V5", logp = FALSE, ylab= "Mutations in $ARGV[2] bp window", genomewideline = FALSE, suggestiveline = FALSE, main = "Sample:$uniqGroupLine:hotspotwindow:$ARGV[2]", ylim = c(0,10), col = c("blue4", "orange3"))');
+	$R->send(qq'manhattan.$uniqGroupLine <- manhattan(x = WOLAND.hotspot.manhattan.$uniqGroupLine, chr="V3", bp="V4", p = "V5", logp = FALSE, ylab= "Mutations per bp in the hotspot window", genomewideline = FALSE, suggestiveline = FALSE, main = "Sample:$uniqGroupLine", ylim = c(0,10), col = c("blue4", "orange3"))');
 	$R->send(q'dev.off()');
 }
 
@@ -510,5 +512,7 @@ $R->send(qq'ggplot(transitiontransversion, aes(x=V3, y=V1, fill=V2))+
 $R->send(q'dev.off()');
 
 $R->stop;
+
+print "\nDONE\n";
 
 exit;
