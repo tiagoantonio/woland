@@ -1,5 +1,5 @@
 ----------------------------------------------------------
-Woland       : Version 1.0 <date>
+Woland       : Version 0.1 <date>
 Author       : Tiago A. de Souza <tiagoantonio@gmail.com>
 Last Modified: <date>
 Credits      : de Souza TA, Defelicibus A, Menck CF
@@ -86,13 +86,13 @@ Woland-1.0/refGene/<refGene.UCSC.txt> - Could be downloaded using UCSC annotatio
 
 * WOLAND scripts
 
-1) $ Woland-anno.pl <annovar.variant_function> <chromosome_profile> <hotspot_window>
+1) $ Woland-anno.pl <annovar.variant_function> <chromosome_profile> <hotspot_window> <genome_version>
 - Woland-anno.pl uses a single <annovar.variant_function> to calculate all patterns in a single result folder for <annovar.variant_function> provided.
 
-2) $ Woland-report.pl <input.table> <chromosome_profile> <hotspot_window>
+2) $ Woland-report.pl <input.table> <chromosome_profile> <hotspot_window> <genome_version>
 - This script uses a group of samples to perform Woland-anno.pl script for each sample provided to build an unique grouped report output folder for the analysis. Sample names and groups are provided by <input.table> and one result folder is also generated for each sample provided. 
 
-3) $ Woland-batch.pl <input.table> <chromosome_profile> <hotspot_window>
+3) $ Woland-batch.pl <input.table> <chromosome_profile> <hotspot_window> <genome_version>
 - Woland.batch enables batch submission of multiple samples as provided by <input.table> file. This script runs Woland-anno.pl for each sample followed by Woland-report.pl generating one result folder for each sample file provided and a grouped report folder for whole analysis as provided by <input.table>
 
 4) $ Woland-bed.pl <coordinates.bed>
@@ -106,6 +106,8 @@ Woland-1.0/refGene/<refGene.UCSC.txt> - Could be downloaded using UCSC annotatio
 <chromosome_profile>       : Regular tabular file without header . First column is chromosome name in chr format (e.g. chr13). Second column is chromosome length sequenced. User can build this file with 				     target .BED file using woland-bed-to-profile.pl
 
 <hotspot_window>           : A natural number N (N>1), for hotspot window length. Hotspot window corresponds to N nucleotides flanking each SNV.
+
+<genome_version>           : Genome version of genomes/genome_<genome_version> and genomes/refseq_<genome_version> files.
 
 <input.table>              : Regular tabular file without header. First column is group name. Second column is file sample name of annovar annotated.variant file. Samples files MUST be located in the Woland root folder. 
 
