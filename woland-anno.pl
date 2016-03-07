@@ -30,8 +30,6 @@
 ##
 ######################################################################################################################### 
 
-
-
 #! /usr/bin/perl
 
 use Bio::DB::Fasta; # bioperl module for the extraction of sequences.
@@ -128,6 +126,18 @@ unless (@ARGV){
 	die "\nERROR : Usage: $0 <tabular_snp_file> <chromosome_length_profile> <hotspot_window_length> <genome_version> \n";	
 }
 
+# sub
+
+sub chrListCount {
+	for my $i3 (0 .. $#chrStart){
+		if ($chrStart[$i3] eq "$_[0]"){
+			++$countChr;
+		}
+	}
+	push @chrCountFreq, $countChr;
+	$countChr=0;
+}
+
 # loading files and parameters
 
 $inputRawSNV = $ARGV[0]; #<tabular_snp_file>
@@ -180,9 +190,6 @@ print LOG "Tabular SNP File              : $inputRawSNV\n";
 print LOG "Chromosome Length Profile File: $chrLengthProfile\n";
 print LOG "Hotspot Window Length         : $hotspotWindowLength bases flanking SNP position in reference genome\n";
 print LOG "Context Sequence Length       : $contextSequenceLength bases flanking SNP position in reference genome\n";
-
-
-
 print LOG "\nOutputs:\n";
 print LOG "Mutation Statistics:                       WOLAND-basechange-$inputRawSNV\n";
 print LOG "Extracted Unannotated Context Sequences:   WOLAND-contextsequences-$inputRawSNV\n";
@@ -297,16 +304,6 @@ $transition=($AGTC+$CTGA)/$SOMA;
 $transversion=($ATTA+$ACTG+$CGGC+$CAGT)/$SOMA;
 
 # Frequency per chromosome target
-
-sub chrListCount {
-	for my $i3 (0 .. $#chrStart){
-		if ($chrStart[$i3] eq "$_[0]"){
-			++$countChr;
-		}
-	}
-	push @chrCountFreq, $countChr;
-	$countChr=0;
-}
 
 $countChr=0;
 $chr1=0;$chr2=0;$chr3=0;$chr4=0;$chr5=0;$chr6=0;$chr7=0;$chr8=0;$chr9=0;$chr10=0;
