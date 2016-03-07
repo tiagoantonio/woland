@@ -8,7 +8,7 @@
 ##
 ## USAGE
 ##
-## perl woland.pl <annnovar_variant_file> <chromosome_length_profile> <hotspot_window_length>
+## perl woland.pl <annnovar_variant_file> <chromosome_length_profile> <hotspot_window_length> <genome_version>
 ## 
 ## e.g.: perl woland.pl sample1_exome.tab mouse_chromosome.tab 1000
 ##
@@ -22,6 +22,8 @@
 ##
 ## <hotspot_window_length> : Any natural X number correspondent to the nucleotide hotspot window length; X nucleotides distant in each
 ## way of SNP position in <tabular_snp_file>.
+## 
+## <genome_version> : Genome version as found in genomes/genome_<genome_version>.fa and genomes/refseq_<genome_version>.txt
 ##
 ## WARNING: You must save a genome FASTA file as "genome.fa" for context sequence extraction. This genome file must be chromosome divided;
 ## >chr1, >chr2 ... as IDs.
@@ -40,81 +42,85 @@ use strict;
 # variables
 
  
-my $inputRawSNV; my $chrLengthProfile; my $hotspotWindowLength; my $contextSequenceLength; my $genome_version;
+my ($inputRawSNV, $chrLengthProfile, $hotspotWindowLength, $contextSequenceLength, $genome_version);
 my $datestring;
-my $rawLine; our $i; my $i2; my $i3;
 
-our $ATTA; our $AGTC; our $ACTG; our $CGGC; our $CTGA; our $CAGT; our $refalt; my $SOMA; our $AVGATTA; our $AVGAGTC; our $AVGACTG; our $AVGCGGC; our $AVGCTGA; our $AVGCAGT;
+my $rawLine; 
 
-my $transition; my $transversion;
+my $i; my $i2; our $i3; my @i; my @i2; our @i3;
 
-my $chr1; my $chr2; my $chr3; my $chr4; my $chr5; my $chr6; my $chr7; my $chr8; my $chr9; my $chr10; my $chr11; 
-my $chr12; my $chr13; my $chr14; my $chr15; my $chr16;my $chr17; my $chr18; my $chr19; my $chr20; my $chr21; my $chr22; 
-my $chrX;my $chrY; my $chrM;
+my ($ATTA, $AGTC, $ACTG, $CGGC, $CTGA, $CAGT, $refalt, $SOMA, $AVGATTA, $AVGAGTC, $AVGACTG, $AVGCGGC, $AVGCTGA, $AVGCAGT);
 
-my $chrNorm1; my $chrNorm2; my $chrNorm3; my $chrNorm4; my $chrNorm5; my $chrNorm6; my $chrNorm7; my $chrNorm8; my $chrNorm9; my $chrNorm10; my $chrNorm11; 
-my $chrNorm12; my $chrNorm13; my $chrNorm14; my $chrNorm15; my $chrNorm16; my $chrNorm17; my $chrNorm18; my $chrNorm19; my $chrNorm20; my $chrNorm21; my $chrNorm22;
- my $chrNormX; my $chrNormY; my $chrNormM;
+my ($transition, $transversion);
 
-my $a1; my $a2; my $a3; my $t1;
+my ($chr1,$chr2,$chr3,$chr4,$chr5,$chr6,$chr7,$chr8,$chr9,$chr10,$chr11,
+	$chr12,$chr13,$chr14,$chr15,$chr16,$chr17,$chr18,$chr19,$chr20,$chr21,
+	$chr22,$chrX,$chrY,$chrM);
 
-my $hotspotSNV; my $hotspotDownstreamSNV; my $hotspotUpstreamSNV; my $hsNum; 
+my @chrList;
+my $countChr;
+my @chrCountFreq;
 
-our $config; our $count; our $notValid;
+my @chrNormList;
+my $chrNorm;
 
-our @rawFile; our @config; our @i; our @chr; our @pos; our @alt; our @chrpos; our %posref; our %posalt; 
-our @refalt; our @ref; our @chrLength;
+my ($hotspotSNV, $hotspotDownstreamSNV, $hotspotUpstreamSNV, $hsNum); 
 
-my $hsChr1; our @hsChr1; our @hs_counts_chr1;
-my $hsChr2; our @hsChr2; our @hs_counts_chr2;
-my $hsChr3; our @hsChr3; our @hs_counts_chr3;
-my $hsChr4; our @hsChr4; our @hs_counts_chr4;
-my $hsChr5; our @hsChr5; our @hs_counts_chr5;
-my $hsChr6; our @hsChr6; our @hs_counts_chr6;
-my $hsChr7; our @hsChr7; our @hs_counts_chr7;
-my $hsChr8; our @hsChr8; our @hs_counts_chr8;
-my $hsChr9; our @hsChr9; our @hs_counts_chr9;
-my $hsChr10; our @hsChr10; our @hs_counts_chr10;
-my $hsChr11; our @hsChr11; our @hs_counts_chr11;
-my $hsChr12; our @hsChr12; our @hs_counts_chr12;
-my $hsChr13; our @hsChr13; our @hs_counts_chr13;
-my $hsChr14; our @hsChr14; our @hs_counts_chr14;
-my $hsChr15; our @hsChr15; our @hs_counts_chr15;
-my $hsChr16; our @hsChr16; our @hs_counts_chr16;
-my $hsChr17; our @hsChr17; our @hs_counts_chr17;
-my $hsChr18; our @hsChr18; our @hs_counts_chr18;
-my $hsChr19; our @hsChr19; our @hs_counts_chr19;
-my $hsChr20; our @hsChr20; our @hs_counts_chr20;
-my $hsChr21; our @hsChr21; our @hs_counts_chr21;
-my $hsChr22; our @hsChr22; our @hs_counts_chr22;
-my $hsChrX; our @hsChrX; our @hs_counts_chrX;
-my $hsChrY; our @hsChrY; our @hs_counts_chrY;
-my $hsChrM; our @hsChrM; our @hs_counts_chrM;
+my $config; my $count; my $notValid;
 
-our @fastaContext; our $fastaContext; our @id; our @targetSequence; my $targetSequence;
-our @SN1; our @DNApoln; our @oxoG; our @UVlambda; our @UVsolar; our @sixfour; our @enu; our $SNPnumber; my $mf1; my $mf2;
-our @SN1counts; our @DNApolncounts; our @oxoGcounts; our @UVlambdacounts; our @UVsolarcounts; our @sixfourcounts; our @enucounts;
-our $SN1; our $DNApoln; our $oxoG; our $UVlambda; our $UVsolar; our $sixfour; our $enu;
-our $SN1counts; our $DNApolncounts; our $oxoGcounts; our $UVlambdacounts; our $UVsolarcounts; our $sixfourcounts; our $enucounts;
-our $normSN1; our $normDNApoln; our $normoxoG; our $normUVlambda; our $normUVsolar; our $normsixfour; our $normenu;
+my @rawFile; my @config; my @chr; my @pos; my @alt; my @chrpos; my %posref; my %posalt; 
+my @refalt; my @ref; my @chrLength;
+
+my $hsChr1; my @hsChr1; my @hs_counts_chr1;
+my $hsChr2; my @hsChr2; my @hs_counts_chr2;
+my $hsChr3; my @hsChr3; my @hs_counts_chr3;
+my $hsChr4; my @hsChr4; my @hs_counts_chr4;
+my $hsChr5; my @hsChr5; my @hs_counts_chr5;
+my $hsChr6; my @hsChr6; my @hs_counts_chr6;
+my $hsChr7; my @hsChr7; my @hs_counts_chr7;
+my $hsChr8; my @hsChr8; my @hs_counts_chr8;
+my $hsChr9; my @hsChr9; my @hs_counts_chr9;
+my $hsChr10; my @hsChr10; my @hs_counts_chr10;
+my $hsChr11; my @hsChr11; my @hs_counts_chr11;
+my $hsChr12; my @hsChr12; my @hs_counts_chr12;
+my $hsChr13; my @hsChr13; my @hs_counts_chr13;
+my $hsChr14; my @hsChr14; my @hs_counts_chr14;
+my $hsChr15; my @hsChr15; my @hs_counts_chr15;
+my $hsChr16; my @hsChr16; my @hs_counts_chr16;
+my $hsChr17; my @hsChr17; my @hs_counts_chr17;
+my $hsChr18; my @hsChr18; my @hs_counts_chr18;
+my $hsChr19; my @hsChr19; my @hs_counts_chr19;
+my $hsChr20; my @hsChr20; my @hs_counts_chr20;
+my $hsChr21; my @hsChr21; my @hs_counts_chr21;
+my $hsChr22; my @hsChr22; my @hs_counts_chr22;
+my $hsChrX; my @hsChrX; my @hs_counts_chrX;
+my $hsChrY; my @hsChrY; my @hs_counts_chrY;
+my $hsChrM; my @hsChrM; my @hs_counts_chrM;
+
+my @fastaContext; my $fastaContext; my @id; my @targetSequence; my $targetSequence;
+my @SN1; my @DNApoln; my @oxoG; my @UVlambda; my @UVsolar; my @sixfour; my @enu; my $SNPnumber; my $mf1; my $mf2;
+my @SN1counts; my @DNApolncounts; my @oxoGcounts; my @UVlambdacounts; my @UVsolarcounts; my @sixfourcounts; my @enucounts;
+my $SN1; my $DNApoln; my $oxoG; my $UVlambda; my $UVsolar; my $sixfour; my $enu;
+my $SN1counts; my $DNApolncounts; my $oxoGcounts; my $UVlambdacounts; my $UVsolarcounts; my $sixfourcounts; my $enucounts;
+my $normSN1; my $normDNApoln; my $normoxoG; my $normUVlambda; my $normUVsolar; my $normsixfour; my $normenu;
 
 ## anno motif search variables
 
-our (@geneClass, $geneClass, @geneName, $geneName);
-our (@geneClasschr1, @geneClasschr2, @geneClasschr3, @geneClasschr4, @geneClasschr5, @geneClasschr6, @geneClasschr7, @geneClasschr8, @geneClasschr9, @geneClasschr10, @geneClasschr11, @geneClasschr12, @geneClasschr13, @geneClasschr14, @geneClasschr15, @geneClasschr16, @geneClasschr17, @geneClasschr18, @geneClasschr19, @geneClasschr20, @geneClasschr21, @geneClasschr22, @geneClasschrX, @geneClasschrY, @geneClasschrM);      
-our (@geneNamechr1, @geneNamechr2, @geneNamechr3, @geneNamechr4, @geneNamechr5, @geneNamechr6, @geneNamechr7, @geneNamechr8, @geneNamechr9, @geneNamechr10, @geneNamechr11, @geneNamechr12, @geneNamechr13, @geneNamechr14, @geneNamechr15, @geneNamechr16, @geneNamechr17, @geneNamechr18, @geneNamechr19, @geneNamechr20, @geneNamechr21, @geneNamechr22, @geneNamechrX, @geneNamechrY, @geneNamechrM);
-our (@chrStart, @chrEnd);
-our (@fastaContextMS, $fastaContextMS, @fastaContextMS1, $fastacontextMS1, @geneClassMS, $geneClassMS, @geneClassMS1, $geneClassMS1, @geneNameMS, $geneNameMS, @geneNameMS1, $geneNameMS1);
-our (@chrRaw, $chrRaw, $chrSt, $refSeqRaw);
-our (@chrRefSeq, @irefSeq, );
-our ($query_coord, $query_chr);
-our (@txtendRefSeq, @txstartRefSeq);
-our (@i2, @i3, $i4, $i5, @i7, $i7, $id);
-our (@geneClass1, @geneName1, @coord, @chrSt, @refSeq, $refSeqline, @strandRefSeq);
-our (@SN1plus, @SN1minus, @DNApolnplus, @DNApolnminus, @oxoGplus, @oxoGminus, @UVlambdaplus, @UVlambdaminus, @UVsolarplus, @UVsolarminus, @sixfourplus, @sixfourminus, @enuplus, @enuminus);
-our ($strand_count, $strand_plus_count, $strand_transcript, $strand_score, $strand_value);
-our ($db, $db1);
-our $readContextSeqAnno;
+my (@geneClass, $geneClass, @geneName, $geneName);
+my (@geneClasschr1, @geneClasschr2, @geneClasschr3, @geneClasschr4, @geneClasschr5, @geneClasschr6, @geneClasschr7, @geneClasschr8, @geneClasschr9, @geneClasschr10, @geneClasschr11, @geneClasschr12, @geneClasschr13, @geneClasschr14, @geneClasschr15, @geneClasschr16, @geneClasschr17, @geneClasschr18, @geneClasschr19, @geneClasschr20, @geneClasschr21, @geneClasschr22, @geneClasschrX, @geneClasschrY, @geneClasschrM);      
+my (@geneNamechr1, @geneNamechr2, @geneNamechr3, @geneNamechr4, @geneNamechr5, @geneNamechr6, @geneNamechr7, @geneNamechr8, @geneNamechr9, @geneNamechr10, @geneNamechr11, @geneNamechr12, @geneNamechr13, @geneNamechr14, @geneNamechr15, @geneNamechr16, @geneNamechr17, @geneNamechr18, @geneNamechr19, @geneNamechr20, @geneNamechr21, @geneNamechr22, @geneNamechrX, @geneNamechrY, @geneNamechrM);
+my (@chrStart, @chrEnd);
+my (@fastaContextMS, $fastaContextMS, @fastaContextMS1, $fastacontextMS1, @geneClassMS, $geneClassMS, @geneClassMS1, $geneClassMS1, @geneNameMS, $geneNameMS, @geneNameMS1, $geneNameMS1);
+my (@chrRaw, $chrRaw, $chrSt, $refSeqRaw);
+my (@chrRefSeq, @irefSeq, );
+my ($query_coord, $query_chr);
+my (@txtendRefSeq, @txstartRefSeq);
+my $id;
+my (@geneClass1, @geneName1, @coord, @chrSt, @refSeq, $refSeqline, @strandRefSeq);
+my (@SN1plus, @SN1minus, @DNApolnplus, @DNApolnminus, @oxoGplus, @oxoGminus, @UVlambdaplus, @UVlambdaminus, @UVsolarplus, @UVsolarminus, @sixfourplus, @sixfourminus, @enuplus, @enuminus);
+my ($strand_count, $strand_plus_count, $strand_transcript, $strand_score, $strand_value);
+my ($db, $db1);
+my $readContextSeqAnno;
 
 # main Warning
 
@@ -175,7 +181,7 @@ print LOG "Chromosome Length Profile File: $chrLengthProfile\n";
 print LOG "Hotspot Window Length         : $hotspotWindowLength bases flanking SNP position in reference genome\n";
 print LOG "Context Sequence Length       : $contextSequenceLength bases flanking SNP position in reference genome\n";
 
-print "\nLoading SNP file...\n";
+
 
 print LOG "\nOutputs:\n";
 print LOG "Mutation Statistics:                       WOLAND-basechange-$inputRawSNV\n";
@@ -195,6 +201,8 @@ print LOG "Strand Bias of ENU Motifs:                 WOLAND-bias_enu-$inputRawS
 
 # Conversion of each column in a dedicated array
 
+print "\nLoading SNP file...\n";
+
 foreach $rawLine (@rawFile){
 	@i = split (/\t/, $rawLine);
 	chomp (@i);
@@ -209,17 +217,17 @@ foreach $rawLine (@rawFile){
 	
 # Array for chr/position of each SNP - @chrpos
 
-for my $i3 (0 .. $#chrStart){
-	push @chrpos, "$chrStart[$i3]_$pos[$i3]";
+for my $i (0 .. $#chrStart){
+	push @chrpos, "$chrStart[$i]_$pos[$i]";
 }
 	
 # Hashe posref & posalt for information of each position - ALT e REF alelles
 
-for my $i3 (0 .. $#chrpos){
-	$posref{"$chrpos[$i3]_$i3"} .= "$ref[$i3]";
+for my $i (0 .. $#chrpos){
+	$posref{"$chrpos[$i]_$i"} .= "$ref[$i]";
 }
-for my $i3 (0 .. $#chrpos){
-	$posalt{"$chrpos[$i3]_$i3"} .= "$alt[$i3]";
+for my $i (0 .. $#chrpos){
+	$posalt{"$chrpos[$i]_$i"} .= "$alt[$i]";
 }
 
 print "\nCalculating general mutation statistics and saving basechange-$inputRawSNV ...\n";
@@ -290,166 +298,26 @@ $transversion=($ATTA+$ACTG+$CGGC+$CAGT)/$SOMA;
 
 # Frequency per chromosome target
 
-$chr1=0;$chr12=0;
-$chr2=0;$chr13=0;
-$chr3=0;$chr14=0;
-$chr4=0;$chr15=0;
-$chr5=0;$chr16=0;
-$chr6=0;$chr17=0;
-$chr7=0;$chr18=0;
-$chr8=0;$chr19=0;
-$chr9=0;$chr20=0;
-$chr10=0;$chr21=0;
-$chr11=0;$chr22=0;
-$chrX=0;$chrY=0;
-$chrM=0;
-
-for my $i6 (0 .. $#chrStart){
-	if ($chrStart[$i6] eq "chr1"){
-		++$chr1;
+sub chrListCount {
+	for my $i3 (0 .. $#chrStart){
+		if ($chrStart[$i3] eq "$_[0]"){
+			++$countChr;
+		}
 	}
-}
-for my $i7 (0 .. $#chrStart){
-	if ($chrStart[$i7] eq "chr2"){
-		++$chr2;
-	}
-}
-for my $i8 (0 .. $#chrStart){
-	if ($chrStart[$i8] eq "chr3"){
-		++$chr3;
-	}
+	push @chrCountFreq, $countChr;
+	$countChr=0;
 }
 
-for my $i9 (0 .. $#chrStart){
-	if ($chrStart[$i9] eq "chr4"){
-		++$chr4;
-	}
-}
+$countChr=0;
+$chr1=0;$chr2=0;$chr3=0;$chr4=0;$chr5=0;$chr6=0;$chr7=0;$chr8=0;$chr9=0;$chr10=0;
+$chr11=0;$chr12=0;$chr13=0;$chr14=0;$chr15=0;$chr16=0;$chr17=0;$chr18=0;$chr19=0;$chr20=0;$chr21=0;$chr22=0;$chrX=0;$chrY=0;$chrM=0;
 
-for my $i10 (0 .. $#chrStart){
-	if ($chrStart[$i10] eq "chr5"){
-		++$chr5;
-	}
-}
 
-for my $i11 (0 .. $#chrStart){
-	if ($chrStart[$i11] eq "chr6"){
-		++$chr6;
-	}
-}
+@chrList = ("chr1","chr2","chr3","chr4","chr5","chr6","chr7","chr8","chr9","chr10",
+	"chr11","chr12","chr13","chr14","chr15","chr16","chr17","chr18","chr19","chr20","chr21","chr22","chrX","chrY","chrM");
 
-for my $i12 (0 .. $#chrStart){
-	if ($chrStart[$i12] eq "chr7"){
-		++$chr7;
-	}
-}
-
-for my $i13 (0 .. $#chrStart){
-	if ($chrStart[$i13] eq "chr8"){
-		++$chr8;
-	}
-}
-
-for my $i14 (0 .. $#chrStart){
-	if ($chrStart[$i14] eq "chr9"){
-		++$chr9;
-	}
-}
-
-for my $i15 (0 .. $#chrStart){
-	if ($chrStart[$i15] eq "chr10"){
-		++$chr10;
-	}
-}
-
-for my $i16 (0 .. $#chrStart){
-	if ($chrStart[$i16] eq "chr11"){
-		++$chr11;
-	}
-}
-
-for my $i17 (0 .. $#chrStart){
-	if ($chrStart[$i17] eq "chr12"){
-		++$chr12;
-	}
-}
-
-for my $i18 (0 .. $#chrStart){
-	if ($chrStart[$i18] eq "chr13"){
-		++$chr13;
-	}
-}
-
-for my $i19 (0 .. $#chrStart){
-	if ($chrStart[$i19] eq "chr14"){
-		++$chr14;
-	}
-}
-
-for my $i20 (0 .. $#chrStart){
-	if ($chrStart[$i20] eq "chr15"){
-		++$chr15;
-	}
-}
-
-for my $i21 (0 .. $#chrStart){
-	if ($chrStart[$i21] eq "chr16"){
-		++$chr16;
-	}
-}
-
-for my $i22 (0 .. $#chrStart){
-	if ($chrStart[$i22] eq "chr17"){
-		++$chr17;
-	}
-}
-
-for my $i23 (0 .. $#chrStart){
-	if ($chrStart[$i23] eq "chr18"){
-		++$chr18;
-	}
-}
-
-for my $i24 (0 .. $#chrStart){
-	if ($chrStart[$i24] eq "chr19"){
-		++$chr19;
-	}
-}
-
-for my $i25 (0 .. $#chrStart){
-	if ($chrStart[$i25] eq "chr20"){
-		++$chr20;
-	}
-}
-
-for my $i26 (0 .. $#chrStart){
-	if ($chrStart[$i26] eq "chr21"){
-		++$chr21;
-	}
-}
-
-for my $i27 (0 .. $#chrStart){
-	if ($chrStart[$i27] eq "chr22"){
-		++$chr22;
-	}
-}
-
-for my $i28 (0 .. $#chrStart){
-	if ($chrStart[$i28] eq "chrX"){
-		++$chrX;
-	}
-}
-
-for my $i29 (0 .. $#chrStart){
-	if ($chrStart[$i29] eq "chrY"){
-		++$chrY;
-	}
-}
-
-for my $i30 (0 .. $#chrStart){
-	if ($chrStart[$i30] eq "chrM"){
-		++$chrM;
-	}
+for my $i (0..$#chrList){
+	&chrListCount("$chrList[$i]");
 }
 
 # Frequency of mutation considering chromosome length as present in chromosome_profile file.
@@ -462,182 +330,15 @@ foreach $config (@config){
 	push (@chrLength, "$i[1]");
 }
 
-if ($chrLength[0] == 0){
-	$chrNorm1="Chromosome not present";
+for my $i (0..$#chrCountFreq){
+	if ($chrLength[$i]==0){
+		$chrNorm=0;
+	}
+	else {
+		$chrNorm=$chrCountFreq[$i]/$chrLength[$i];
+	}
+	push @chrNormList, $chrNorm;
 }
-else {
-	$chrNorm1=$chr1/$chrLength[0];
-}
-
-if ($chrLength[1] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm2=$chr2/$chrLength[1];
-}
-
-if ($chrLength[2] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm3=$chr3/$chrLength[2];
-}
-
-if ($chrLength[3] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm4=$chr4/$chrLength[3];
-}
-
-if ($chrLength[4] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm5=$chr5/$chrLength[4];
-}
-
-if ($chrLength[5] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm6=$chr6/$chrLength[5];
-}
-
-if ($chrLength[6] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm7=$chr7/$chrLength[6];
-}
-
-if ($chrLength[7] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm8=$chr8/$chrLength[7];
-}
-
-if ($chrLength[8] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm9=$chr9/$chrLength[8];
-}
-
-if ($chrLength[9] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm10=$chr10/$chrLength[9];
-}
-
-if ($chrLength[10] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm11=$chr11/$chrLength[10];
-}
-
-if ($chrLength[11] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm12=$chr12/$chrLength[11];
-}
-
-if ($chrLength[12] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm13=$chr13/$chrLength[12];
-}
-
-if ($chrLength[13] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm14=$chr14/$chrLength[13];
-
-}
-if ($chrLength[14] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm15=$chr15/$chrLength[14];
-}
-
-if ($chrLength[15] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm16=$chr16/$chrLength[15];
-}
-
-if ($chrLength[16] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm17=$chr17/$chrLength[16];
-}
-
-if ($chrLength[17] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm18=$chr18/$chrLength[17];
-}
-
-if ($chrLength[18] == 0){
-	$chrNorm1="Chromosome not present";
-}
-else {
-	$chrNorm19=$chr19/$chrLength[18];
-}
-
-
-if($chrLength[19] == 0){
-	$chrNorm20="Chromosome not present";
-} 
-else {
-	$chrNorm20=$chr20/$chrLength[19];
-}
-
-if($chrLength[20] == 0){
-	$chrNorm21="Chromosome not present";
-}
-else {
-	$chrNorm21=$chr21/$chrLength[20];
-}
-
-if($chrLength[21] == 0){
-	$chrNorm22="Chromosome not present";
-}
-else{
-	$chrNorm22=$chr22/$chrLength[21];
-}
-
-if ($chrLength[22] == 0){
-	$chrNormX="Chromosome not present";
-}
-else {
-	$chrNormX=$chrX/$chrLength[22];
-}
-
-if ($chrLength[23] == 0){
-	$chrNormX="Chromosome not present";
-}
-else {
-	$chrNormY=$chrY/$chrLength[23];
-}
-
-if ($chrLength[24] == 0){
-	$chrNormX="Chromosome not present";
-}
-else {
-	$chrNormM=$chrM/$chrLength[24];
-}
-
 
 ##### BASECHANGE Printing Format ####
 print BASECHANGE "$inputRawSNV\tA>T\tA>G\tA>C\tC>G\tC>T\tC>A\n";
@@ -647,31 +348,31 @@ print BASECHANGE "Type\tTransversion\tTransition\tTransversion\tTransversion\tTr
 print BASECHANGE "\n";
 
 print MUTFREQ "Chromosome\tTotalNumver\tMutPerBaseProfile\n";
-print MUTFREQ "chr1\t$chr1\t$chrNorm1\n";
-print MUTFREQ "chr2\t$chr2\t$chrNorm2\n";
-print MUTFREQ "chr3\t$chr3\t$chrNorm3\n";
-print MUTFREQ "chr4\t$chr4\t$chrNorm4\n";
-print MUTFREQ "chr5\t$chr5\t$chrNorm5\n";
-print MUTFREQ "chr6\t$chr6\t$chrNorm6\n";
-print MUTFREQ "chr7\t$chr7\t$chrNorm7\n";
-print MUTFREQ "chr8\t$chr8\t$chrNorm8\n";
-print MUTFREQ "chr9\t$chr9\t$chrNorm9\n";
-print MUTFREQ "chr10\t$chr10\t$chrNorm10\n";
-print MUTFREQ "chr11\t$chr11\t$chrNorm11\n";
-print MUTFREQ "chr12\t$chr12\t$chrNorm12\n";
-print MUTFREQ "chr13\t$chr13\t$chrNorm13\n";
-print MUTFREQ "chr14\t$chr14\t$chrNorm14\n";
-print MUTFREQ "chr15\t$chr15\t$chrNorm15\n";
-print MUTFREQ "chr16\t$chr16\t$chrNorm16\n";
-print MUTFREQ "chr17\t$chr17\t$chrNorm17\n";
-print MUTFREQ "chr18\t$chr18\t$chrNorm18\n";
-print MUTFREQ "chr19\t$chr19\t$chrNorm19\n";
-print MUTFREQ "chr20\t$chr20\t$chrNorm20\n";
-print MUTFREQ "chr21\t$chr21\t$chrNorm21\n";
-print MUTFREQ "chr22\t$chr22\t$chrNorm22\n";
-print MUTFREQ "chrX\t$chrX\t$chrNormX\n";
-print MUTFREQ "chrY\t$chrY\t$chrNormY\n";
-print MUTFREQ "chrM\t$chrM\t$chrNormM\n";
+print MUTFREQ "chr1\t$chrCountFreq[0]\t$chrNormList[0]\n";
+print MUTFREQ "chr2\t$chrCountFreq[1]\t$chrNormList[1]\n";
+print MUTFREQ "chr3\t$chrCountFreq[2]\t$chrNormList[2]\n";
+print MUTFREQ "chr4\t$chrCountFreq[3]\t$chrNormList[3]\n";
+print MUTFREQ "chr5\t$chrCountFreq[4]\t$chrNormList[4]\n";
+print MUTFREQ "chr6\t$chrCountFreq[5]\t$chrNormList[5]\n";
+print MUTFREQ "chr7\t$chrCountFreq[6]\t$chrNormList[6]\n";
+print MUTFREQ "chr8\t$chrCountFreq[7]\t$chrNormList[7]\n";
+print MUTFREQ "chr9\t$chrCountFreq[8]\t$chrNormList[8]\n";
+print MUTFREQ "chr10\t$chrCountFreq[9]\t$chrNormList[9]\n";
+print MUTFREQ "chr11\t$chrCountFreq[10]\t$chrNormList[10]\n";
+print MUTFREQ "chr12\t$chrCountFreq[11]\t$chrNormList[11]\n";
+print MUTFREQ "chr13\t$chrCountFreq[12]\t$chrNormList[12]\n";
+print MUTFREQ "chr14\t$chrCountFreq[13]\t$chrNormList[13]\n";
+print MUTFREQ "chr15\t$chrCountFreq[14]\t$chrNormList[14]\n";
+print MUTFREQ "chr16\t$chrCountFreq[15]\t$chrNormList[15]\n";
+print MUTFREQ "chr17\t$chrCountFreq[16]\t$chrNormList[16]\n";
+print MUTFREQ "chr18\t$chrCountFreq[17]\t$chrNormList[17]\n";
+print MUTFREQ "chr19\t$chrCountFreq[18]\t$chrNormList[18]\n";
+print MUTFREQ "chr20\t$chrCountFreq[19]\t$chrNormList[19]\n";
+print MUTFREQ "chr21\t$chrCountFreq[20]\t$chrNormList[20]\n";
+print MUTFREQ "chr22\t$chrCountFreq[21]\t$chrNormList[21]\n";
+print MUTFREQ "chrX\t$chrCountFreq[22]\t$chrNormList[22]\n";
+print MUTFREQ "chrY\t$chrCountFreq[23]\t$chrNormList[23]\n";
+print MUTFREQ "chrM\t$chrCountFreq[24]\t$chrNormList[24]\n";
 
 ############################################# HOT SPOT #####################################
 
@@ -679,132 +380,132 @@ print "\nCalculating hotspots and saving hotspots-$inputRawSNV.txt ...\n";
 
 # One array of each chromosome.
 
-for my $hs_a (0..$#chrStart){
+for my $i (0..$#chrStart){
 
-	if ($chrStart[$hs_a] eq "chr1"){
-		push @hsChr1, $pos[$hs_a];
-		push @geneClasschr1, $geneClass[$hs_a];
-		push @geneNamechr1, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr1"){
+		push @hsChr1, $pos[$i];
+		push @geneClasschr1, $geneClass[$i];
+		push @geneNamechr1, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr2"){
-		push @hsChr2, $pos[$hs_a];
-		push @geneClasschr2, $geneClass[$hs_a];
-		push @geneNamechr2, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr2"){
+		push @hsChr2, $pos[$i];
+		push @geneClasschr2, $geneClass[$i];
+		push @geneNamechr2, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr3"){
-		push @hsChr3, $pos[$hs_a];
-		push @geneClasschr3, $geneClass[$hs_a];
-		push @geneNamechr3, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr3"){
+		push @hsChr3, $pos[$i];
+		push @geneClasschr3, $geneClass[$i];
+		push @geneNamechr3, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr4"){
-		push @hsChr4, $pos[$hs_a];
-		push @geneClasschr4, $geneClass[$hs_a];
-		push @geneNamechr4, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr4"){
+		push @hsChr4, $pos[$i];
+		push @geneClasschr4, $geneClass[$i];
+		push @geneNamechr4, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr5"){
-		push @hsChr5, $pos[$hs_a];
-		push @geneClasschr5, $geneClass[$hs_a];
-		push @geneNamechr5, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr5"){
+		push @hsChr5, $pos[$i];
+		push @geneClasschr5, $geneClass[$i];
+		push @geneNamechr5, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr6"){
-		push @hsChr6, $pos[$hs_a];
-		push @geneClasschr6, $geneClass[$hs_a];
-		push @geneNamechr6, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr6"){
+		push @hsChr6, $pos[$i];
+		push @geneClasschr6, $geneClass[$i];
+		push @geneNamechr6, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr7"){
-		push @hsChr7, $pos[$hs_a];
-		push @geneClasschr7, $geneClass[$hs_a];
-		push @geneNamechr7, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr7"){
+		push @hsChr7, $pos[$i];
+		push @geneClasschr7, $geneClass[$i];
+		push @geneNamechr7, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr8"){
-		push @hsChr8, $pos[$hs_a];
-		push @geneClasschr8, $geneClass[$hs_a];
-		push @geneNamechr8, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr8"){
+		push @hsChr8, $pos[$i];
+		push @geneClasschr8, $geneClass[$i];
+		push @geneNamechr8, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr9"){
-		push @hsChr9, $pos[$hs_a];
-		push @geneClasschr9, $geneClass[$hs_a];
-		push @geneNamechr9, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr9"){
+		push @hsChr9, $pos[$i];
+		push @geneClasschr9, $geneClass[$i];
+		push @geneNamechr9, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr10"){
-		push @hsChr10, $pos[$hs_a];
-		push @geneClasschr10, $geneClass[$hs_a];
-		push @geneNamechr10, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr10"){
+		push @hsChr10, $pos[$i];
+		push @geneClasschr10, $geneClass[$i];
+		push @geneNamechr10, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr11"){
-		push @hsChr11, $pos[$hs_a];
-		push @geneClasschr11, $geneClass[$hs_a];
-		push @geneNamechr11, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr11"){
+		push @hsChr11, $pos[$i];
+		push @geneClasschr11, $geneClass[$i];
+		push @geneNamechr11, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr12"){
-		push @hsChr12, $pos[$hs_a];
-		push @geneClasschr12, $geneClass[$hs_a];
-		push @geneNamechr12, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr12"){
+		push @hsChr12, $pos[$i];
+		push @geneClasschr12, $geneClass[$i];
+		push @geneNamechr12, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr13"){
-		push @hsChr13, $pos[$hs_a];
-		push @geneClasschr13, $geneClass[$hs_a];
-		push @geneNamechr13, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr13"){
+		push @hsChr13, $pos[$i];
+		push @geneClasschr13, $geneClass[$i];
+		push @geneNamechr13, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr14"){
-		push @hsChr14, $pos[$hs_a];
-		push @geneClasschr14, $geneClass[$hs_a];
-		push @geneNamechr14, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr14"){
+		push @hsChr14, $pos[$i];
+		push @geneClasschr14, $geneClass[$i];
+		push @geneNamechr14, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr15"){
-		push @hsChr15, $pos[$hs_a];
-		push @geneClasschr15, $geneClass[$hs_a];
-		push @geneNamechr15, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr15"){
+		push @hsChr15, $pos[$i];
+		push @geneClasschr15, $geneClass[$i];
+		push @geneNamechr15, $geneName[$i];
 	}
-		if ($chrStart[$hs_a] eq "chr16"){
-		push @hsChr16, $pos[$hs_a];
-		push @geneClasschr16, $geneClass[$hs_a];
-		push @geneNamechr16, $geneName[$hs_a];
+		if ($chrStart[$i] eq "chr16"){
+		push @hsChr16, $pos[$i];
+		push @geneClasschr16, $geneClass[$i];
+		push @geneNamechr16, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr17"){
-		push @hsChr17, $pos[$hs_a];
-		push @geneClasschr17, $geneClass[$hs_a];
-		push @geneNamechr17, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr17"){
+		push @hsChr17, $pos[$i];
+		push @geneClasschr17, $geneClass[$i];
+		push @geneNamechr17, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr18"){
-		push @hsChr18, $pos[$hs_a];
-		push @geneClasschr18, $geneClass[$hs_a];
-		push @geneNamechr18, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr18"){
+		push @hsChr18, $pos[$i];
+		push @geneClasschr18, $geneClass[$i];
+		push @geneNamechr18, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr19"){
-		push @hsChr19, $pos[$hs_a];
-		push @geneClasschr19, $geneClass[$hs_a];
-		push @geneNamechr19, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr19"){
+		push @hsChr19, $pos[$i];
+		push @geneClasschr19, $geneClass[$i];
+		push @geneNamechr19, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr20"){
-		push @hsChr20, $pos[$hs_a];
-		push @geneClasschr20, $geneClass[$hs_a];
-		push @geneNamechr20, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr20"){
+		push @hsChr20, $pos[$i];
+		push @geneClasschr20, $geneClass[$i];
+		push @geneNamechr20, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr21"){
-		push @hsChr21, $pos[$hs_a];
-		push @geneClasschr21, $geneClass[$hs_a];
-		push @geneNamechr21, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr21"){
+		push @hsChr21, $pos[$i];
+		push @geneClasschr21, $geneClass[$i];
+		push @geneNamechr21, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chr22"){
-		push @hsChr22, $pos[$hs_a];
-		push @geneClasschr22, $geneClass[$hs_a];
-		push @geneNamechr22, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chr22"){
+		push @hsChr22, $pos[$i];
+		push @geneClasschr22, $geneClass[$i];
+		push @geneNamechr22, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chrX"){
-		push @hsChrX, $pos[$hs_a];
-		push @geneClasschrX, $geneClass[$hs_a];
-		push @geneNamechrX, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chrX"){
+		push @hsChrX, $pos[$i];
+		push @geneClasschrX, $geneClass[$i];
+		push @geneNamechrX, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chrY"){
-		push @hsChrY, $pos[$hs_a];
-		push @geneClasschrY, $geneClass[$hs_a];
-		push @geneNamechrY, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chrY"){
+		push @hsChrY, $pos[$i];
+		push @geneClasschrY, $geneClass[$i];
+		push @geneNamechrY, $geneName[$i];
 	}
-	if ($chrStart[$hs_a] eq "chrM"){
-		push @hsChrM, $pos[$hs_a];
-		push @geneClasschrM, $geneClass[$hs_a];
-		push @geneNamechrM, $geneName[$hs_a];
+	if ($chrStart[$i] eq "chrM"){
+		push @hsChrM, $pos[$i];
+		push @geneClasschrM, $geneClass[$i];
+		push @geneNamechrM, $geneName[$i];
 	}
 }
 
@@ -1063,80 +764,80 @@ for my $hotspotSNV (0..$#hsChrM){
 
 ##### HOTSPOTS Printing Format ####
 print HOTSPOTS "geneClass\tGeneName\tCHR\tBP\tHotspotCount\n";
-for my $t1 (0 .. $#hsChr1){
-	print HOTSPOTS "$geneClasschr1[$t1]\t$geneNamechr1[$t1]\t1\t$hsChr1[$t1]\t$hs_counts_chr1[$t1]\n";
+for my $i (0 .. $#hsChr1){
+	print HOTSPOTS "$geneClasschr1[$i]\t$geneNamechr1[$i]\t1\t$hsChr1[$i]\t$hs_counts_chr1[$i]\n";
 }
-for my $t1 (0 .. $#hsChr2){
-	print HOTSPOTS "$geneClasschr2[$t1]\t$geneNamechr2[$t1]\t2\t$hsChr2[$t1]\t$hs_counts_chr2[$t1]\n";
+for my $i (0 .. $#hsChr2){
+	print HOTSPOTS "$geneClasschr2[$i]\t$geneNamechr2[$i]\t2\t$hsChr2[$i]\t$hs_counts_chr2[$i]\n";
 }
-for my $t1 (0 .. $#hsChr3){
-	print HOTSPOTS "$geneClasschr3[$t1]\t$geneNamechr3[$t1]\t3\t$hsChr3[$t1]\t$hs_counts_chr3[$t1]\n";
+for my $i (0 .. $#hsChr3){
+	print HOTSPOTS "$geneClasschr3[$i]\t$geneNamechr3[$i]\t3\t$hsChr3[$i]\t$hs_counts_chr3[$i]\n";
 }
-for my $t1 (0 .. $#hsChr4){
-	print HOTSPOTS "$geneClasschr4[$t1]\t$geneNamechr4[$t1]\t4\t$hsChr4[$t1]\t$hs_counts_chr4[$t1]\n";
+for my $i (0 .. $#hsChr4){
+	print HOTSPOTS "$geneClasschr4[$i]\t$geneNamechr4[$i]\t4\t$hsChr4[$i]\t$hs_counts_chr4[$i]\n";
 }
-for my $t1 (0 .. $#hsChr5){
-	print HOTSPOTS "$geneClasschr5[$t1]\t$geneNamechr5[$t1]\t5\t$hsChr5[$t1]\t$hs_counts_chr5[$t1]\n";
+for my $i (0 .. $#hsChr5){
+	print HOTSPOTS "$geneClasschr5[$i]\t$geneNamechr5[$i]\t5\t$hsChr5[$i]\t$hs_counts_chr5[$i]\n";
 }
-for my $t1 (0 .. $#hsChr6){
-	print HOTSPOTS "$geneClasschr6[$t1]\t$geneNamechr6[$t1]\t6\t$hsChr6[$t1]\t$hs_counts_chr6[$t1]\n";
+for my $i (0 .. $#hsChr6){
+	print HOTSPOTS "$geneClasschr6[$i]\t$geneNamechr6[$i]\t6\t$hsChr6[$i]\t$hs_counts_chr6[$i]\n";
 }
-for my $t1 (0 .. $#hsChr7){
-	print HOTSPOTS "$geneClasschr7[$t1]\t$geneNamechr7[$t1]\t7\t$hsChr7[$t1]\t$hs_counts_chr7[$t1]\n";
+for my $i (0 .. $#hsChr7){
+	print HOTSPOTS "$geneClasschr7[$i]\t$geneNamechr7[$i]\t7\t$hsChr7[$i]\t$hs_counts_chr7[$i]\n";
 }
-for my $t1 (0 .. $#hsChr8){
-	print HOTSPOTS "$geneClasschr8[$t1]\t$geneNamechr8[$t1]\t8\t$hsChr8[$t1]\t$hs_counts_chr8[$t1]\n";
+for my $i (0 .. $#hsChr8){
+	print HOTSPOTS "$geneClasschr8[$i]\t$geneNamechr8[$i]\t8\t$hsChr8[$i]\t$hs_counts_chr8[$i]\n";
 }
-for my $t1 (0 .. $#hsChr9){
-	print HOTSPOTS "$geneClasschr9[$t1]\t$geneNamechr9[$t1]\t9\t$hsChr9[$t1]\t$hs_counts_chr9[$t1]\n";
+for my $i (0 .. $#hsChr9){
+	print HOTSPOTS "$geneClasschr9[$i]\t$geneNamechr9[$i]\t9\t$hsChr9[$i]\t$hs_counts_chr9[$i]\n";
 }
-for my $t1 (0 .. $#hsChr10){
-	print HOTSPOTS "$geneClasschr10[$t1]\t$geneNamechr10[$t1]\t10\t$hsChr10[$t1]\t$hs_counts_chr10[$t1]\n";
+for my $i (0 .. $#hsChr10){
+	print HOTSPOTS "$geneClasschr10[$i]\t$geneNamechr10[$i]\t10\t$hsChr10[$i]\t$hs_counts_chr10[$i]\n";
 }
-for my $t1 (0 .. $#hsChr11){
-	print HOTSPOTS "$geneClasschr11[$t1]\t$geneNamechr11[$t1]\t11\t$hsChr11[$t1]\t$hs_counts_chr11[$t1]\n";
+for my $i (0 .. $#hsChr11){
+	print HOTSPOTS "$geneClasschr11[$i]\t$geneNamechr11[$i]\t11\t$hsChr11[$i]\t$hs_counts_chr11[$i]\n";
 }
-for my $t1 (0 .. $#hsChr12){
-	print HOTSPOTS "$geneClasschr12[$t1]\t$geneNamechr12[$t1]\t12\t$hsChr12[$t1]\t$hs_counts_chr12[$t1]\n";
+for my $i (0 .. $#hsChr12){
+	print HOTSPOTS "$geneClasschr12[$i]\t$geneNamechr12[$i]\t12\t$hsChr12[$i]\t$hs_counts_chr12[$i]\n";
 }
-for my $t1 (0 .. $#hsChr13){
-	print HOTSPOTS "$geneClasschr13[$t1]\t$geneNamechr13[$t1]\t13\t$hsChr13[$t1]\t$hs_counts_chr13[$t1]\n";
+for my $i (0 .. $#hsChr13){
+	print HOTSPOTS "$geneClasschr13[$i]\t$geneNamechr13[$i]\t13\t$hsChr13[$i]\t$hs_counts_chr13[$i]\n";
 }
-for my $t1 (0 .. $#hsChr14){
-	print HOTSPOTS "$geneClasschr14[$t1]\t$geneNamechr14[$t1]\t14\t$hsChr14[$t1]\t$hs_counts_chr14[$t1]\n";
+for my $i (0 .. $#hsChr14){
+	print HOTSPOTS "$geneClasschr14[$i]\t$geneNamechr14[$i]\t14\t$hsChr14[$i]\t$hs_counts_chr14[$i]\n";
 }
-for my $t1 (0 .. $#hsChr15){
-	print HOTSPOTS "$geneClasschr15[$t1]\t$geneNamechr15[$t1]\t15\t$hsChr15[$t1]\t$hs_counts_chr15[$t1]\n";
+for my $i (0 .. $#hsChr15){
+	print HOTSPOTS "$geneClasschr15[$i]\t$geneNamechr15[$i]\t15\t$hsChr15[$i]\t$hs_counts_chr15[$i]\n";
 }
-for my $t1 (0 .. $#hsChr16){
-	print HOTSPOTS "$geneClasschr16[$t1]\t$geneNamechr16[$t1]\t16\t$hsChr16[$t1]\t$hs_counts_chr16[$t1]\n";
+for my $i (0 .. $#hsChr16){
+	print HOTSPOTS "$geneClasschr16[$i]\t$geneNamechr16[$i]\t16\t$hsChr16[$i]\t$hs_counts_chr16[$i]\n";
 }
-for my $t1 (0 .. $#hsChr17){
-	print HOTSPOTS "$geneClasschr17[$t1]\t$geneNamechr17[$t1]\t17\t$hsChr17[$t1]\t$hs_counts_chr17[$t1]\n";
+for my $i (0 .. $#hsChr17){
+	print HOTSPOTS "$geneClasschr17[$i]\t$geneNamechr17[$i]\t17\t$hsChr17[$i]\t$hs_counts_chr17[$i]\n";
 }
-for my $t1 (0 .. $#hsChr18){
-	print HOTSPOTS "$geneClasschr18[$t1]\t$geneNamechr18[$t1]\t18\t$hsChr18[$t1]\t$hs_counts_chr18[$t1]\n";
+for my $i (0 .. $#hsChr18){
+	print HOTSPOTS "$geneClasschr18[$i]\t$geneNamechr18[$i]\t18\t$hsChr18[$i]\t$hs_counts_chr18[$i]\n";
 }
-for my $t1 (0 .. $#hsChr19){
-	print HOTSPOTS "$geneClasschr19[$t1]\t$geneNamechr19[$t1]\t19\t$hsChr19[$t1]\t$hs_counts_chr19[$t1]\n";
+for my $i (0 .. $#hsChr19){
+	print HOTSPOTS "$geneClasschr19[$i]\t$geneNamechr19[$i]\t19\t$hsChr19[$i]\t$hs_counts_chr19[$i]\n";
 }
-for my $t1 (0 .. $#hsChr20){
-	print HOTSPOTS "$geneClasschr20[$t1]\t$geneNamechr20[$t1]\t20\t$hsChr20[$t1]\t$hs_counts_chr20[$t1]\n";
+for my $i (0 .. $#hsChr20){
+	print HOTSPOTS "$geneClasschr20[$i]\t$geneNamechr20[$i]\t20\t$hsChr20[$i]\t$hs_counts_chr20[$i]\n";
 }
-for my $t1 (0 .. $#hsChr21){
-	print HOTSPOTS "$geneClasschr21[$t1]\t$geneNamechr21[$t1]\t21\t$hsChr21[$t1]\t$hs_counts_chr21[$t1]\n";
+for my $i (0 .. $#hsChr21){
+	print HOTSPOTS "$geneClasschr21[$i]\t$geneNamechr21[$i]\t21\t$hsChr21[$i]\t$hs_counts_chr21[$i]\n";
 }
-for my $t1 (0 .. $#hsChr22){
-	print HOTSPOTS "$geneClasschr22[$t1]\t$geneNamechr22[$t1]\t22\t$hsChr22[$t1]\t$hs_counts_chr22[$t1]\n";
+for my $i (0 .. $#hsChr22){
+	print HOTSPOTS "$geneClasschr22[$i]\t$geneNamechr22[$i]\t22\t$hsChr22[$i]\t$hs_counts_chr22[$i]\n";
 }
-for my $t1 (0 .. $#hsChrX){
-	print HOTSPOTS "$geneClasschrX[$t1]\t$geneNamechrX[$t1]\t23\t$hsChrX[$t1]\t$hs_counts_chrX[$t1]\n";
+for my $i (0 .. $#hsChrX){
+	print HOTSPOTS "$geneClasschrX[$i]\t$geneNamechrX[$i]\t23\t$hsChrX[$i]\t$hs_counts_chrX[$i]\n";
 }
-for my $t1 (0 .. $#hsChrY){
-	print HOTSPOTS "$geneClasschrY[$t1]\t$geneNamechrY[$t1]\t24\t$hsChrY[$t1]\t$hs_counts_chrY[$t1]\n";
+for my $i (0 .. $#hsChrY){
+	print HOTSPOTS "$geneClasschrY[$i]\t$geneNamechrY[$i]\t24\t$hsChrY[$i]\t$hs_counts_chrY[$i]\n";
 }
-for my $t1 (0 .. $#hsChrM){
-	print HOTSPOTS "$geneClasschrM[$t1]\t$geneNamechrM[$t1]\t25\t$hsChrM[$t1]\t$hs_counts_chrM[$t1]\n";
+for my $i (0 .. $#hsChrM){
+	print HOTSPOTS "$geneClasschrM[$i]\t$geneNamechrM[$i]\t25\t$hsChrM[$i]\t$hs_counts_chrM[$i]\n";
 }
 
 
@@ -1146,436 +847,436 @@ print "\nExtracting context sequences and saving weblogo-$inputRawSNV ..\n";
 
 $db = Bio::DB::Fasta->new("genomes/genome_$genome_version.fa");
 
-for my $a1 (0..$#hsChr1){
-	my $a2=$hsChr1[$a1]-$contextSequenceLength;
-	my $a3=$hsChr1[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr1', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr1_$hsChr1[$a1]\n$seq\n";
+for my $i (0..$#hsChr1){
+	my $i2=$hsChr1[$i]-$contextSequenceLength;
+	my $i3=$hsChr1[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr1', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr1_$hsChr1[$i]\n$seq\n";
 }
 
-for my $a1 (0..$#hsChr2){
-	my $a2=$hsChr2[$a1]-$contextSequenceLength;
-	my $a3=$hsChr2[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr2', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr2_$hsChr2[$a1]\n$seq\n";
+for my $i (0..$#hsChr2){
+	my $i2=$hsChr2[$i]-$contextSequenceLength;
+	my $i3=$hsChr2[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr2', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr2_$hsChr2[$i]\n$seq\n";
 }
 
-for my $a1 (0..$#hsChr3){
-	my $a2=$hsChr3[$a1]-$contextSequenceLength;
-	my $a3=$hsChr3[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr3', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr3_$hsChr3[$a1]\n$seq\n";
+for my $i (0..$#hsChr3){
+	my $i2=$hsChr3[$i]-$contextSequenceLength;
+	my $i3=$hsChr3[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr3', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr3_$hsChr3[$i]\n$seq\n";
 }
 
-for my $a1 (0..$#hsChr4){
-	my $a2=$hsChr4[$a1]-$contextSequenceLength;
-	my $a3=$hsChr4[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr4', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr4_$hsChr4[$a1]\n$seq\n";
+for my $i (0..$#hsChr4){
+	my $i2=$hsChr4[$i]-$contextSequenceLength;
+	my $i3=$hsChr4[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr4', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr4_$hsChr4[$i]\n$seq\n";
 }
 
-for my $a1 (0..$#hsChr5){
-	my $a2=$hsChr5[$a1]-$contextSequenceLength;
-	my $a3=$hsChr5[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr5', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr5_$hsChr5[$a1]\n$seq\n";
+for my $i (0..$#hsChr5){
+	my $i2=$hsChr5[$i]-$contextSequenceLength;
+	my $i3=$hsChr5[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr5', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr5_$hsChr5[$i]\n$seq\n";
 }
 
-for my $a1 (0..$#hsChr6){
-	my $a2=$hsChr6[$a1]-$contextSequenceLength;
-	my $a3=$hsChr6[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr6', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr6_$hsChr6[$a1]\n$seq\n";
+for my $i (0..$#hsChr6){
+	my $i2=$hsChr6[$i]-$contextSequenceLength;
+	my $i3=$hsChr6[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr6', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr6_$hsChr6[$i]\n$seq\n";
 }
 
-for my $a1 (0..$#hsChr7){
-	my $a2=$hsChr7[$a1]-$contextSequenceLength;
-	my $a3=$hsChr7[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr7', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr7_$hsChr7[$a1]\n$seq\n";
+for my $i (0..$#hsChr7){
+	my $i2=$hsChr7[$i]-$contextSequenceLength;
+	my $i3=$hsChr7[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr7', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr7_$hsChr7[$i]\n$seq\n";
 }
 
-for my $a1 (0..$#hsChr8){
-	my $a2=$hsChr8[$a1]-$contextSequenceLength;
-	my $a3=$hsChr8[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr8', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr8_$hsChr8[$a1]\n$seq\n";
+for my $i (0..$#hsChr8){
+	my $i2=$hsChr8[$i]-$contextSequenceLength;
+	my $i3=$hsChr8[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr8', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr8_$hsChr8[$i]\n$seq\n";
 }
 
-for my $a1 (0..$#hsChr9){
-	my $a2=$hsChr9[$a1]-$contextSequenceLength;
-	my $a3=$hsChr9[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr9', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr9_$hsChr9[$a1]\n$seq\n";
+for my $i (0..$#hsChr9){
+	my $i2=$hsChr9[$i]-$contextSequenceLength;
+	my $i3=$hsChr9[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr9', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr9_$hsChr9[$i]\n$seq\n";
 }
 
-for my $a1 (0..$#hsChr10){
-	my $a2=$hsChr10[$a1]-$contextSequenceLength;
-	my $a3=$hsChr10[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr10', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr10_$hsChr10[$a1]\n$seq\n";
+for my $i (0..$#hsChr10){
+	my $i2=$hsChr10[$i]-$contextSequenceLength;
+	my $i3=$hsChr10[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr10', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr10_$hsChr10[$i]\n$seq\n";
 }
 
-for my $a1 (0..$#hsChr11){
-	my $a2=$hsChr11[$a1]-$contextSequenceLength;
-	my $a3=$hsChr11[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr11', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr11_$hsChr11[$a1]\n$seq\n";
+for my $i (0..$#hsChr11){
+	my $i2=$hsChr11[$i]-$contextSequenceLength;
+	my $i3=$hsChr11[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr11', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr11_$hsChr11[$i]\n$seq\n";
 }
 
-for my $a1 (0..$#hsChr12){
-	my $a2=$hsChr12[$a1]-$contextSequenceLength;
-	my $a3=$hsChr12[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr12', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr12_$hsChr1[$a1]\n$seq\n";
+for my $i (0..$#hsChr12){
+	my $i2=$hsChr12[$i]-$contextSequenceLength;
+	my $i3=$hsChr12[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr12', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr12_$hsChr1[$i]\n$seq\n";
 }
 
-for my $a1 (0..$#hsChr13){
-	my $a2=$hsChr13[$a1]-$contextSequenceLength;
-	my $a3=$hsChr13[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr13', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr13_$hsChr13[$a1]\n$seq\n";
+for my $i (0..$#hsChr13){
+	my $i2=$hsChr13[$i]-$contextSequenceLength;
+	my $i3=$hsChr13[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr13', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr13_$hsChr13[$i]\n$seq\n";
 }
 
-for my $a1 (0..$#hsChr14){
-	my $a2=$hsChr14[$a1]-$contextSequenceLength;
-	my $a3=$hsChr14[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr14', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr14_$hsChr14[$a1]\n$seq\n";
+for my $i (0..$#hsChr14){
+	my $i2=$hsChr14[$i]-$contextSequenceLength;
+	my $i3=$hsChr14[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr14', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr14_$hsChr14[$i]\n$seq\n";
 }
-for my $a1 (0..$#hsChr15){
-	my $a2=$hsChr15[$a1]-$contextSequenceLength;
-	my $a3=$hsChr15[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr15', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr15_$hsChr15[$a1]\n$seq\n";
+for my $i (0..$#hsChr15){
+	my $i2=$hsChr15[$i]-$contextSequenceLength;
+	my $i3=$hsChr15[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr15', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr15_$hsChr15[$i]\n$seq\n";
 }
-for my $a1 (0..$#hsChr16){
-	my $a2=$hsChr16[$a1]-$contextSequenceLength;
-	my $a3=$hsChr16[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr16', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr16_$hsChr16[$a1]\n$seq\n";
+for my $i (0..$#hsChr16){
+	my $i2=$hsChr16[$i]-$contextSequenceLength;
+	my $i3=$hsChr16[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr16', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr16_$hsChr16[$i]\n$seq\n";
 }
-for my $a1 (0..$#hsChr17){
-	my $a2=$hsChr17[$a1]-$contextSequenceLength;
-	my $a3=$hsChr17[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr17', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr17_$hsChr17[$a1]\n$seq\n";
+for my $i (0..$#hsChr17){
+	my $i2=$hsChr17[$i]-$contextSequenceLength;
+	my $i3=$hsChr17[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr17', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr17_$hsChr17[$i]\n$seq\n";
 }
-for my $a1 (0..$#hsChr18){
-	my $a2=$hsChr18[$a1]-$contextSequenceLength;
-	my $a3=$hsChr18[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr18', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr18_$hsChr18[$a1]\n$seq\n";
+for my $i (0..$#hsChr18){
+	my $i2=$hsChr18[$i]-$contextSequenceLength;
+	my $i3=$hsChr18[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr18', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr18_$hsChr18[$i]\n$seq\n";
 }
-for my $a1 (0..$#hsChr19){
-	my $a2=$hsChr19[$a1]-$contextSequenceLength;
-	my $a3=$hsChr19[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr19', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr19_$hsChr19[$a1]\n$seq\n";
+for my $i (0..$#hsChr19){
+	my $i2=$hsChr19[$i]-$contextSequenceLength;
+	my $i3=$hsChr19[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr19', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr19_$hsChr19[$i]\n$seq\n";
 }
-for my $a1 (0..$#hsChr20){
-	my $a2=$hsChr20[$a1]-$contextSequenceLength;
-	my $a3=$hsChr20[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr20', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr20_$hsChr20[$a1]\n$seq\n";
+for my $i (0..$#hsChr20){
+	my $i2=$hsChr20[$i]-$contextSequenceLength;
+	my $i3=$hsChr20[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr20', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr20_$hsChr20[$i]\n$seq\n";
 }
-for my $a1 (0..$#hsChr21){
-	my $a2=$hsChr21[$a1]-$contextSequenceLength;
-	my $a3=$hsChr21[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr21', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr21_$hsChr21[$a1]\n$seq\n";
+for my $i (0..$#hsChr21){
+	my $i2=$hsChr21[$i]-$contextSequenceLength;
+	my $i3=$hsChr21[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr21', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr21_$hsChr21[$i]\n$seq\n";
 }
-for my $a1 (0..$#hsChr22){
-	my $a2=$hsChr22[$a1]-$contextSequenceLength;
-	my $a3=$hsChr22[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chr22', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chr22_$hsChr22[$a1]\n$seq\n";
+for my $i (0..$#hsChr22){
+	my $i2=$hsChr22[$i]-$contextSequenceLength;
+	my $i3=$hsChr22[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chr22', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chr22_$hsChr22[$i]\n$seq\n";
 }
-for my $a1 (0..$#hsChrX){
-	my $a2=$hsChrX[$a1]-$contextSequenceLength;
-	my $a3=$hsChrX[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chrX', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chrX_$hsChrX[$a1]\n$seq\n";
+for my $i (0..$#hsChrX){
+	my $i2=$hsChrX[$i]-$contextSequenceLength;
+	my $i3=$hsChrX[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chrX', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chrX_$hsChrX[$i]\n$seq\n";
 }
-for my $a1 (0..$#hsChrY){
-	my $a2=$hsChrY[$a1]-$contextSequenceLength;
-	my $a3=$hsChrY[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chrY', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chrY_$hsChrY[$a1]\n$seq\n";
+for my $i (0..$#hsChrY){
+	my $i2=$hsChrY[$i]-$contextSequenceLength;
+	my $i3=$hsChrY[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chrY', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chrY_$hsChrY[$i]\n$seq\n";
 }
-for my $a1 (0..$#hsChrM){
-	my $a2=$hsChrM[$a1]-$contextSequenceLength;
-	my $a3=$hsChrM[$a1]+$contextSequenceLength;
-	my $seq = $db->seq('chrM', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQ ">chrM_$hsChrM[$a1]\n$seq\n";
+for my $i (0..$#hsChrM){
+	my $i2=$hsChrM[$i]-$contextSequenceLength;
+	my $i3=$hsChrM[$i]+$contextSequenceLength;
+	my $seq = $db->seq('chrM', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQ ">chrM_$hsChrM[$i]\n$seq\n";
 }
 
 print "\nExtracting context sequences and saving extracted_sequences-$inputRawSNV ..\n";
 
 $db1 = Bio::DB::Fasta->new("genomes/genome_$genome_version.fa");
 
-for my $a1 (0..$#hsChr1){
-	my $a2=$hsChr1[$a1]-$contextSequenceLength;
-	my $a3=$hsChr1[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr1', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr1_$hsChr1[$a1]\n$seq\t$geneClasschr1[$a1]\t$geneNamechr1[$a1]\n";
+for my $i (0..$#hsChr1){
+	my $i2=$hsChr1[$i]-$contextSequenceLength;
+	my $i3=$hsChr1[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr1', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr1_$hsChr1[$i]\n$seq\t$geneClasschr1[$i]\t$geneNamechr1[$i]\n";
 }
 
-for my $a1 (0..$#hsChr2){
-	my $a2=$hsChr2[$a1]-$contextSequenceLength;
-	my $a3=$hsChr2[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr2', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr2_$hsChr2[$a1]\n$seq\t$geneClasschr2[$a1]\t$geneNamechr2[$a1]\n";
+for my $i (0..$#hsChr2){
+	my $i2=$hsChr2[$i]-$contextSequenceLength;
+	my $i3=$hsChr2[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr2', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr2_$hsChr2[$i]\n$seq\t$geneClasschr2[$i]\t$geneNamechr2[$i]\n";
 }
 
-for my $a1 (0..$#hsChr3){
-	my $a2=$hsChr3[$a1]-$contextSequenceLength;
-	my $a3=$hsChr3[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr3', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr3_$hsChr3[$a1]\n$seq\t$geneClasschr3[$a1]\t$geneNamechr3[$a1]\n";
+for my $i (0..$#hsChr3){
+	my $i2=$hsChr3[$i]-$contextSequenceLength;
+	my $i3=$hsChr3[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr3', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr3_$hsChr3[$i]\n$seq\t$geneClasschr3[$i]\t$geneNamechr3[$i]\n";
 }
 
-for my $a1 (0..$#hsChr4){
-	my $a2=$hsChr4[$a1]-$contextSequenceLength;
-	my $a3=$hsChr4[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr4', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr4_$hsChr4[$a1]\n$seq\t$geneClasschr4[$a1]\t$geneNamechr4[$a1]\n";
+for my $i (0..$#hsChr4){
+	my $i2=$hsChr4[$i]-$contextSequenceLength;
+	my $i3=$hsChr4[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr4', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr4_$hsChr4[$i]\n$seq\t$geneClasschr4[$i]\t$geneNamechr4[$i]\n";
 }
 
-for my $a1 (0..$#hsChr5){
-	my $a2=$hsChr5[$a1]-$contextSequenceLength;
-	my $a3=$hsChr5[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr5', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr5_$hsChr5[$a1]\n$seq\t$geneClasschr5[$a1]\t$geneNamechr5[$a1]\n";
+for my $i (0..$#hsChr5){
+	my $i2=$hsChr5[$i]-$contextSequenceLength;
+	my $i3=$hsChr5[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr5', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr5_$hsChr5[$i]\n$seq\t$geneClasschr5[$i]\t$geneNamechr5[$i]\n";
 }
 
-for my $a1 (0..$#hsChr6){
-	my $a2=$hsChr6[$a1]-$contextSequenceLength;
-	my $a3=$hsChr6[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr6', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr6_$hsChr6[$a1]\n$seq\t$geneClasschr6[$a1]\t$geneNamechr6[$a1]\n";
+for my $i (0..$#hsChr6){
+	my $i2=$hsChr6[$i]-$contextSequenceLength;
+	my $i3=$hsChr6[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr6', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr6_$hsChr6[$i]\n$seq\t$geneClasschr6[$i]\t$geneNamechr6[$i]\n";
 }
 
-for my $a1 (0..$#hsChr7){
-	my $a2=$hsChr7[$a1]-$contextSequenceLength;
-	my $a3=$hsChr7[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr7', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr7_$hsChr7[$a1]\n$seq\t$geneClasschr7[$a1]\t$geneNamechr7[$a1]\n";
+for my $i (0..$#hsChr7){
+	my $i2=$hsChr7[$i]-$contextSequenceLength;
+	my $i3=$hsChr7[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr7', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr7_$hsChr7[$i]\n$seq\t$geneClasschr7[$i]\t$geneNamechr7[$i]\n";
 }
 
-for my $a1 (0..$#hsChr8){
-	my $a2=$hsChr8[$a1]-$contextSequenceLength;
-	my $a3=$hsChr8[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr8', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr8_$hsChr8[$a1]\n$seq\t$geneClasschr8[$a1]\t$geneNamechr8[$a1]\n";
+for my $i (0..$#hsChr8){
+	my $i2=$hsChr8[$i]-$contextSequenceLength;
+	my $i3=$hsChr8[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr8', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr8_$hsChr8[$i]\n$seq\t$geneClasschr8[$i]\t$geneNamechr8[$i]\n";
 }
 
-for my $a1 (0..$#hsChr9){
-	my $a2=$hsChr9[$a1]-$contextSequenceLength;
-	my $a3=$hsChr9[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr9', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr9_$hsChr9[$a1]\n$seq\t$geneClasschr9[$a1]\t$geneNamechr9[$a1]\n";
+for my $i (0..$#hsChr9){
+	my $i2=$hsChr9[$i]-$contextSequenceLength;
+	my $i3=$hsChr9[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr9', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr9_$hsChr9[$i]\n$seq\t$geneClasschr9[$i]\t$geneNamechr9[$i]\n";
 }
 
-for my $a1 (0..$#hsChr10){
-	my $a2=$hsChr10[$a1]-$contextSequenceLength;
-	my $a3=$hsChr10[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr10', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr10_$hsChr10[$a1]\n$seq\t$geneClasschr10[$a1]\t$geneNamechr10[$a1]\n";
+for my $i (0..$#hsChr10){
+	my $i2=$hsChr10[$i]-$contextSequenceLength;
+	my $i3=$hsChr10[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr10', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr10_$hsChr10[$i]\n$seq\t$geneClasschr10[$i]\t$geneNamechr10[$i]\n";
 }
 
-for my $a1 (0..$#hsChr11){
-	my $a2=$hsChr11[$a1]-$contextSequenceLength;
-	my $a3=$hsChr11[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr11', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr11_$hsChr11[$a1]\n$seq\t$geneClasschr11[$a1]\t$geneNamechr11[$a1]\n";
+for my $i (0..$#hsChr11){
+	my $i2=$hsChr11[$i]-$contextSequenceLength;
+	my $i3=$hsChr11[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr11', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr11_$hsChr11[$i]\n$seq\t$geneClasschr11[$i]\t$geneNamechr11[$i]\n";
 }
 
-for my $a1 (0..$#hsChr12){
-	my $a2=$hsChr12[$a1]-$contextSequenceLength;
-	my $a3=$hsChr12[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr12', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr12_$hsChr1[$a1]\n$seq\t$geneClasschr12[$a1]\t$geneNamechr12[$a1]\n";
+for my $i (0..$#hsChr12){
+	my $i2=$hsChr12[$i]-$contextSequenceLength;
+	my $i3=$hsChr12[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr12', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr12_$hsChr1[$i]\n$seq\t$geneClasschr12[$i]\t$geneNamechr12[$i]\n";
 }
 
-for my $a1 (0..$#hsChr13){
-	my $a2=$hsChr13[$a1]-$contextSequenceLength;
-	my $a3=$hsChr13[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr13', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr13_$hsChr13[$a1]\n$seq\t$geneClasschr13[$a1]\t$geneNamechr13[$a1]\n";
+for my $i (0..$#hsChr13){
+	my $i2=$hsChr13[$i]-$contextSequenceLength;
+	my $i3=$hsChr13[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr13', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr13_$hsChr13[$i]\n$seq\t$geneClasschr13[$i]\t$geneNamechr13[$i]\n";
 }
 
-for my $a1 (0..$#hsChr14){
-	my $a2=$hsChr14[$a1]-$contextSequenceLength;
-	my $a3=$hsChr14[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr14', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr14_$hsChr14[$a1]\n$seq\t$geneClasschr14[$a1]\t$geneNamechr14[$a1]\n";
+for my $i (0..$#hsChr14){
+	my $i2=$hsChr14[$i]-$contextSequenceLength;
+	my $i3=$hsChr14[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr14', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr14_$hsChr14[$i]\n$seq\t$geneClasschr14[$i]\t$geneNamechr14[$i]\n";
 }
-for my $a1 (0..$#hsChr15){
-	my $a2=$hsChr15[$a1]-$contextSequenceLength;
-	my $a3=$hsChr15[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr15', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr15_$hsChr15[$a1]\n$seq\t$geneClasschr15[$a1]\t$geneNamechr15[$a1]\n";
+for my $i (0..$#hsChr15){
+	my $i2=$hsChr15[$i]-$contextSequenceLength;
+	my $i3=$hsChr15[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr15', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr15_$hsChr15[$i]\n$seq\t$geneClasschr15[$i]\t$geneNamechr15[$i]\n";
 }
-for my $a1 (0..$#hsChr16){
-	my $a2=$hsChr16[$a1]-$contextSequenceLength;
-	my $a3=$hsChr16[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr16', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr16_$hsChr16[$a1]\n$seq\t$geneClasschr16[$a1]\t$geneNamechr16[$a1]\n";
+for my $i (0..$#hsChr16){
+	my $i2=$hsChr16[$i]-$contextSequenceLength;
+	my $i3=$hsChr16[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr16', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr16_$hsChr16[$i]\n$seq\t$geneClasschr16[$i]\t$geneNamechr16[$i]\n";
 }
-for my $a1 (0..$#hsChr17){
-	my $a2=$hsChr17[$a1]-$contextSequenceLength;
-	my $a3=$hsChr17[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr17', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr17_$hsChr17[$a1]\n$seq\t$geneClasschr17[$a1]\t$geneNamechr17[$a1]\n";
+for my $i (0..$#hsChr17){
+	my $i2=$hsChr17[$i]-$contextSequenceLength;
+	my $i3=$hsChr17[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr17', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr17_$hsChr17[$i]\n$seq\t$geneClasschr17[$i]\t$geneNamechr17[$i]\n";
 }
-for my $a1 (0..$#hsChr18){
-	my $a2=$hsChr18[$a1]-$contextSequenceLength;
-	my $a3=$hsChr18[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr18', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr18_$hsChr18[$a1]\n$seq\t$geneClasschr18[$a1]\t$geneNamechr18[$a1]\n";
+for my $i (0..$#hsChr18){
+	my $i2=$hsChr18[$i]-$contextSequenceLength;
+	my $i3=$hsChr18[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr18', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr18_$hsChr18[$i]\n$seq\t$geneClasschr18[$i]\t$geneNamechr18[$i]\n";
 }
-for my $a1 (0..$#hsChr19){
-	my $a2=$hsChr19[$a1]-$contextSequenceLength;
-	my $a3=$hsChr19[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr19', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr19_$hsChr19[$a1]\n$seq\t$geneClasschr19[$a1]\t$geneNamechr19[$a1]\n";
+for my $i (0..$#hsChr19){
+	my $i2=$hsChr19[$i]-$contextSequenceLength;
+	my $i3=$hsChr19[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr19', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr19_$hsChr19[$i]\n$seq\t$geneClasschr19[$i]\t$geneNamechr19[$i]\n";
 }
-for my $a1 (0..$#hsChr20){
-	my $a2=$hsChr20[$a1]-$contextSequenceLength;
-	my $a3=$hsChr20[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr20', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr20_$hsChr20[$a1]\n$seq\t$geneClasschr20[$a1]\t$geneNamechr20[$a1]\n";
+for my $i (0..$#hsChr20){
+	my $i2=$hsChr20[$i]-$contextSequenceLength;
+	my $i3=$hsChr20[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr20', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr20_$hsChr20[$i]\n$seq\t$geneClasschr20[$i]\t$geneNamechr20[$i]\n";
 }
-for my $a1 (0..$#hsChr21){
-	my $a2=$hsChr21[$a1]-$contextSequenceLength;
-	my $a3=$hsChr21[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr21', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr21_$hsChr21[$a1]\n$seq\t$geneClasschr21[$a1]\t$geneNamechr21[$a1]\n";
+for my $i (0..$#hsChr21){
+	my $i2=$hsChr21[$i]-$contextSequenceLength;
+	my $i3=$hsChr21[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr21', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr21_$hsChr21[$i]\n$seq\t$geneClasschr21[$i]\t$geneNamechr21[$i]\n";
 }
-for my $a1 (0..$#hsChr22){
-	my $a2=$hsChr22[$a1]-$contextSequenceLength;
-	my $a3=$hsChr22[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chr22', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chr22_$hsChr22[$a1]\n$seq\t$geneClasschr22[$a1]\t$geneNamechr22[$a1]\n";
+for my $i (0..$#hsChr22){
+	my $i2=$hsChr22[$i]-$contextSequenceLength;
+	my $i3=$hsChr22[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chr22', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chr22_$hsChr22[$i]\n$seq\t$geneClasschr22[$i]\t$geneNamechr22[$i]\n";
 }
-for my $a1 (0..$#hsChrX){
-	my $a2=$hsChrX[$a1]-$contextSequenceLength;
-	my $a3=$hsChrX[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chrX', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chrX_$hsChrX[$a1]\n$seq\t$geneClasschrX[$a1]\t$geneNamechrX[$a1]\n";
+for my $i (0..$#hsChrX){
+	my $i2=$hsChrX[$i]-$contextSequenceLength;
+	my $i3=$hsChrX[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chrX', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chrX_$hsChrX[$i]\n$seq\t$geneClasschrX[$i]\t$geneNamechrX[$i]\n";
 }
-for my $a1 (0..$#hsChrY){
-	my $a2=$hsChrY[$a1]-$contextSequenceLength;
-	my $a3=$hsChrY[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chrY', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chrY_$hsChrY[$a1]\n$seq\t$geneClasschrY[$a1]\t$geneNamechrY[$a1]\n";
+for my $i (0..$#hsChrY){
+	my $i2=$hsChrY[$i]-$contextSequenceLength;
+	my $i3=$hsChrY[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chrY', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chrY_$hsChrY[$i]\n$seq\t$geneClasschrY[$i]\t$geneNamechrY[$i]\n";
 }
-for my $a1 (0..$#hsChrM){
-	my $a2=$hsChrM[$a1]-$contextSequenceLength;
-	my $a3=$hsChrM[$a1]+$contextSequenceLength;
-	my $seq = $db1->seq('chrM', $a2 => $a3);
-	$a2=0;
-	$a3=0;
-	print CONTEXTSEQANNO ">chrM_$hsChrM[$a1]\n$seq\t$geneClasschrM[$a1]\t$geneNamechrM[$a1]\n";
+for my $i (0..$#hsChrM){
+	my $i2=$hsChrM[$i]-$contextSequenceLength;
+	my $i3=$hsChrM[$i]+$contextSequenceLength;
+	my $seq = $db1->seq('chrM', $i2 => $i3);
+	$i2=0;
+	$i3=0;
+	print CONTEXTSEQANNO ">chrM_$hsChrM[$i]\n$seq\t$geneClasschrM[$i]\t$geneNamechrM[$i]\n";
 }
 
 
@@ -1611,14 +1312,14 @@ open CONTEXTSEQANNO, "<results-$inputRawSNV/WOLAND-contextsequencesanno-$inputRa
 
 for my $i (0..$#fastaContext){
 	if ($fastaContext[$i] =~ /^>/){
-		@i7 = split (/\t/, "$fastaContext[$i+1]");
-		@i3 = split (/\n/, "$fastaContext[$i]");
-		chomp(@i7);
-		push (@fastaContextMS, "$i3[0]\n$i7[0]\n");
-		push (@geneClassMS, "$i7[1]");
-		push (@geneNameMS, "$i7[2]");
-		@i7=();
-		@i3=();
+		@i2 = split (/\t/, "$fastaContext[$i+1]");
+		@i = split (/\n/, "$fastaContext[$i]");
+		chomp(@i2);
+		push (@fastaContextMS, "$i[0]\n$i2[0]\n");
+		push (@geneClassMS, "$i2[1]");
+		push (@geneNameMS, "$i2[2]");
+		@i2=();
+		@i=();
 	}
 }
 
@@ -1635,22 +1336,22 @@ foreach $geneNameMS (@geneNameMS){
 }
 
 foreach $fastaContextMS (@fastaContextMS){
-	@i3 = split (/\n/, "$fastaContextMS");
-	push (@id, $i3[0]);
-	push (@targetSequence, $i3[1]);
+	@i = split (/\n/, "$fastaContextMS");
+	push (@id, $i[0]);
+	push (@targetSequence, $i[1]);
 }
 
 foreach $id (@id){
-	@i2 = split (/_/, $id);
-	chomp (@i2);
-	push (@chrRaw, "$i2[0]");
-	push (@coord, "$i2[1]");
+	@i = split (/_/, $id);
+	chomp (@i);
+	push (@chrRaw, "$i[0]");
+	push (@coord, "$i[1]");
 }
 
 foreach $chrRaw (@chrRaw){
-	@i3 = split (/>/, $chrRaw);
-	chomp (@i3);
-	push (@chrSt, "$i3[1]");
+	@i = split (/>/, $chrRaw);
+	chomp (@i);
+	push (@chrSt, "$i[1]");
 }
 
 ############################# STRAND BIAS REFSEQ #############################################
@@ -1708,15 +1409,15 @@ for my $iSN1 (0..$#SN1){
 		$query_coord=$coord[$iSN1];
 		$strand_plus_count=0;
     	$strand_count=0;
-		for my $i4 (0 .. $#chrRefSeq){
-			if ($chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
+		for my $i (0 .. $#chrRefSeq){
+			if ($chrRefSeq[$i] eq $query_chr and (($query_coord <= $txstartRefSeq[$i] and $query_coord >= $txtendRefSeq[$i]) or ($query_coord >= $txstartRefSeq[$i] and $query_coord <= $txtendRefSeq[$i]))){
 				++$strand_count;
 			}
-			if ($strandRefSeq[$i4] eq "+" && $chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
+			if ($strandRefSeq[$i] eq "+" && $chrRefSeq[$i] eq $query_chr and (($query_coord <= $txstartRefSeq[$i] and $query_coord >= $txtendRefSeq[$i]) or ($query_coord >= $txstartRefSeq[$i] and $query_coord <= $txtendRefSeq[$i]))){
 				++$strand_plus_count;
 			} 
 		}
-		$i4=0;
+		$i=0;
 		if ($strand_count >= 1){
 			$strand_transcript=$strand_plus_count/$strand_count;
     		$strand_score=$strand_transcript - ($strand_value);
@@ -1761,15 +1462,15 @@ for my $iDNApoln (0..$#DNApoln){
 	$query_coord=$coord[$iDNApoln];
 	$strand_plus_count=0;
 	$strand_count=0;
-	for my $i4 (0 .. $#chrRefSeq){
-		if ($chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
+	for my $i (0 .. $#chrRefSeq){
+		if ($chrRefSeq[$i] eq $query_chr and (($query_coord <= $txstartRefSeq[$i] and $query_coord >= $txtendRefSeq[$i]) or ($query_coord >= $txstartRefSeq[$i] and $query_coord <= $txtendRefSeq[$i]))){
 			++$strand_count;
 		}
-		if ($strandRefSeq[$i4] eq "+" && $chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
+		if ($strandRefSeq[$i] eq "+" && $chrRefSeq[$i] eq $query_chr and (($query_coord <= $txstartRefSeq[$i] and $query_coord >= $txtendRefSeq[$i]) or ($query_coord >= $txstartRefSeq[$i] and $query_coord <= $txtendRefSeq[$i]))){
 			++$strand_plus_count;
 		} 
 	}
-	$i4=0;
+	$i=0;
 		if ($strand_count >= 1){
 			$strand_transcript=$strand_plus_count/$strand_count;
 			$strand_score=$strand_transcript - ($strand_value);
@@ -1811,15 +1512,15 @@ for my $ioxoG (0..$#oxoG){
 		$query_coord=$coord[$ioxoG];
 		$strand_plus_count=0;
     	$strand_count=0;
-		for my $i4 (0 .. $#chrRefSeq){
-			if ($chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
+		for my $i (0 .. $#chrRefSeq){
+			if ($chrRefSeq[$i] eq $query_chr and (($query_coord <= $txstartRefSeq[$i] and $query_coord >= $txtendRefSeq[$i]) or ($query_coord >= $txstartRefSeq[$i] and $query_coord <= $txtendRefSeq[$i]))){
 				++$strand_count;
 			}
-			if ($strandRefSeq[$i4] eq "+" && $chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
+			if ($strandRefSeq[$i] eq "+" && $chrRefSeq[$i] eq $query_chr and (($query_coord <= $txstartRefSeq[$i] and $query_coord >= $txtendRefSeq[$i]) or ($query_coord >= $txstartRefSeq[$i] and $query_coord <= $txtendRefSeq[$i]))){
 				++$strand_plus_count;
 			} 
 		}
-		$i4=0;
+		$i=0;
 		if ($strand_count >= 1){
 			$strand_transcript=$strand_plus_count/$strand_count;
 			$strand_score=$strand_transcript - ($strand_value);
@@ -1871,15 +1572,15 @@ for my $iuv (0..$#UVlambda){
 		$query_coord=$coord[$iuv];
 		$strand_plus_count=0;
 		$strand_count=0;
-		for my $i5 (0 .. $#chrRefSeq){
-			if ($chrRefSeq[$i5] eq $query_chr and (($query_coord <= $txstartRefSeq[$i5] and $query_coord >= $txtendRefSeq[$i5]) or ($query_coord >= $txstartRefSeq[$i5] and $query_coord <= $txtendRefSeq[$i5]))){
+		for my $i (0 .. $#chrRefSeq){
+			if ($chrRefSeq[$i] eq $query_chr and (($query_coord <= $txstartRefSeq[$i] and $query_coord >= $txtendRefSeq[$i]) or ($query_coord >= $txstartRefSeq[$i] and $query_coord <= $txtendRefSeq[$i]))){
 				++$strand_count;
 			}
-			if ($strandRefSeq[$i5] eq "+" && $chrRefSeq[$i5] eq $query_chr and (($query_coord <= $txstartRefSeq[$i5] and $query_coord >= $txtendRefSeq[$i5]) or ($query_coord >= $txstartRefSeq[$i5] and $query_coord <= $txtendRefSeq[$i5]))){
+			if ($strandRefSeq[$i] eq "+" && $chrRefSeq[$i] eq $query_chr and (($query_coord <= $txstartRefSeq[$i] and $query_coord >= $txtendRefSeq[$i]) or ($query_coord >= $txstartRefSeq[$i] and $query_coord <= $txtendRefSeq[$i]))){
 				++$strand_plus_count;
 			} 
 		}
-		$i5=0;
+		$i=0;
 		if ($strand_count >= 1){
 			$strand_transcript=$strand_plus_count/$strand_count;
 			$strand_score=$strand_transcript - ($strand_value);
@@ -1927,15 +1628,15 @@ for my $iUVsolar (0..$#UVsolar){
 		$query_coord=$coord[$iUVsolar];
 		$strand_plus_count=0;
 		$strand_count=0;
-		for my $i4 (0 .. $#chrRefSeq){
-			if ($chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
+		for my $i (0 .. $#chrRefSeq){
+			if ($chrRefSeq[$i] eq $query_chr and (($query_coord <= $txstartRefSeq[$i] and $query_coord >= $txtendRefSeq[$i]) or ($query_coord >= $txstartRefSeq[$i] and $query_coord <= $txtendRefSeq[$i]))){
 				++$strand_count;
 			}
-			if ($strandRefSeq[$i4] eq "+" && $chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
+			if ($strandRefSeq[$i] eq "+" && $chrRefSeq[$i] eq $query_chr and (($query_coord <= $txstartRefSeq[$i] and $query_coord >= $txtendRefSeq[$i]) or ($query_coord >= $txstartRefSeq[$i] and $query_coord <= $txtendRefSeq[$i]))){
 				++$strand_plus_count;
 			} 
 		}
-		$i4=0;
+		$i=0;
 		if ($strand_count >= 1){
 			$strand_transcript=$strand_plus_count/$strand_count;
 			$strand_score=$strand_transcript - ($strand_value);
@@ -1981,15 +1682,15 @@ for my $isixfour (0..$#sixfour){
 		$query_coord=$coord[$isixfour];
 		$strand_plus_count=0;
     	$strand_count=0;
-		for my $i4 (0 .. $#chrRefSeq){
-			if ($chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
+		for my $i (0 .. $#chrRefSeq){
+			if ($chrRefSeq[$i] eq $query_chr and (($query_coord <= $txstartRefSeq[$i] and $query_coord >= $txtendRefSeq[$i]) or ($query_coord >= $txstartRefSeq[$i] and $query_coord <= $txtendRefSeq[$i]))){
 				++$strand_count;
 			}
-			if ($strandRefSeq[$i4] eq "+" && $chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
+			if ($strandRefSeq[$i] eq "+" && $chrRefSeq[$i] eq $query_chr and (($query_coord <= $txstartRefSeq[$i] and $query_coord >= $txtendRefSeq[$i]) or ($query_coord >= $txstartRefSeq[$i] and $query_coord <= $txtendRefSeq[$i]))){
 				++$strand_plus_count;
 			} 
 		}
-		$i4=0;
+		$i=0;
 		if ($strand_count >= 1){
 			$strand_transcript=$strand_plus_count/$strand_count;
 			$strand_score=$strand_transcript - ($strand_value);
@@ -2034,15 +1735,15 @@ for my $ienu (0..$#enu){
 		$query_coord=$coord[$ienu];
 		$strand_plus_count=0;
     	$strand_count=0;
-		for my $i4 (0 .. $#chrRefSeq){
-			if ($chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
+		for my $i (0 .. $#chrRefSeq){
+			if ($chrRefSeq[$i] eq $query_chr and (($query_coord <= $txstartRefSeq[$i] and $query_coord >= $txtendRefSeq[$i]) or ($query_coord >= $txstartRefSeq[$i] and $query_coord <= $txtendRefSeq[$i]))){
 				++$strand_count;
 			}
-			if ($strandRefSeq[$i4] eq "+" && $chrRefSeq[$i4] eq $query_chr and (($query_coord <= $txstartRefSeq[$i4] and $query_coord >= $txtendRefSeq[$i4]) or ($query_coord >= $txstartRefSeq[$i4] and $query_coord <= $txtendRefSeq[$i4]))){
+			if ($strandRefSeq[$i] eq "+" && $chrRefSeq[$i] eq $query_chr and (($query_coord <= $txstartRefSeq[$i] and $query_coord >= $txtendRefSeq[$i]) or ($query_coord >= $txstartRefSeq[$i] and $query_coord <= $txtendRefSeq[$i]))){
 				++$strand_plus_count;
 			} 
 		}
-		$i4=0;
+		$i=0;
 		if ($strand_count >= 1){
 			$strand_transcript=$strand_plus_count/$strand_count;
 			$strand_score=$strand_transcript - ($strand_value);
@@ -2057,7 +1758,7 @@ for my $ienu (0..$#enu){
 
 ## CALCULATION OF NORMALIZED NUMBER OF MOTIFS FOUND
 
-for my $a1 (0 .. $#id){
+for my $i (0 .. $#id){
 	++$SNPnumber;
 }
 
@@ -2123,8 +1824,8 @@ $normUVsolar=$UVsolarcounts/$SNPnumber;
 print "\nSaving mutational motifs file\n";
 
 print MOTIFS "Chr\tPos\ttargetSequence\tClass\tGene\tSN1\tDNApol\t8-oxoG\tUV-lambda\tSixFour\tENU\tUVA-solar\n";
-for $a2 (0..$#targetSequence){
-	print MOTIFS "$chrSt[$a2]\t$coord[$a2]\t$targetSequence[$a2]\t$geneClass1[$a2]\t$geneName1[$a2]\t$SN1[$a2]\t$DNApoln[$a2]\t$oxoG[$a2]\t$UVlambda[$a2]\t$sixfour[$a2]\t$enu[$a2]\t$UVsolar[$a2]\n";
+for $i (0..$#targetSequence){
+	print MOTIFS "$chrSt[$i]\t$coord[$i]\t$targetSequence[$i]\t$geneClass1[$i]\t$geneName1[$i]\t$SN1[$i]\t$DNApoln[$i]\t$oxoG[$i]\t$UVlambda[$i]\t$sixfour[$i]\t$enu[$i]\t$UVsolar[$i]\n";
 }
 
 #### PRINTING OF NORMALIZED MUTABLE MOTIFS FILE #####
