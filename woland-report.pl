@@ -3,55 +3,42 @@
 ##
 ## WOLAND is a software package based on Perl and R for calculation of general mutation metrics, identification and
 ## comparison of predicted hotspots across biological samples. WOLAND uses Single Nucleotide Polymorphisms (SNPs) data
-## from Next Generation Sequencing (NGS) pipelines as main input. Please observe file requirements.
+## from Next Generation Sequencing (NGS) pipelines as main input. Please read README file.
 ##
+## Use woland-report to build a grouped report using results-folder of each woland-anno.pl analyzed sample
+##
+## USAGE:
+##
+## woland-report.pl <input_table> 
 ##
 ######################################################################################################################## 
 
-
-
 #! /usr/bin/perl
-
 use Statistics::R; # module for the bridge between Perl and R.
 use strict;
 use warnings;
 
 ## variables
-
 my ($inputTable, $inputTableLine, @inputTableArray);
-
 my ($i, $i2, $i3, $i4); my (@i, @i2, @i3); #variables for indices
-
 my (@Group, @sampleName, $sampleNameLine);
-
 my ($inputChromosomeProfile, $inputChromosomeProfileArrayLine, @inputChromosomeProfileArray);
-
 my ($inputSampleBaseChange, @CHR_P, @MUT_P, @inputSampleBaseChangeArray, @AT,@AG,@AC,@CG,@CT,@CA,@ATF,@AGF,@ACF,@CGF,@CTF,@CAF);
-
 my ($TransversionF, $TransitionF, @TransversionF, @TransitionF);
-
 my ($inputSampleMotif, $inputSampleMotifArray, @inputSampleMotifArray);
-
 my ($inputSampleHotSpot, $inputSampleHotSpotArrayLine, $item, @SN1,@DNApol,@oxoG,@UV,@SixFour,@ENU,@UVAsolar,@SN1F,@DNApolF,@oxoGF,@UVF,@SixFourF,@ENUF,@UVAsolarF);
-
 my ($uniqueGroup, $input, $HofA, @inputSampleHotSpotArray, @geneClass, @GeneName, @CHR, @BP, @HotspotCount, @uniqgroup);
-
 my ($inputStrandScoreArrayLine, $inputStrandScore, $SC_0, $SC_1,$SC_m1,$SC_SC,$totalSC,$nConcordance,$nDiscordance,$ratioConcordanceDiscordance,$n, @inputStrandScoreArray, @CHR_SC, @BP_SC, @SC_SC, @colorGauss);
-
 my ($R, $colorGausspick, $uniqGroupLine, $pick, $legendltyV, $legendlwdV, $lastgroup, @legendname, @legendlty, @legendlwd, @legendcol);
 
-
-## main Warning
-
+## main warning
 unless (@ARGV){
 	die "\nERROR : Usage: $0 woland.input.table ... \n";	
 }
 
-
 print "\nGrouping samples and building reports\n";
 
 ## parsing input table
-
 $inputTable = $ARGV[0]; # <input.table>
 open (inputTable, $inputTable);
 @inputTableArray=<inputTable>;
@@ -65,15 +52,10 @@ foreach $inputTableLine (@inputTableArray){ # two arrays for each category (grou
 
 @i=0;
 
-
-##Create Report Folder
-
+##creating report folder
 mkdir("report-$inputTable", 0755);
 
-
-### Frequency Histogram across chromosomes 
-
-
+###frequency histogram of mutations across chromosomes
 for my $i3 (0..$#sampleName){
 	$inputChromosomeProfile = "results-$sampleName[$i3]/WOLAND-mutfreq-$sampleName[$i3]";
 	open (inputChromosomeProfile, $inputChromosomeProfile);
@@ -105,10 +87,8 @@ for my $i3 (0..$#sampleName){
 
 $i3=0;
 
-#### Nucleotide-type change - BOXPLOT & and transition/transvertion ratio PIE CHART####
-
+#### nucleotide-type change - boxplot & and transition/transvertion ratio pie chart
 ## building grouped sample input arrays for R using parsed input table
-
 foreach $sampleNameLine (@sampleName){
 	$inputSampleBaseChange = "results-$sampleNameLine/WOLAND-basechange-$sampleNameLine";
 	open (inputSampleBaseChange, $inputSampleBaseChange);
@@ -134,8 +114,7 @@ $inputSampleBaseChange=0;
 @inputSampleBaseChangeArray=0;
 @i=0;
 
-## temporary output file for R analysis of Nucleotide-type changes
-
+##grouped output file for R analysis of nucleotide-type changes
 open (BASECHANGE, ">>report-$inputTable/nucleotide_type_change-$inputTable.tmp");
 
 print BASECHANGE "X\tA.T\tA.G\tA.C\tC.G\tC.T\tC.A\n";
@@ -146,8 +125,7 @@ for my $i (0 .. $#Group){
 @i=0;
 close (BASECHANGE);
 
-## temporary output file for R analysis of Nucleotide-type changes frequency
-
+##grouped output file for R analysis of nucleotide-type changes frequency
 open (BASECHANGEF, ">>report-$inputTable/nucleotide_type_changeF-$inputTable.tmp");
 print BASECHANGEF "X\tA.T\tA.G\tA.C\tC.G\tC.T\tC.A\n";
 
@@ -157,8 +135,7 @@ for my $i (0 .. $#Group){
 @i=0;
 close (BASECHANGEF);
 
-## temporary output file for Transvertion Transition Ratio
-
+##grouped output file for transvertion transition Ratio
 for my $i (0..$#sampleName){
 	$TransversionF=$ATF[$i]+$ACF[$i]+$CGF[$i]+$CAF[$i];
 	$TransitionF=$AGF[$i]+$CTF[$i];
@@ -174,10 +151,8 @@ for my $i (0 .. $#sampleName){
 @i=0;
 close (TRANSITIONTRANSVERSION);
 
-#### Motif-Search Number BOXPLOT #####
-
+#### boxplot of number of motifs
 ## building grouped sample input arrays for R using parsed input table
-
 foreach $sampleNameLine (@sampleName){
 	$inputSampleMotif = "results-$sampleNameLine/WOLAND-norm_motifs-$sampleNameLine";
 	open (inputSampleMotif, $inputSampleMotif);
@@ -206,9 +181,7 @@ $inputSampleMotif=0;
 @inputSampleMotifArray=0;
 @i=0;
 
-
-## temporary output file for R analysis of MOTIF number
-
+## grouped output file for R analysis of number of motifs
 open (MOTIFNUMBER, ">>report-$inputTable/motif_number-$inputTable.tmp");
 print MOTIFNUMBER "X\tSN1\tDNApol\t8-oxoG\tUV-lambda\tSixFour\tENU\tUV-solar\n";
 
@@ -218,7 +191,7 @@ for my $i (0 .. $#Group){
 @i=0;
 close (MOTIFNUMBER);
 
-## temporary output file for R analysis of MOTIF normalized
+## grouped output file for R analysis of number of motifs normalized
 open (MOTIFNUMBERNORM, ">>report-$inputTable/motif_numberNorm-$inputTable.tmp");
 print MOTIFNUMBERNORM "X\tSN1\tDNApol\t8-oxoG\tUV-lambda\tSixFour\tENU\tUV-solar\n";
 
@@ -228,10 +201,8 @@ for my $i (0 .. $#Group){
 @i=0;
 close (MOTIFNUMBERNORM);
 
-#### Hotspots Manhattan Plot #####
-
-##Grouping Samples using parsed input.table
-
+#### hotspot manhattan plot
+## grouping samples using parsed input.table
 for my $i3 (0..$#sampleName){
 	$inputSampleHotSpot = "results-$sampleName[$i3]/WOLAND-hotspots-$sampleName[$i3]";
 	open (inputSampleHotSpot, $inputSampleHotSpot);
@@ -268,18 +239,15 @@ for my $i3 (0..$#sampleName){
 
 $i3=0;
 
-## Parsing unique group names for Hotspots
-
+## parsing unique group names for hotspots
 my %uniqueGroup = ();
 
 foreach $item (@Group) {
 	push(@uniqgroup, $item) unless $uniqueGroup{$item}++;
 }
 
-
-#### Box Plot for Concordance/Discordace SC ratio #####
-##Parsing Grouped Files
-
+#### box plot of concordance/discordance SC ratio
+## parsing grouped files
 open (CONCORDANCEDISCORDANCERATIO, ">>report-$inputTable/SC_concordance_ratio-$inputTable.tmp");
 print CONCORDANCEDISCORDANCERATIO "X\tSN1\tDNApol\t8-oxoG\tUVlambda\tSixFour\tUV-solar\n";
 
@@ -347,7 +315,6 @@ sub SCRatioGroup{
 &SCRatioGroup ("oxoG");
 &SCRatioGroup ("UV-lambda");
 &SCRatioGroup ("sixfour");
-#&SCRatioGroup ("enu");
 &SCRatioGroup ("UVsolar");
 
 for my $i (0 .. $#Group){
@@ -359,8 +326,7 @@ close (CONCORDANCEDISCORDANCERATIO);
 $i3=0;
 
 
-### R bridge
-
+### R-bridge
 $R = Statistics::R->new() ;
 $R->start_sharedR ;
 $R->send('library (reshape2)');
@@ -370,8 +336,7 @@ $R->send('library (RColorBrewer)');
 $R->send('library (plyr)');
 $R->send(qq'setwd(dir = "./report-$inputTable/")');
 
-#Box Plots of Grouped Samples
-
+# box plot of grouped samples
 sub BoxPlotGroup{	
 
 	$R->send(qq'WOLAND.$_[0].boxplot<-read.table("$_[0]-$inputTable.tmp", sep = "\t", header=TRUE)');
@@ -392,9 +357,7 @@ sub BoxPlotGroup{
 &BoxPlotGroup("motif_number");
 &BoxPlotGroup("motif_numberNorm");
 
-
-#Manhattan Plot Hotspots
-
+# manhattan plot hotspots
 foreach $uniqGroupLine (@uniqgroup){
 	$R->send(qq'WOLAND.hotspot.manhattan.$uniqGroupLine <- read.delim ("hotspot-$uniqGroupLine.tmp", comment.char="#", header=FALSE)');
 	$R->send(qq'pdf("manhattan.hotspot.$uniqGroupLine-$inputTable.pdf")');
@@ -402,11 +365,9 @@ foreach $uniqGroupLine (@uniqgroup){
 	$R->send(q'dev.off()');
 }
 
-#Gaussian Density Strand Concordance
-
+# gaussian kernel density of SC scores
 @colorGauss=("\"#9E0142\"", "\"#5E4FA2\"","\"#D53E4F\"","\"#3288BD\"", "\"#F46D43\"","\"#66C2A5\"","\"#FDAE61\"","\"#ABDDA4\"","\"#FEE08B\"",
 			 "\"#E6F598\"" );
-
 			
 sub GaussGraphPlot{
 
@@ -467,27 +428,21 @@ sub GaussGraphPlot{
 &GaussGraphPlot("sixfour");
 &GaussGraphPlot("DNApoln");
 &GaussGraphPlot("oxoG");
-#&GaussGraphPlot("enu");
 &GaussGraphPlot("UVsolar");
 &GaussGraphPlot("SN1");
 
-## BoxPlot for Concordance/Discordance Strand Score ratio
-
+## boxplot of concordance/discordance SC ratio
 &BoxPlotGroup("SC_concordance_ratio");
 
-## Chromosome Profile Mean Mutation Rate
-
+## chromosome profile mean mutation rate
 $R->send(qq'mutfreq <- read.delim ("mutfreq-$inputTable.tmp", comment.char="#", header=FALSE)');
 $R->send(qq'svg("mutfreq-$inputTable.svg", width=11.692, height=8.267)');
-
-
 $R->send(qq'melted <- melt(mutfreq,id.vars=c("V1","V2","V3"))');
 $R->send(qq'means = ddply(melted,c("V1","V3"),summarise, mean=mean(V2))');
 $R->send(qq'means.sem = ddply(melted,c("V1","V3"),summarise, mean=mean(V2), sem=sd(V2)/sqrt(length(V2)))');
 $R->send(qq'means.sem <- transform(means.sem, lower=mean-sem, upper=mean+sem)');
 $R->send(qq'means.group<-ddply(means,"V3",summarise, mean=mean(mean))');
 $R->send(qq'colnames(means.group)<-c("Average","mean")');
-
 $R->send('ggplot(data=means, aes(x = V1, y = mean, fill=V3))+
 	geom_bar(stat="identity", position ="dodge")+
 	xlab("Chromosome") + ylab("Mutations per base sequenced") +
@@ -499,7 +454,7 @@ $R->send('ggplot(data=means, aes(x = V1, y = mean, fill=V3))+
 	geom_hline(aes(yintercept=mean, col=Average), data=means.group)');
 $R->send('dev.off()');
 
-## Transition e Transversion Barplot Pie
+## transition and traversion barplot pie
 $R->send(qq'pdf(file="barplot_pie_TransTransv-$inputTable.pdf", width=11.692, height=8.267)');
 $R->send(qq'transitiontransversion <- read.delim("transitiontransversionF-$inputTable.tmp", header=FALSE)');
 $R->send(qq'ggplot(transitiontransversion, aes(x=V3, y=V1, fill=V2))+

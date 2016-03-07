@@ -3,8 +3,7 @@
 ##
 ## WOLAND is a software package based on Perl and R for calculation of general mutation metrics, identification and
 ## comparison of predicted hotspots across biological samples. WOLAND uses Single Nucleotide Polymorphisms (SNPs) data
-## from Next Generation Sequencing (NGS) pipelines as main input. Please observe file requirements.
-##
+## from Next Generation Sequencing (NGS) pipelines as main input. Please read README file.
 ##
 ## USAGE
 ##
@@ -31,44 +30,30 @@
 ######################################################################################################################### 
 
 #! /usr/bin/perl
-
 use Bio::DB::Fasta; # bioperl module for the extraction of sequences.
 use Cwd;
 use warnings;
 use strict;
 
 # variables
-
- 
 my ($inputRawSNV, $chrLengthProfile, $hotspotWindowLength, $contextSequenceLength, $genome_version);
 my $datestring;
-
 my $rawLine; 
-
 my $i; my $i2; our $i3; my @i; my @i2; our @i3;
-
 my ($ATTA, $AGTC, $ACTG, $CGGC, $CTGA, $CAGT, $refalt, $SOMA, $AVGATTA, $AVGAGTC, $AVGACTG, $AVGCGGC, $AVGCTGA, $AVGCAGT);
-
 my ($transition, $transversion);
-
 my ($chr1,$chr2,$chr3,$chr4,$chr5,$chr6,$chr7,$chr8,$chr9,$chr10,$chr11,
 	$chr12,$chr13,$chr14,$chr15,$chr16,$chr17,$chr18,$chr19,$chr20,$chr21,
 	$chr22,$chrX,$chrY,$chrM);
-
 my @chrList;
 my $countChr;
 my @chrCountFreq;
-
 my @chrNormList;
 my $chrNorm;
-
 my ($hotspotSNV, $hotspotDownstreamSNV, $hotspotUpstreamSNV, $hsNum); 
-
 my $config; my $count; my $notValid;
-
 my @rawFile; my @config; my @chr; my @pos; my @alt; my @chrpos; my %posref; my %posalt; 
 my @refalt; my @ref; my @chrLength;
-
 my $hsChr1; my @hsChr1; my @hs_counts_chr1;
 my $hsChr2; my @hsChr2; my @hs_counts_chr2;
 my $hsChr3; my @hsChr3; my @hs_counts_chr3;
@@ -94,16 +79,13 @@ my $hsChr22; my @hsChr22; my @hs_counts_chr22;
 my $hsChrX; my @hsChrX; my @hs_counts_chrX;
 my $hsChrY; my @hsChrY; my @hs_counts_chrY;
 my $hsChrM; my @hsChrM; my @hs_counts_chrM;
-
 my @fastaContext; my $fastaContext; my @id; my @targetSequence; my $targetSequence;
 my @SN1; my @DNApoln; my @oxoG; my @UVlambda; my @UVsolar; my @sixfour; my @enu; my $SNPnumber; my $mf1; my $mf2;
 my @SN1counts; my @DNApolncounts; my @oxoGcounts; my @UVlambdacounts; my @UVsolarcounts; my @sixfourcounts; my @enucounts;
 my $SN1; my $DNApoln; my $oxoG; my $UVlambda; my $UVsolar; my $sixfour; my $enu;
 my $SN1counts; my $DNApolncounts; my $oxoGcounts; my $UVlambdacounts; my $UVsolarcounts; my $sixfourcounts; my $enucounts;
 my $normSN1; my $normDNApoln; my $normoxoG; my $normUVlambda; my $normUVsolar; my $normsixfour; my $normenu;
-
 ## anno motif search variables
-
 my (@geneClass, $geneClass, @geneName, $geneName);
 my (@geneClasschr1, @geneClasschr2, @geneClasschr3, @geneClasschr4, @geneClasschr5, @geneClasschr6, @geneClasschr7, @geneClasschr8, @geneClasschr9, @geneClasschr10, @geneClasschr11, @geneClasschr12, @geneClasschr13, @geneClasschr14, @geneClasschr15, @geneClasschr16, @geneClasschr17, @geneClasschr18, @geneClasschr19, @geneClasschr20, @geneClasschr21, @geneClasschr22, @geneClasschrX, @geneClasschrY, @geneClasschrM);      
 my (@geneNamechr1, @geneNamechr2, @geneNamechr3, @geneNamechr4, @geneNamechr5, @geneNamechr6, @geneNamechr7, @geneNamechr8, @geneNamechr9, @geneNamechr10, @geneNamechr11, @geneNamechr12, @geneNamechr13, @geneNamechr14, @geneNamechr15, @geneNamechr16, @geneNamechr17, @geneNamechr18, @geneNamechr19, @geneNamechr20, @geneNamechr21, @geneNamechr22, @geneNamechrX, @geneNamechrY, @geneNamechrM);
@@ -120,14 +102,12 @@ my ($strand_count, $strand_plus_count, $strand_transcript, $strand_score, $stran
 my ($db, $db1);
 my $readContextSeqAnno;
 
-# main Warning
-
+# main warning
 unless (@ARGV){
 	die "\nERROR : Usage: $0 <tabular_snp_file> <chromosome_length_profile> <hotspot_window_length> <genome_version> \n";	
 }
 
-# sub
-
+# subroutines
 sub chrListCount {
 	for my $i3 (0 .. $#chrStart){
 		if ($chrStart[$i3] eq "$_[0]"){
@@ -139,7 +119,6 @@ sub chrListCount {
 }
 
 # loading files and parameters
-
 $inputRawSNV = $ARGV[0]; #<tabular_snp_file>
 open (inputRawSNV, $inputRawSNV);
 @rawFile=<inputRawSNV>;
@@ -167,7 +146,6 @@ unless ($genome_version){
 $contextSequenceLength=3; #<context_sequence_length> #default=3nt downstream & 3nt upstream
 
 # loading of outputs
-
 mkdir("results-$inputRawSNV", 0755) || die "Cannot mkdir results-$inputRawSNV - folder already exists, please delete it or change samplename";
 
 open (BASECHANGE, ">>results-$inputRawSNV/WOLAND-basechange-$inputRawSNV");
@@ -178,8 +156,7 @@ open (HOTSPOTS, ">>results-$inputRawSNV/WOLAND-hotspots-$inputRawSNV");
 open (MOTIFS, ">>results-$inputRawSNV/WOLAND-motifs-$inputRawSNV");
 open (NMOTIFS, ">>results-$inputRawSNV/WOLAND-norm_motifs-$inputRawSNV");
 
-# Start Screen & LOG file
-
+# start Screen & log file
 $datestring = localtime();
 
 open (LOG, ">>results-$inputRawSNV/WOLAND-log-$inputRawSNV");
@@ -206,8 +183,7 @@ print LOG "Strand Bias of 6-4 Motifs:                 WOLAND-bias_sixfour-$input
 print LOG "Strand Bias of ENU Motifs:                 WOLAND-bias_enu-$inputRawSNV\n";
 
 
-# Conversion of each column in a dedicated array
-
+# conversion of each column in a dedicated array
 print "\nLoading SNP file...\n";
 
 foreach $rawLine (@rawFile){
@@ -223,13 +199,11 @@ foreach $rawLine (@rawFile){
 }
 	
 # Array for chr/position of each SNP - @chrpos
-
 for my $i (0 .. $#chrStart){
 	push @chrpos, "$chrStart[$i]_$pos[$i]";
 }
 	
 # Hashe posref & posalt for information of each position - ALT e REF alelles
-
 for my $i (0 .. $#chrpos){
 	$posref{"$chrpos[$i]_$i"} .= "$ref[$i]";
 }
@@ -240,14 +214,12 @@ for my $i (0 .. $#chrpos){
 print "\nCalculating general mutation statistics and saving basechange-$inputRawSNV ...\n";
 
 # Array for a single entry for each SNP containing a single REFALT string value. Considering  A->T # & T->A; A->G & T->C; A->C & T->G; C->G & G->C; C->T & G->A; C->A & G->T.
-
 foreach my $key (sort keys %posref){
 	push @refalt,"$posref{$key}$posalt{$key}";
 }
 
 
-# Counting of changes.
-
+# counting of nucleotide changes.
 $ATTA=0;
 $AGTC=0;
 $ACTG=0;
@@ -276,8 +248,7 @@ foreach $refalt (@refalt){
 	}
 }
 
-# Frequency of changes considering total amount of changes.
-
+# frequency of changes considering total amount of changes.
 $SOMA=$ATTA+$AGTC+$ACTG+$CGGC+$CTGA+$CAGT;
 if ($SOMA== 0){
 	die "Please review input file format";
@@ -298,17 +269,14 @@ $AVGCGGC=$CGGC/$SOMA;
 $AVGCTGA=$CTGA/$SOMA;
 $AVGCAGT=$CAGT/$SOMA;
 
-# Transitions & Transversion
-
+# transitions & transversions
 $transition=($AGTC+$CTGA)/$SOMA;
 $transversion=($ATTA+$ACTG+$CGGC+$CAGT)/$SOMA;
 
-# Frequency per chromosome target
-
+# frequency per chromosome target
 $countChr=0;
 $chr1=0;$chr2=0;$chr3=0;$chr4=0;$chr5=0;$chr6=0;$chr7=0;$chr8=0;$chr9=0;$chr10=0;
 $chr11=0;$chr12=0;$chr13=0;$chr14=0;$chr15=0;$chr16=0;$chr17=0;$chr18=0;$chr19=0;$chr20=0;$chr21=0;$chr22=0;$chrX=0;$chrY=0;$chrM=0;
-
 
 @chrList = ("chr1","chr2","chr3","chr4","chr5","chr6","chr7","chr8","chr9","chr10",
 	"chr11","chr12","chr13","chr14","chr15","chr16","chr17","chr18","chr19","chr20","chr21","chr22","chrX","chrY","chrM");
@@ -317,8 +285,7 @@ for my $i (0..$#chrList){
 	&chrListCount("$chrList[$i]");
 }
 
-# Frequency of mutation considering chromosome length as present in chromosome_profile file.
-
+# frequency of mutation considering chromosome length as present in chromosome_profile file.
 print "\nCalculating mutation frequency and saving basechange-$inputRawSNV ...\n";
 
 foreach $config (@config){
@@ -337,7 +304,7 @@ for my $i (0..$#chrCountFreq){
 	push @chrNormList, $chrNorm;
 }
 
-##### BASECHANGE Printing Format ####
+##### nucleotide type changes and frequency
 print BASECHANGE "$inputRawSNV\tA>T\tA>G\tA>C\tC>G\tC>T\tC>A\n";
 print BASECHANGE "Changes\t$ATTA\t$AGTC\t$ACTG\t$CGGC\t$CTGA\t$CAGT\n";
 print BASECHANGE "Frequency\t$AVGATTA\t$AVGAGTC\t$AVGACTG\t$AVGCGGC\t$AVGCTGA\t$AVGCAGT\n";
@@ -371,12 +338,10 @@ print MUTFREQ "chrX\t$chrCountFreq[22]\t$chrNormList[22]\n";
 print MUTFREQ "chrY\t$chrCountFreq[23]\t$chrNormList[23]\n";
 print MUTFREQ "chrM\t$chrCountFreq[24]\t$chrNormList[24]\n";
 
-############################################# HOT SPOT #####################################
-
+##### hotspots 
 print "\nCalculating hotspots and saving hotspots-$inputRawSNV.txt ...\n";
 
-# One array of each chromosome.
-
+# one array of each chromosome.
 for my $i (0..$#chrStart){
 
 	if ($chrStart[$i] eq "chr1"){
@@ -506,8 +471,7 @@ for my $i (0..$#chrStart){
 	}
 }
 
-# Counting of Hotspots using one array for each chromosome.
-
+# counting of hotspots using one array for each chromosome.
 for my $hotspotSNV (0..$#hsChr1){
 	my $hotspotDownstreamSNV=$hsChr1[$hotspotSNV]-$hotspotWindowLength;
 	my $hotspotUpstreamSNV=$hsChr1[$hotspotSNV]+$hotspotWindowLength;
@@ -759,7 +723,7 @@ for my $hotspotSNV (0..$#hsChrM){
 	$hsNum=0;
 }
 
-##### HOTSPOTS Printing Format ####
+##### Saving hotspots output file
 print HOTSPOTS "geneClass\tGeneName\tCHR\tBP\tHotspotCount\n";
 for my $i (0 .. $#hsChr1){
 	print HOTSPOTS "$geneClasschr1[$i]\t$geneNamechr1[$i]\t1\t$hsChr1[$i]\t$hs_counts_chr1[$i]\n";
@@ -837,9 +801,7 @@ for my $i (0 .. $#hsChrM){
 	print HOTSPOTS "$geneClasschrM[$i]\t$geneNamechrM[$i]\t25\t$hsChrM[$i]\t$hs_counts_chrM[$i]\n";
 }
 
-
-### Bioperl module for extraction of context sequences in reference genomes of each SNP.
-
+### bioperl module for extraction of context sequences in reference genomes of each SNP.
 print "\nExtracting context sequences and saving weblogo-$inputRawSNV ..\n";
 
 $db = Bio::DB::Fasta->new("genomes/genome_$genome_version.fa");
@@ -1276,9 +1238,7 @@ for my $i (0..$#hsChrM){
 	print CONTEXTSEQANNO ">chrM_$hsChrM[$i]\n$seq\t$geneClasschrM[$i]\t$geneNamechrM[$i]\n";
 }
 
-
 ## closing of outputs
-
 close (">>results-$inputRawSNV/WOLAND-basechange-$inputRawSNV");
 close (">>results-$inputRawSNV/WOLAND-mutfreq-$inputRawSNV");
 close (">>results-$inputRawSNV/WOLAND-contextsequences-$inputRawSNV");
@@ -1287,26 +1247,20 @@ close (">>results-$inputRawSNV/WOLAND-log-$inputRawSNV");
 close (">>results-$inputRawSNV/WOLAND-contextsequencesanno-$inputRawSNV");
 
 
-####################### WOLAND MOTIF SEARCHER ###################################
-
-#outputs:
-
+### motif search
+# outputs
 open (OUTPUTbiasSN1, ">>results-$inputRawSNV/WOLAND-bias_SN1-$inputRawSNV");
 open (OUTPUTbiasDNApoln, ">>results-$inputRawSNV/WOLAND-bias_DNApoln-$inputRawSNV");
 open (OUTPUTbiasoxoG, ">>results-$inputRawSNV/WOLAND-bias_oxoG-$inputRawSNV");
 open (OUTPUTbiasUV, ">>results-$inputRawSNV/WOLAND-bias_UV-lambda-$inputRawSNV");
 open (OUTPUTbiasUVsolar, ">>results-$inputRawSNV/WOLAND-bias_UVsolar-$inputRawSNV");
 open (OUTPUTbiassixfour, ">>results-$inputRawSNV/WOLAND-bias_sixfour-$inputRawSNV");
-#open (OUTPUTbiasenu, ">>results-$inputRawSNV/WOLAND-bias_enu-$inputRawSNV");
 
-# Open Context Sequences generated
-
+# opening context sequences generated
 open CONTEXTSEQANNO, "<results-$inputRawSNV/WOLAND-contextsequencesanno-$inputRawSNV";
 @fastaContext=<CONTEXTSEQANNO>;
 
-# Array processing
-
-
+# array processing
 for my $i (0..$#fastaContext){
 	if ($fastaContext[$i] =~ /^>/){
 		@i2 = split (/\t/, "$fastaContext[$i+1]");
@@ -1351,8 +1305,7 @@ foreach $chrRaw (@chrRaw){
 	push (@chrSt, "$i[1]");
 }
 
-############################# STRAND BIAS REFSEQ #############################################
-
+### SC score (strand bias)
 $refSeqRaw = "genomes/refseq_$genome_version.txt";
 open (REFSEQRAW, $refSeqRaw);
 @refSeq=<REFSEQRAW>;
@@ -1370,12 +1323,10 @@ foreach $refSeqline (@refSeq){
 }
 
 
-# Search for Mutable Motifs
-
+# search for motifs
 print "\nSearching for mutable motifs\n";
 
 ## SN1 MOTIF
-
 foreach $targetSequence (@targetSequence){
 	if ($targetSequence =~ "..AG..." || $targetSequence =~ "..GG..."|| $targetSequence =~ "...CT.."|| $targetSequence =~ "...CC.."){
 		push (@SN1, "1");
@@ -1398,7 +1349,6 @@ foreach $targetSequence (@targetSequence){
 }
 
 #### Strand Concordance Score SN1
-
 for my $iSN1 (0..$#SN1){
 	if ($SN1[$iSN1] eq "1"){
 		$strand_value=$SN1plus[$iSN1];
@@ -1428,7 +1378,6 @@ for my $iSN1 (0..$#SN1){
 }
 
 ## DNA POL ETA MOTIF
-
 foreach $targetSequence (@targetSequence){
 	if ($targetSequence =~ "..AA..." || $targetSequence =~ "..TA..."|| $targetSequence =~ "...TT.."|| $targetSequence =~ "...TA.."){
 		push (@DNApoln, "1");
@@ -1451,7 +1400,6 @@ foreach $targetSequence (@targetSequence){
 }
 
 #### Strand Concordance Score DNAPOLeta
-
 for my $iDNApoln (0..$#DNApoln){
 	if ($DNApoln[$iDNApoln] eq "1"){
 	$strand_value=$DNApolnplus[$iDNApoln];
@@ -1481,7 +1429,6 @@ for my $iDNApoln (0..$#DNApoln){
 }
 
 ## OXO G MOTIF
-
 foreach $targetSequence (@targetSequence){
 	if ($targetSequence =~ "..AGA.." || $targetSequence =~ "..GGG.." || $targetSequence =~ "..AGG.." || $targetSequence =~ "..GGA.."|| $targetSequence =~ "..TCT.." || $targetSequence =~ "..CCC.." || $targetSequence =~ "..CCT.."|| $targetSequence =~ "..TCC.."){
 		push (@oxoG, "1");}
@@ -1501,7 +1448,6 @@ foreach $targetSequence (@targetSequence){
 }
 
 #### Strand Concordance Score 8-oxoG
-
 for my $ioxoG (0..$#oxoG){
 	if ($oxoG[$ioxoG] eq "1"){
 		$strand_value=$oxoGplus[$ioxoG];
@@ -1532,7 +1478,6 @@ for my $ioxoG (0..$#oxoG){
 
 
 ## UV LAMBDA MOTIF
-
 foreach $targetSequence (@targetSequence){
 	if($targetSequence =~ "...TC.." || $targetSequence =~ "..TC..." || $targetSequence =~ "...CT.." || $targetSequence =~ "..CT..." ||
 		$targetSequence =~ "..TT..." || $targetSequence =~ "...TT.." || $targetSequence =~ "..CC..." || $targetSequence =~ "...CC.."|| 
@@ -1560,8 +1505,6 @@ foreach $targetSequence (@targetSequence){
 }
 
 #### Strand Concordance Score UV-lambda
-
-
 for my $iuv (0..$#UVlambda){
 	if ($UVlambda[$iuv] eq "1"){
 		$strand_value=$UVlambdaplus[$iuv];
@@ -1591,7 +1534,6 @@ for my $iuv (0..$#UVlambda){
 }
 
 ## UV SOLAR UVA-1
-
 foreach $targetSequence (@targetSequence){
 	if ($targetSequence =~ "..TCG.."  || $targetSequence =~ "...TCG."|| $targetSequence =~ ".TCG..." || $targetSequence =~ "..CCG.." ||$targetSequence =~ "...CCG." || $targetSequence =~ ".CCG..." || 
 		$targetSequence =~ "..CGA.." || $targetSequence =~ "...CGA."|| $targetSequence =~ ".CGA..." || $targetSequence =~ "..CGG.." || $targetSequence =~ "...CGG."|| $targetSequence =~ ".CGG..."){
@@ -1617,7 +1559,6 @@ foreach $targetSequence (@targetSequence){
 }
 
 #### Strand Concordance Score UVsolar
-
 for my $iUVsolar (0..$#UVsolar){
 	if ($UVsolar[$iUVsolar] eq "1"){
 		$strand_value=$UVsolarplus[$iUVsolar];
@@ -1648,7 +1589,6 @@ for my $iUVsolar (0..$#UVsolar){
 
 
 ## SIX FOUR MOTIF
-
 foreach $targetSequence (@targetSequence){
 	if ($targetSequence =~ "TTCA" || $targetSequence =~ "CTCA" || $targetSequence =~ "TGAA" || $targetSequence =~ "TGAG"){
 		push (@sixfour, "1");
@@ -1671,7 +1611,6 @@ foreach $targetSequence (@targetSequence){
 }
 
 #### Strand Concordance Score 6-4
-
 for my $isixfour (0..$#sixfour){
 	if ($sixfour[$isixfour] eq "1"){
 		$strand_value=$sixfourplus[$isixfour];
@@ -1701,7 +1640,6 @@ for my $isixfour (0..$#sixfour){
 }
 
 ## ENU MOTIF
-
 foreach $targetSequence (@targetSequence){
 	if ($targetSequence =~ "..CAG.." || $targetSequence =~ "..GAC.."|| $targetSequence =~ "..GAG.."|| $targetSequence =~ "..CAC.."|| $targetSequence =~ "..CTG.." || $targetSequence =~ "..GTC.."|| $targetSequence =~ "..GTG.."|| $targetSequence =~ "..CTC.."){
 		push (@enu, "1");
@@ -1724,7 +1662,6 @@ foreach $targetSequence (@targetSequence){
 }
 
 #### Strand Concordance Score ENU
-
 for my $ienu (0..$#enu){
 	if ($enu[$ienu] eq "1"){
 		$strand_value=$enuplus[$ienu];
@@ -1753,8 +1690,7 @@ for my $ienu (0..$#enu){
 	}
 }
 
-## CALCULATION OF NORMALIZED NUMBER OF MOTIFS FOUND
-
+## calculation of normalized motifs
 for my $i (0 .. $#id){
 	++$SNPnumber;
 }
@@ -1816,8 +1752,7 @@ $normsixfour=$sixfourcounts/$SNPnumber;
 $normenu=$enucounts/$SNPnumber;
 $normUVsolar=$UVsolarcounts/$SNPnumber;
 
-#### PRINTING OF RAW MUTABLE MOTIFS FILE #####
-
+#### output for motif number
 print "\nSaving mutational motifs file\n";
 
 print MOTIFS "Chr\tPos\ttargetSequence\tClass\tGene\tSN1\tDNApol\t8-oxoG\tUV-lambda\tSixFour\tENU\tUVA-solar\n";
@@ -1825,7 +1760,7 @@ for $i (0..$#targetSequence){
 	print MOTIFS "$chrSt[$i]\t$coord[$i]\t$targetSequence[$i]\t$geneClass1[$i]\t$geneName1[$i]\t$SN1[$i]\t$DNApoln[$i]\t$oxoG[$i]\t$UVlambda[$i]\t$sixfour[$i]\t$enu[$i]\t$UVsolar[$i]\n";
 }
 
-#### PRINTING OF NORMALIZED MUTABLE MOTIFS FILE #####
+#### output for motif number normalized
 print "\nSaving normalized mutational motifs\n";
 print NMOTIFS "$inputRawSNV\tSN1\tDNApol\t8-oxoG\tUV-lambda\tSixFour\tENU\tUVA-solar\n";
 print NMOTIFS "Number of Total SNPs\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\t$SNPnumber\n";

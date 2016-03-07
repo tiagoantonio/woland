@@ -1,29 +1,31 @@
-# WOLAND-BED-TO-PROFILE 0.1 (15-02-2015)
-#
-# WOLAND-BED-TO-PROFILE is a software based on Perl for nucleotide length calculation using a .BED coordinate file as input.
-# Please observe file requirements.
-#
-#
-# USAGE
-#
-# perl woland-bed-to-profile.pl <file.bed> 
-# 
-# e.g.: perl woland-bed-to-profile.pl mouse_exome_mm9.bed
-#
-# INPUT FILE REQUIREMENTS
-# 
-# <file.bed> : Coordinate bed file. IDs must be in the format: chr1, chr2, chr3 ...
-
-
+##########################################################################################################################
+## WOLAND-BED-TO-PROFILE 0.1 (15-02-2015)
+##
+## WOLAND is a software package based on Perl and R for calculation of general mutation metrics, identification and
+## comparison of predicted hotspots across biological samples. WOLAND uses Single Nucleotide Polymorphisms (SNPs) data
+## from Next Generation Sequencing (NGS) pipelines as main input. Please read README file.
+##
+## Use woland-bed.pl to calculate nucleotide length using a .BED coordinate file as input and to build <chromosome_length_profile> for other woland scripts.
+##
+## USAGE
+##
+## perl woland-bed.pl <file.bed> 
+## 
+## e.g.: perl woland-bed.pl mouse_exome_mm9.bed
+##
+## INPUT FILE REQUIREMENTS
+## 
+## <file.bed> : Coordinate bed file. IDs must be in the format: chr1, chr2, chr3 ...
+##
+##
+###########################################################################################################################
 
 #! /usr/bin/perl
-
 use List::Util qw(sum); #module for sum of chromosome coordinates
 use strict;
 use warnings;
 
 # variables
-
 my @ARGV;
 my ($input, @rawfile);
 my $datestring;
@@ -33,14 +35,12 @@ my (@chrbed, @pos1, @pos2);
 my (@res, @tam_1, @tam_2, @tam_3, @tam_4, @tam_5, @tam_6, @tam_7, @tam_8, @tam_9, @tam_10, @tam_11, @tam_12, @tam_13, @tam_14, @tam_15, @tam_16, @tam_17, @tam_18, @tam_19, @tam_20, @tam_21, @tam_22, @tam_X, @tam_Y, @tam_M);
 my ($total);
 
-# main Warning
-
+# main warning
 unless (@ARGV){
 	die "ERROR: USAGE: $0 filename.bed \n";	
 }
 
 # loading files
-
 $input = $ARGV[0];
 open (INPUT, $input);
 @rawfile=<INPUT>;
@@ -50,8 +50,7 @@ unless (@rawfile){
 	die "ERROR: Could not load .bed file\n";
 }
 
-# Start Screen
-
+# start screen
 $datestring = localtime();
 print "\n\nWOLAND BETA 1 - 01-12-2015\n";
 print "Analysis started at $datestring\n";
@@ -60,10 +59,9 @@ print "\nOpening file .bed\n";
 
 
 # loading outputs
-
 open (OUTPUT, ">>WOLAND-BED-PROFILE-$input");
 
-# Conversion of each column in a dedicated array
+# conversion of each column in a dedicated array
 foreach $rawline (@rawfile){
 	@i = split (/\t/, $rawline);
 	chomp (@i);
@@ -72,8 +70,7 @@ foreach $rawline (@rawfile){
 	push (@pos2, $i[2]);
 }
 
-# Calculating lengths of fragments in .bed file
-
+# calculating lengths of fragments in the .bed file
 print "Calculating length (bp)...\n";
 
 for my $i (0 .. $#pos1){
@@ -202,8 +199,7 @@ for my $i (0 .. $#pos1){
 	}
 }
 	
-# Array for sum of fragment length for each chromosome.
-
+# array for sum of fragment length for each chromosome.
 push @res, sum(@tam_1);
 push @res, sum(@tam_2);
 push @res, sum(@tam_3);
@@ -233,16 +229,13 @@ push @res, sum(@tam_M);
 $total=sum(@res);
 $i2=1;
 
-##### SCREEN PRINTING FORMAT ####
-
+##### screen stats
 print "\nSaving file WOLAND-BED-PROFILE-$input \n";
 print "\n";
 print "Total target nucleotide length\(bp\)\=$total"; 
 print "\n";
 
-##### CROMOSOME PROFILE PRINTING FORMAT ####
-
-
+##### saving chromosome profile file
 foreach $res (@res){
 	if ($i2<=22){
 		print OUTPUT "chr$i2\t";
@@ -285,4 +278,5 @@ foreach $res (@res){
 		++$i2;
 	}
 }
+
 exit;
