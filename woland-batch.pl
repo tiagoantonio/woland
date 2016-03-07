@@ -26,7 +26,7 @@ use warnings;
 ## variables
 
 my $inputTable; my @inputTableArray; my $inputTableLine; 
-my @i; my $i; my $i2;
+my @i; my $i;
 my @Group; my @sampleName;
 my ($profile, $hotspot, $genome_version);
 my ($pm,$pid, $MAX_PROCESSES);
@@ -54,7 +54,8 @@ foreach $inputTableLine (@inputTableArray){ #two arrays for each category (group
 	push (@sampleName, "$i[1]"); # array for sample folder definition
 }
 
-@i=0;
+@i=();
+$i=0;
 
 @time=localtime;
 
@@ -67,8 +68,8 @@ $profile= $ARGV[1];
 $hotspot= $ARGV[2];
 $genome_version = $ARGV[3];
 
-for my $i2 (0..$#sampleName){
-	push (@ARGS, $sampleName[$i2]);
+for my $i (0..$#sampleName){
+	push (@ARGS, $sampleName[$i]);
 	push (@ARGS, $profile);
 	push (@ARGS, $hotspot);
 	push (@ARGS, $genome_version);
@@ -87,8 +88,8 @@ $pm->finish;
 
 move ("report-$inputTable", "results-batch-$inputTable-$time[0].$time[1].$time[2].$time[3].$time[4].$time[5]/report-$inputTable");
 
-for my $i2 (0..$#inputTableArray){
-	move ("results-$sampleName[$i2]", "results-batch-$inputTable-$time[0].$time[1].$time[2].$time[3].$time[4].$time[5]/samples-$inputTable/results-$sampleName[$i2]");
+for my $i (0..$#inputTableArray){
+	move ("results-$sampleName[$i]", "results-batch-$inputTable-$time[0].$time[1].$time[2].$time[3].$time[4].$time[5]/samples-$inputTable/results-$sampleName[$i]");
 }
 
 exit;
