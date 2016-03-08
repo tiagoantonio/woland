@@ -1,0 +1,250 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Using &mdash; woland 0.1.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="woland 0.1.1 documentation" href="index.html"/>
+        <link rel="prev" title="Install" href="install.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> woland
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Using</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#scripts">Scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inputs">Inputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#outputs">Outputs</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">woland</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Using</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="_sources/using.txt" rel="nofollow"> View page source</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="using">
+<h1>Using<a class="headerlink" href="#using" title="Permalink to this headline">¶</a></h1>
+<p>Woland has three main scripts (woland-anno.pl, woland-report.pl and woland-batch.pl) plus a acessory script (woland-bed.pl). Please observe descriptions of each script, input file file requirements, usage and outputs.</p>
+<div class="section" id="scripts">
+<h2>Scripts<a class="headerlink" href="#scripts" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>woland-anno.pl: Script used to calculate mutational patterns of a single annotated variant file.</li>
+<li>woland-report.pl: Script used to build a report of multiple annotated variant files assigned as groups.</li>
+<li>woland-batch.pl: Script which automatically runs multiple instances of woland-anno.pl and build a single report using woland-report.pl</li>
+</ul>
+</div>
+<div class="section" id="inputs">
+<h2>Inputs<a class="headerlink" href="#inputs" title="Permalink to this headline">¶</a></h2>
+<p>&lt;annovar.variant_function&gt; : Annotated .variant_function file which can be obtained using annotate-variation.pl script from ANNOVAR.</p>
+<p>&lt;chromosome_profile&gt;       : Regular tabular file without header . First column is chromosome name in chr format (e.g. chr13). Second column is chromosome length sequenced. User can build this file witth target .BED file using woland-bed-to-profile.pl</p>
+<p>&lt;hotspot_window&gt;           : A natural number N (N&gt;1), for hotspot window length. Hotspot window corresponds to N nucleotides flanking each SNV.</p>
+<p>&lt;genome_version&gt;           : Genome version of genomes/genome_&lt;genome_version&gt; and genomes/refseq_&lt;genome_version&gt; files.</p>
+<p>&lt;input.table&gt;              : Regular tabular file without header. First column is group name. Second column is file sample name of annovar annotated.variant file. Samples files MUST be located in the Woland root folder.</p>
+<p>&lt;coordinates.bed&gt;          : Coordinates of target regions used in sequencing experiment in BED format.</p>
+</div>
+<div class="section" id="usage">
+<h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
+<p>$ woland-anno.pl &lt;annovar.variant_function&gt; &lt;chromosome_profile&gt; &lt;hotspot_window&gt; &lt;genome_version&gt;</p>
+<ul class="simple">
+<li>woland-anno.pl uses a single &lt;annovar.variant_function&gt; to calculate all patterns in a single result folder for &lt;annovar.variant_function&gt; provided.</li>
+</ul>
+<p>$ woland-report.pl &lt;input.table&gt; &lt;chromosome_profile&gt; &lt;hotspot_window&gt; &lt;genome_version&gt;</p>
+<ul class="simple">
+<li>This script uses a group of samples to perform Woland-anno.pl script for each sample provided to build an unique grouped report output folder for the analysis. Sample names and groups are provided by &lt;input.table&gt; and one result folder is also generated for each sample provided.</li>
+</ul>
+<p>$ woland-batch.pl &lt;input.table&gt; &lt;chromosome_profile&gt; &lt;hotspot_window&gt; &lt;genome_version&gt;</p>
+<ul class="simple">
+<li>woland.batch enables batch submission of multiple samples as provided by &lt;input.table&gt; file. This script runs Woland-anno.pl for each sample followed by Woland-report.pl generating one result folder for each sample file provided and a grouped report folder for whole analysis as provided by &lt;input.table&gt;</li>
+</ul>
+<p>$ woland-bed.pl &lt;coordinates.bed&gt;</p>
+<ul class="simple">
+<li>This script generates a &lt;chromosome_profile&gt; file using a .bed file from a targeted-sequencing experiment, for example. The &lt;chromosome_profile&gt; file could be used in other Woland scripts.</li>
+</ul>
+</div>
+<div class="section" id="outputs">
+<h2>Outputs<a class="headerlink" href="#outputs" title="Permalink to this headline">¶</a></h2>
+<p>&lt;results-samplename&gt; folder : All results from a single sample file.</p>
+<p>&lt;report-samplename&gt; folder  : Grouped report files &lt;.tmp&gt; and graphic reports from a single &lt;input.table&gt;</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="install.html" class="btn btn-neutral" title="Install" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Tiago de Souza, Alexandre Defelicibus, Carlos Menck.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

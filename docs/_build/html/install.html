@@ -1,0 +1,267 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Install &mdash; woland 0.1.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="woland 0.1.1 documentation" href="index.html"/>
+        <link rel="next" title="Using" href="using.html"/>
+        <link rel="prev" title="README" href="README.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> woland
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">README</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Install</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="using.html">Using</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">woland</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Install</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="_sources/install.txt" rel="nofollow"> View page source</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="install">
+<h1>Install<a class="headerlink" href="#install" title="Permalink to this headline">¶</a></h1>
+<p>WOLAND is a multiplatform tool based on Perl and R. Please observe prerequisites and modules and libraries need.
+They must be installed before WOLAND installation.</p>
+<div class="section" id="prerequisites">
+<h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
+<p>The following software must be present before installing Woland:</p>
+<p>&#8212; Perl (Minimal recommended Perl version: 5.17)</p>
+<p>To check Perl version type:</p>
+<p>$ perl -v</p>
+<p>The following Perl modules should be present:</p>
+<ul class="simple">
+<li>Bio::DB::Fasta</li>
+<li>Cwd</li>
+<li>List::Util</li>
+<li>IPC::System::Simple</li>
+<li>IPC::Run</li>
+<li>Parallel::ForkManager</li>
+<li>Regexp::Common</li>
+<li>Text::Balanced(&gt;=1.97)</li>
+<li>Text::Wrap</li>
+<li>Statistics::R</li>
+</ul>
+<p>&#8212; R (Minimal recommended R version: 3.1)</p>
+<p>The following R packages must be installed:</p>
+<ul class="simple">
+<li>reshape2</li>
+<li>ggplot2</li>
+<li>qqman</li>
+<li>RColorBrewer</li>
+<li>plyr</li>
+</ul>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>&#8212; Installing Perl modules</p>
+<p>You can use CPAN to get any missing module. First install cpanm:
+$ sudo cpan App::cpanminus</p>
+<p>Them you can install each module:
+$ sudo cpanm Module::Name</p>
+<p>&#8212; Installing R packages</p>
+<p>You can use this following command in R to install each missing library:</p>
+<p>$R install.packages(&#8220;packagename&#8221;)</p>
+<p>&#8212; Installing source WOLAND files</p>
+<p>Download last Woland source release in &lt;link&gt;. Woland is provided as a tar.gz file which could be extracted using, for example:</p>
+<p>$ tar vxzf &lt;file&gt;</p>
+<p>Woland will be installed inside woland folder.</p>
+<p>&#8212; Copying genome sequences and annotation</p>
+<p>Woland needs genome reference sequence and its gene annotation for each organism. User should download two files in order to perform its analysis:</p>
+<ul class="simple">
+<li>Woland-1.0/genomes/genome_&lt;genome_version&gt;.fa - Can be downloaded using UCSC genome sequences database.</li>
+<li>Woland-1.0/refGene/&lt;refseq_&lt;genome_version&gt;.txt - Can be downloaded using UCSC annotation database.</li>
+</ul>
+<p>You must rename genome.fa and refGene.txt according to &lt;genome_version&gt;. For example:</p>
+<ul class="simple">
+<li>hg19</li>
+</ul>
+<p>$install_dir/genomes/genome_hg19.fa</p>
+<p>$install_dir/genomes/refseq_hg19.fa</p>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="using.html" class="btn btn-neutral float-right" title="Using" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="README.html" class="btn btn-neutral" title="README" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Tiago de Souza, Alexandre Defelicibus, Carlos Menck.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
