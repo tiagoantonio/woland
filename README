@@ -73,29 +73,29 @@ If you do not have them you can use this following command in R to install each 
 Download last Woland source release in <link>. Woland is provided as a tar.gz file which could be extracted using, for example:
 	$ tar vxzf <file>
 
-Woland will be installed inside Woland-1.0\ folder.
+Woland will be installed inside woland\ folder.
 
 * Copying genome sequences and annotation
 Woland needs genome reference sequence and its gene annotation for each organism. User should download two files in order to perform its analysis:
 
-Woland-1.0/genomes/<genome.referece.sequence.fasta> - Could be downloaded using UCSC genome sequences database.
-Woland-1.0/refGene/<refGene.UCSC.txt> - Could be downloaded using UCSC annotation database.
+Woland-1.0/genomes/genome_<genome_version>.fa - Can be downloaded using UCSC genome sequences database.
+Woland-1.0/refGene/<refseq_<genome_version>.txt - Can be downloaded using UCSC annotation database.
 
 
 ** WOLAND USAGE
 
 * WOLAND scripts
 
-1) $ Woland-anno.pl <annovar.variant_function> <chromosome_profile> <hotspot_window> <genome_version>
+1) $ woland-anno.pl <annovar.variant_function> <chromosome_profile> <hotspot_window> <genome_version>
 - Woland-anno.pl uses a single <annovar.variant_function> to calculate all patterns in a single result folder for <annovar.variant_function> provided.
 
-2) $ Woland-report.pl <input.table> <chromosome_profile> <hotspot_window> <genome_version>
+2) $ woland-report.pl <input.table> <chromosome_profile> <hotspot_window> <genome_version>
 - This script uses a group of samples to perform Woland-anno.pl script for each sample provided to build an unique grouped report output folder for the analysis. Sample names and groups are provided by <input.table> and one result folder is also generated for each sample provided. 
 
-3) $ Woland-batch.pl <input.table> <chromosome_profile> <hotspot_window> <genome_version>
+3) $ woland-batch.pl <input.table> <chromosome_profile> <hotspot_window> <genome_version>
 - Woland.batch enables batch submission of multiple samples as provided by <input.table> file. This script runs Woland-anno.pl for each sample followed by Woland-report.pl generating one result folder for each sample file provided and a grouped report folder for whole analysis as provided by <input.table>
 
-4) $ Woland-bed.pl <coordinates.bed>
+4) $ woland-bed.pl <coordinates.bed>
 - This script generates a <chromosome_profile> file using a .bed file from a targeted-sequencing experiment, for example. The <chromosome_profile> file could be used in other Woland scripts.
 
 
