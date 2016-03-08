@@ -1,9 +1,12 @@
-#########################################################################################################################
-## WOLAND BETA 0.1 (15-02-2016)
+########################################################################################################################################
+## WOLAND Beta 0.1 (03-08-2016)
+## woland-anno.pl
 ##
-## WOLAND is a software package based on Perl and R for calculation of general mutation metrics, identification and
-## comparison of predicted hotspots across biological samples. WOLAND uses Single Nucleotide Polymorphisms (SNPs) data
-## from Next Generation Sequencing (NGS) pipelines as main input. Please read README file.
+## WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell. 
+## It is implemented as a Perl and R tool using as inputs filtered unannotated or annotated SNV lists, combined with its 
+## correspondent genome sequences.
+## 
+## For more details please read README file.
 ##
 ## USAGE
 ##
@@ -27,7 +30,7 @@
 ## WARNING: You must save a genome FASTA file as "genome.fa" for context sequence extraction. This genome file must be chromosome divided;
 ## >chr1, >chr2 ... as IDs.
 ##
-######################################################################################################################### 
+###########################################################################################################################################
 
 #! /usr/bin/perl
 use Bio::DB::Fasta; # bioperl module for the extraction of sequences.

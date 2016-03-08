@@ -1,9 +1,12 @@
 ########################################################################################################################
-## WOLAND REPORT BETA 0.1 (15-02-2016)
+## WOLAND Beta 0.1 (03-08-2016)
+## woland-report.pl 
 ##
-## WOLAND is a software package based on Perl and R for calculation of general mutation metrics, identification and
-## comparison of predicted hotspots across biological samples. WOLAND uses Single Nucleotide Polymorphisms (SNPs) data
-## from Next Generation Sequencing (NGS) pipelines as main input. Please read README file.
+## WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell. 
+## It is implemented as a Perl and R tool using as inputs filtered unannotated or annotated SNV lists, combined with its 
+## correspondent genome sequences.
+## 
+## For more details please read README file.
 ##
 ## Use woland-report to build a grouped report using results-folder of each woland-anno.pl analyzed sample
 ##
@@ -20,16 +23,137 @@ use warnings;
 
 ## variables
 my ($inputTable, $inputTableLine, @inputTableArray);
-my ($i, $i2, $i3, $i4); my (@i, @i2, @i3); #variables for indices
+my ($i, $i2, $i3, $i4); my (@i, @i2, @i3); #variables for indexes
 my (@Group, @sampleName, $sampleNameLine);
 my ($inputChromosomeProfile, $inputChromosomeProfileArrayLine, @inputChromosomeProfileArray);
-my ($inputSampleBaseChange, @CHR_P, @MUT_P, @inputSampleBaseChangeArray, @AT,@AG,@AC,@CG,@CT,@CA,@ATF,@AGF,@ACF,@CGF,@CTF,@CAF);
+my ($inputSampleBaseChange, @chrProfile, @mutProfile, @inputSampleBaseChangeArray, @AT,@AG,@AC,@CG,@CT,@CA,@ATF,@AGF,@ACF,@CGF,@CTF,@CAF);
 my ($TransversionF, $TransitionF, @TransversionF, @TransitionF);
 my ($inputSampleMotif, $inputSampleMotifArray, @inputSampleMotifArray);
 my ($inputSampleHotSpot, $inputSampleHotSpotArrayLine, $item, @SN1,@DNApol,@oxoG,@UV,@SixFour,@ENU,@UVAsolar,@SN1F,@DNApolF,@oxoGF,@UVF,@SixFourF,@ENUF,@UVAsolarF);
 my ($uniqueGroup, $input, $HofA, @inputSampleHotSpotArray, @geneClass, @GeneName, @CHR, @BP, @HotspotCount, @uniqgroup);
 my ($inputStrandScoreArrayLine, $inputStrandScore, $SC_0, $SC_1,$SC_m1,$SC_SC,$totalSC,$nConcordance,$nDiscordance,$ratioConcordanceDiscordance,$n, @inputStrandScoreArray, @CHR_SC, @BP_SC, @SC_SC, @colorGauss);
 my ($R, $colorGausspick, $uniqGroupLine, $pick, $legendltyV, $legendlwdV, $lastgroup, @legendname, @legendlty, @legendlwd, @legendcol);
+my %HofA=();
+
+## subroutines
+sub BoxPlotGroup{
+
+	$R->send(qq'WOLAND.$_[0].boxplot<-read.table("$_[0]-$inputTable.tmp", sep = "\t", header=TRUE)');
+	$R->send(qq'WOLAND.$_[0].boxplot.m <- melt (WOLAND.$_[0].boxplot)');
+	$R->send(qq'pdf(file="$_[0]_number_boxplot_$inputTable.pdf", width=11.692, height=8.267)');
+	$R->send(qq'ggplot (WOLAND.$_[0].boxplot.m, aes(x=variable, y=value, fill = X))+
+	ggtitle("$_[0]_$inputTable")+
+	theme(plot.title = element_text(size=16, vjust=1.1))+
+	theme(axis.title.y = element_text(size=16))+
+	scale_x_discrete(name="")+
+	geom_boxplot(lwd=0.25)+
+	scale_fill_brewer(name="Group", palette="Spectral")');
+	$R->send('dev.off()');
+}
+
+sub SCRatioGroup{
+
+	for my $i3 (0..$#sampleName){
+		$inputStrandScore = "results-$sampleName[$i3]/WOLAND-bias_$_[0]-$sampleName[$i3]";
+		open (inputStrandScore, $inputStrandScore);
+		@inputStrandScoreArray=<inputStrandScore>;
+
+		foreach $inputStrandScoreArrayLine (@inputStrandScoreArray){
+			@i = split (/\t/, $inputStrandScoreArrayLine);
+			chomp (@i);
+			push (@CHR_SC, "$i[0]");
+			push (@BP_SC, "$i[1]");
+			push (@SC_SC, "$i[2]");
+		}
+
+		$SC_0=0;
+		$SC_1=0;
+		$SC_m1=0;
+
+		for my $i4 (0..$#SC_SC){
+			if ($SC_SC[$i4] == 0){ ++$SC_0;}
+			if ($SC_SC[$i4] == 1){ ++$SC_1;}
+			if ($SC_SC[$i4] eq "-1"){ ++$SC_m1;}
+		}
+
+		$totalSC=$SC_0+$SC_1+$SC_m1;
+			if ($totalSC==0){
+				$totalSC=1;
+			}
+		$nConcordance=$SC_0/$totalSC;
+		$nDiscordance=($SC_1+$SC_m1)/$totalSC;
+			if ($nDiscordance==0){
+				$nDiscordance=1;
+			}
+		$ratioConcordanceDiscordance=$nConcordance/$nDiscordance;
+
+		push @{ $HofA{$n} } , $ratioConcordanceDiscordance;
+
+		$SC_0=0;
+		$SC_1=0;
+		$SC_m1=0;
+
+		@CHR_SC =();
+		@BP_SC =();
+		@SC_SC =();
+	}
+	++$n;
+}
+
+sub GaussGraphPlot{
+
+	$R->send(qq'pdf(file="gauss_$_[0]-$inputTable.pdf", width=11.692, height=8.267)');
+	$R->send(qq'plot(5,
+			5,
+			main="Kernel Density Estimation for SC score of $_[0]-$inputTable",
+			xlab="SC score",
+			ylab="SC score for bw=0.05",
+			xlim=c(-1.25, 1.25),
+			ylim = c(0,5))'
+			);
+	$pick=0;
+	foreach $uniqGroupLine(@uniqgroup){
+
+		$colorGausspick=$colorGauss[$pick];
+
+		for my $i3 (0..$#sampleName){
+			if($Group[$i3] eq $uniqGroupLine){
+				$R->send(qq'FirstPlot <- read.delim("../results-$sampleName[$i3]/WOLAND-bias_$_[0]-$sampleName[$i3]", header=FALSE)');
+				$R->send(q'fp<-density (FirstPlot$V3, bw=0.05)');
+				$R->send(qq'lines (fp, col=$colorGausspick, lwd=2, ylim=c(0,5))');
+			}
+		}
+
+		$pick++;
+	}
+
+	$legendltyV="1\,";
+	$legendlwdV="2.5\,";
+	$lastgroup=$#uniqgroup;
+
+	for my $i3(0..$#uniqgroup){
+
+		push (@legendname, "\"$uniqgroup[$i3]\"\,");
+		push (@legendlty, "$legendltyV");
+		push (@legendlwd, "$legendlwdV");
+		push (@legendcol, "$colorGauss[$i3]\,");
+
+		if ($i3==$lastgroup){
+			chop ($legendname[$i3]);
+			chop ($legendlty[$i3]);
+			chop ($legendlwd[$i3]);
+			chop ($legendcol[$i3]);
+		}
+	}
+	
+	$R->send(qq'legend("topright",c(@legendname),lty=c(@legendlty), lwd=c(@legendlwd), col=c(@legendcol))');
+	$R->send(q'dev.off()');
+	$pick=0;
+	@legendname=();
+	@legendlty=();
+	@legendlwd=();
+	@legendcol=();
+}
 
 ## main warning
 unless (@ARGV){
@@ -64,14 +188,14 @@ for my $i3 (0..$#sampleName){
 	foreach $inputChromosomeProfileArrayLine (@inputChromosomeProfileArray){
 		@i2 = split (/\t/, $inputChromosomeProfileArrayLine);
 		chomp (@i2);
-		push (@CHR_P, "$i2[0]");
-		push (@MUT_P, "$i2[2]");
+		push (@chrProfile, "$i2[0]");
+		push (@mutProfile, "$i2[2]");
 	}
 
 	open (MUTFREQ, ">>report-$inputTable/mutfreq-$inputTable.tmp");
 
-	for my $i (1..$#CHR_P){
-		print MUTFREQ "$CHR_P[$i]\t$MUT_P[$i]\t$Group[$i3]\n";
+	for my $i (1..$#chrProfile){
+		print MUTFREQ "$chrProfile[$i]\t$mutProfile[$i]\t$Group[$i3]\n";
 	}
 
 	$i=0;
@@ -81,8 +205,8 @@ for my $i3 (0..$#sampleName){
 	$inputChromosomeProfileArrayLine=0;
 	@inputChromosomeProfileArray=();
 	@i = 0;
-	@CHR_P =();
-	@MUT_P=();
+	@chrProfile =();
+	@mutProfile=();
 }
 
 $i3=0;
@@ -254,61 +378,11 @@ print CONCORDANCEDISCORDANCERATIO "X\tSN1\tDNApol\t8-oxoG\tUVlambda\tSixFour\tUV
 $input = 6;
 $HofA = ();
 
-my %HofA=();
 for (0..$input) {
    $HofA{$_} = [];
 }
 
 $n=0;
-
-sub SCRatioGroup{
-
-	for my $i3 (0..$#sampleName){
-		$inputStrandScore = "results-$sampleName[$i3]/WOLAND-bias_$_[0]-$sampleName[$i3]";
-		open (inputStrandScore, $inputStrandScore);
-		@inputStrandScoreArray=<inputStrandScore>;
-
-		foreach $inputStrandScoreArrayLine (@inputStrandScoreArray){
-			@i = split (/\t/, $inputStrandScoreArrayLine);
-			chomp (@i);
-			push (@CHR_SC, "$i[0]");
-			push (@BP_SC, "$i[1]");
-			push (@SC_SC, "$i[2]");
-		}
-
-		$SC_0=0;
-		$SC_1=0;
-		$SC_m1=0;
-
-		for my $i4 (0..$#SC_SC){
-			if ($SC_SC[$i4] == 0){ ++$SC_0;}
-			if ($SC_SC[$i4] == 1){ ++$SC_1;}
-			if ($SC_SC[$i4] eq "-1"){ ++$SC_m1;}
-		}
-
-		$totalSC=$SC_0+$SC_1+$SC_m1;
-			if ($totalSC==0){
-				$totalSC=1;
-			}
-		$nConcordance=$SC_0/$totalSC;
-		$nDiscordance=($SC_1+$SC_m1)/$totalSC;
-			if ($nDiscordance==0){
-				$nDiscordance=1;
-			}
-		$ratioConcordanceDiscordance=$nConcordance/$nDiscordance;
-
-		push @{ $HofA{$n} } , $ratioConcordanceDiscordance;
-
-		$SC_0=0;
-		$SC_1=0;
-		$SC_m1=0;
-
-		@CHR_SC =();
-		@BP_SC =();
-		@SC_SC =();
-	}
-	++$n;
-}
 
 &SCRatioGroup ("SN1");
 &SCRatioGroup ("DNApoln");
@@ -325,7 +399,6 @@ for my $i (0 .. $#Group){
 close (CONCORDANCEDISCORDANCERATIO);
 $i3=0;
 
-
 ### R-bridge
 $R = Statistics::R->new() ;
 $R->start_sharedR ;
@@ -337,21 +410,6 @@ $R->send('library (plyr)');
 $R->send(qq'setwd(dir = "./report-$inputTable/")');
 
 # box plot of grouped samples
-sub BoxPlotGroup{	
-
-	$R->send(qq'WOLAND.$_[0].boxplot<-read.table("$_[0]-$inputTable.tmp", sep = "\t", header=TRUE)');
-	$R->send(qq'WOLAND.$_[0].boxplot.m <- melt (WOLAND.$_[0].boxplot)');
-	$R->send(qq'pdf(file="$_[0]_number_boxplot_$inputTable.pdf", width=11.692, height=8.267)');
-	$R->send(qq'ggplot (WOLAND.$_[0].boxplot.m, aes(x=variable, y=value, fill = X))+
-	ggtitle("$_[0]_$inputTable")+
-	theme(plot.title = element_text(size=16, vjust=1.1))+
-	theme(axis.title.y = element_text(size=16))+
-	scale_x_discrete(name="")+
-	geom_boxplot(lwd=0.25)+
-	scale_fill_brewer(name="Group", palette="Spectral")');
-	$R->send('dev.off()');
-}
-
 &BoxPlotGroup("nucleotide_type_changeF");
 &BoxPlotGroup("nucleotide_type_change");
 &BoxPlotGroup("motif_number");
@@ -368,61 +426,6 @@ foreach $uniqGroupLine (@uniqgroup){
 # gaussian kernel density of SC scores
 @colorGauss=("\"#9E0142\"", "\"#5E4FA2\"","\"#D53E4F\"","\"#3288BD\"", "\"#F46D43\"","\"#66C2A5\"","\"#FDAE61\"","\"#ABDDA4\"","\"#FEE08B\"",
 			 "\"#E6F598\"" );
-			
-sub GaussGraphPlot{
-
-	$R->send(qq'pdf(file="gauss_$_[0]-$inputTable.pdf", width=11.692, height=8.267)');
-	$R->send(qq'plot(5,
-			5,
-			main="Kernel Density Estimation for SC score of $_[0]-$inputTable",
-			xlab="SC score",
-			ylab="SC score for bw=0.05",
-			xlim=c(-1.25, 1.25),
-			ylim = c(0,5))'
-			);
-	$pick=0;
-	foreach $uniqGroupLine(@uniqgroup){
-
-		$colorGausspick=$colorGauss[$pick];
-
-		for my $i3 (0..$#sampleName){
-			if($Group[$i3] eq $uniqGroupLine){
-				$R->send(qq'FirstPlot <- read.delim("../results-$sampleName[$i3]/WOLAND-bias_$_[0]-$sampleName[$i3]", header=FALSE)');
-				$R->send(q'fp<-density (FirstPlot$V3, bw=0.05)');
-				$R->send(qq'lines (fp, col=$colorGausspick, lwd=2, ylim=c(0,5))');
-			}
-		}
-
-		$pick++;
-	}
-
-	$legendltyV="1\,";
-	$legendlwdV="2.5\,";
-	$lastgroup=$#uniqgroup;
-
-	for my $i3(0..$#uniqgroup){
-
-		push (@legendname, "\"$uniqgroup[$i3]\"\,");
-		push (@legendlty, "$legendltyV");
-		push (@legendlwd, "$legendlwdV");
-		push (@legendcol, "$colorGauss[$i3]\,");
-
-		if ($i3==$lastgroup){
-			chop ($legendname[$i3]);
-			chop ($legendlty[$i3]);
-			chop ($legendlwd[$i3]);
-			chop ($legendcol[$i3]);
-		}
-	}
-	
-	$R->send(qq'legend("topright",c(@legendname),lty=c(@legendlty), lwd=c(@legendlwd), col=c(@legendcol))');
-	$R->send(q'dev.off()');
-	$pick=0;
-	@legendname=();
-	@legendlty=();
-	@legendlwd=();
-	@legendcol=();
-}
 
 &GaussGraphPlot("UV-lambda");
 &GaussGraphPlot("sixfour");
