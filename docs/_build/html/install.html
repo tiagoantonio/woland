@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Install &mdash; woland 0.1.1 documentation</title>
+  <title>Install &mdash; WOLAND 0.1.1 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="woland 0.1.1 documentation" href="index.html"/>
+    <link rel="top" title="WOLAND 0.1.1 documentation" href="index.html"/>
         <link rel="next" title="Using" href="using.html"/>
         <link rel="prev" title="README" href="README.html"/> 
 
@@ -51,7 +51,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> woland
+            <a href="index.html" class="icon icon-home"> WOLAND
           
 
           
@@ -85,8 +85,18 @@
                 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="README.html">README</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Install</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#prerequisites">Prerequisites</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#perl-minimal-recommended-perl-version-5-17">Perl (Minimal recommended Perl version: 5.17)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#r-minimal-recommended-r-version-3-1">R (Minimal recommended R version: 3.1)</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#installing-perl-modules">Installing Perl modules</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installing-r-packages">Installing R packages</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#installing-source-woland-files">Installing source WOLAND files</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#copying-genome-sequences-and-annotation">Copying genome sequences and annotation</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="using.html">Using</a></li>
@@ -103,7 +113,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">woland</a>
+        <a href="index.html">WOLAND</a>
       </nav>
 
 
@@ -141,11 +151,15 @@ They must be installed before WOLAND installation.</p>
 <div class="section" id="prerequisites">
 <h2>Prerequisites<a class="headerlink" href="#prerequisites" title="Permalink to this headline">¶</a></h2>
 <p>The following software must be present before installing Woland:</p>
-<p>&#8212; Perl (Minimal recommended Perl version: 5.17)</p>
+<div class="section" id="perl-minimal-recommended-perl-version-5-17">
+<h3>Perl (Minimal recommended Perl version: 5.17)<a class="headerlink" href="#perl-minimal-recommended-perl-version-5-17" title="Permalink to this headline">¶</a></h3>
 <p>To check Perl version type:</p>
-<p>$ perl -v</p>
+<div class="highlight-python"><div class="highlight"><pre>$ perl -v
+</pre></div>
+</div>
 <p>The following Perl modules should be present:</p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li>Bio::DB::Fasta</li>
 <li>Cwd</li>
 <li>List::Util</li>
@@ -157,42 +171,84 @@ They must be installed before WOLAND installation.</p>
 <li>Text::Wrap</li>
 <li>Statistics::R</li>
 </ul>
-<p>&#8212; R (Minimal recommended R version: 3.1)</p>
+</div></blockquote>
+</div>
+<div class="section" id="r-minimal-recommended-r-version-3-1">
+<h3>R (Minimal recommended R version: 3.1)<a class="headerlink" href="#r-minimal-recommended-r-version-3-1" title="Permalink to this headline">¶</a></h3>
+<p>To check R version type (in R):</p>
+<div class="highlight-python"><div class="highlight"><pre>$ R.Version()
+</pre></div>
+</div>
 <p>The following R packages must be installed:</p>
-<ul class="simple">
+<blockquote>
+<div><ul class="simple">
 <li>reshape2</li>
 <li>ggplot2</li>
 <li>qqman</li>
 <li>RColorBrewer</li>
 <li>plyr</li>
 </ul>
+</div></blockquote>
+</div>
 </div>
 <div class="section" id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>&#8212; Installing Perl modules</p>
-<p>You can use CPAN to get any missing module. First install cpanm:
-$ sudo cpan App::cpanminus</p>
-<p>Them you can install each module:
-$ sudo cpanm Module::Name</p>
-<p>&#8212; Installing R packages</p>
+<div class="section" id="installing-perl-modules">
+<h3>Installing Perl modules<a class="headerlink" href="#installing-perl-modules" title="Permalink to this headline">¶</a></h3>
+<p>You can use CPAN to get any missing module. First install cpanm:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ sudo cpan App::cpanminus
+</pre></div>
+</div>
+<p>Them you can install each module:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ sudo cpanm Module::Name
+</pre></div>
+</div>
+</div>
+<div class="section" id="installing-r-packages">
+<h3>Installing R packages<a class="headerlink" href="#installing-r-packages" title="Permalink to this headline">¶</a></h3>
 <p>You can use this following command in R to install each missing library:</p>
-<p>$R install.packages(&#8220;packagename&#8221;)</p>
-<p>&#8212; Installing source WOLAND files</p>
+<p>$R install.packages(<tt class="docutils literal"><span class="pre">packagename</span></tt>)</p>
+</div>
+<div class="section" id="installing-source-woland-files">
+<h3>Installing source WOLAND files<a class="headerlink" href="#installing-source-woland-files" title="Permalink to this headline">¶</a></h3>
 <p>Download last Woland source release in &lt;link&gt;. Woland is provided as a tar.gz file which could be extracted using, for example:</p>
-<p>$ tar vxzf &lt;file&gt;</p>
-<p>Woland will be installed inside woland folder.</p>
-<p>&#8212; Copying genome sequences and annotation</p>
-<p>Woland needs genome reference sequence and its gene annotation for each organism. User should download two files in order to perform its analysis:</p>
-<ul class="simple">
-<li>Woland-1.0/genomes/genome_&lt;genome_version&gt;.fa - Can be downloaded using UCSC genome sequences database.</li>
-<li>Woland-1.0/refGene/&lt;refseq_&lt;genome_version&gt;.txt - Can be downloaded using UCSC annotation database.</li>
+<div class="highlight-python"><div class="highlight"><pre>$ tar -xvzf woland-&lt;version&gt;-install.tar.gz
+</pre></div>
+</div>
+<p>Woland will be installed inside woland installation folder <tt class="docutils literal"><span class="pre">install_dir</span></tt>.</p>
+</div>
+<div class="section" id="copying-genome-sequences-and-annotation">
+<h3>Copying genome sequences and annotation<a class="headerlink" href="#copying-genome-sequences-and-annotation" title="Permalink to this headline">¶</a></h3>
+<p>Woland needs genome reference sequence and its gene annotation for each organism in the <tt class="docutils literal"><span class="pre">$install_dir/genomes</span></tt> folder. User should download two files in order to perform its analysis:</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>These files can be downloaded using UCSC database (<a class="reference external" href="http://hgdownload.cse.ucsc.edu/downloads.html">http://hgdownload.cse.ucsc.edu/downloads.html</a>). See below how to rename them:</p>
+<div class="last highlight-python"><div class="highlight"><pre>$install_dir/genomes/genome_&lt;genome_version&gt;.fa
+$install_dir/genomes/refseq_&lt;genome_version&gt;.txt
+</pre></div>
+</div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">You must rename <tt class="docutils literal"><span class="pre">&lt;genome_version&gt;.fa</span></tt> and refGene.txt according to <tt class="docutils literal"><span class="pre">&lt;genome_version&gt;</span></tt>. For example:</p>
+</div>
+<ul>
+<li><p class="first">hg19:</p>
+<div class="highlight-python"><div class="highlight"><pre>$install_dir/genomes/genome_hg19.fa
+
+$install_dir/genomes/refseq_hg19.fa
+</pre></div>
+</div>
+</li>
+<li><p class="first">mm10:</p>
+<div class="highlight-python"><div class="highlight"><pre>$install_dir/genomes/genome_mm10.fa
+
+$install_dir/genomes/refseq_mm10.fa
+</pre></div>
+</div>
+</li>
 </ul>
-<p>You must rename genome.fa and refGene.txt according to &lt;genome_version&gt;. For example:</p>
-<ul class="simple">
-<li>hg19</li>
-</ul>
-<p>$install_dir/genomes/genome_hg19.fa</p>
-<p>$install_dir/genomes/refseq_hg19.fa</p>
+</div>
 </div>
 </div>
 

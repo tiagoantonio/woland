@@ -9,72 +9,92 @@ Prerequisites
 
 The following software must be present before installing Woland:
 
---- Perl (Minimal recommended Perl version: 5.17)
+Perl (Minimal recommended Perl version: 5.17)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To check Perl version type:
+To check Perl version type::
 
-$ perl -v 
+	$ perl -v 
 
 The following Perl modules should be present:
 
-- Bio::DB::Fasta
-- Cwd
-- List::Util
-- IPC::System::Simple
-- IPC::Run
-- Parallel::ForkManager
-- Regexp::Common
-- Text::Balanced(>=1.97)
-- Text::Wrap
-- Statistics::R
+	* Bio::DB::Fasta
+	* Cwd
+	* List::Util
+	* IPC::System::Simple
+	* IPC::Run
+	* Parallel::ForkManager
+	* Regexp::Common
+	* Text::Balanced(>=1.97)
+	* Text::Wrap
+	* Statistics::R
 
---- R (Minimal recommended R version: 3.1)
+R (Minimal recommended R version: 3.1)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To check R version type (in R)::
+
+	$ R.Version()
 
 The following R packages must be installed:
 
-- reshape2
-- ggplot2
-- qqman
-- RColorBrewer
-- plyr
+	* reshape2
+	* ggplot2
+	* qqman
+	* RColorBrewer
+	* plyr
 
 
 Installation
 -------------
 
---- Installing Perl modules
+Installing Perl modules
+~~~~~~~~~~~~~~~~~~~~~~~
 
-You can use CPAN to get any missing module. First install cpanm:
-$ sudo cpan App::cpanminus
+You can use CPAN to get any missing module. First install cpanm::
 
-Them you can install each module:
-$ sudo cpanm Module::Name
+	$ sudo cpan App::cpanminus
 
---- Installing R packages
+Them you can install each module::
+
+	$ sudo cpanm Module::Name
+
+Installing R packages
+~~~~~~~~~~~~~~~~~~~~~
 
 You can use this following command in R to install each missing library:
 
-$R install.packages("packagename")
+$R install.packages(``packagename``)
 
---- Installing source WOLAND files
+Installing source WOLAND files
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Download last Woland source release in <link>. Woland is provided as a tar.gz file which could be extracted using, for example:
+Download last Woland source release in <link>. Woland is provided as a tar.gz file which could be extracted using, for example::
 
-$ tar vxzf <file>
+	$ tar -xvzf woland-<version>-install.tar.gz
 
-Woland will be installed inside woland folder.
+Woland will be installed inside woland installation folder ``install_dir``.
 
---- Copying genome sequences and annotation
+Copying genome sequences and annotation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Woland needs genome reference sequence and its gene annotation for each organism. User should download two files in order to perform its analysis:
+Woland needs genome reference sequence and its gene annotation for each organism in the ``$install_dir/genomes`` folder. User should download two files in order to perform its analysis:
 
-- Woland-1.0/genomes/genome_<genome_version>.fa - Can be downloaded using UCSC genome sequences database.
-- Woland-1.0/refGene/<refseq_<genome_version>.txt - Can be downloaded using UCSC annotation database.
+.. note:: These files can be downloaded using UCSC database (http://hgdownload.cse.ucsc.edu/downloads.html). See below how to rename them::
 
-You must rename genome.fa and refGene.txt according to <genome_version>. For example:
+	$install_dir/genomes/genome_<genome_version>.fa
+	$install_dir/genomes/refseq_<genome_version>.txt
 
-- hg19
+.. warning:: You must rename ``<genome_version>.fa`` and refGene.txt according to ``<genome_version>``. For example:
 
-$install_dir/genomes/genome_hg19.fa
+- hg19::
 
-$install_dir/genomes/refseq_hg19.fa
+	$install_dir/genomes/genome_hg19.fa
+
+	$install_dir/genomes/refseq_hg19.fa
+
+- mm10::
+
+	$install_dir/genomes/genome_mm10.fa
+
+	$install_dir/genomes/refseq_mm10.fa

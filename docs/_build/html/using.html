@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Using &mdash; woland 0.1.1 documentation</title>
+  <title>Using &mdash; WOLAND 0.1.1 documentation</title>
   
 
   
@@ -30,7 +30,7 @@
   
 
   
-    <link rel="top" title="woland 0.1.1 documentation" href="index.html"/>
+    <link rel="top" title="WOLAND 0.1.1 documentation" href="index.html"/>
         <link rel="prev" title="Install" href="install.html"/> 
 
   
@@ -50,7 +50,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> woland
+            <a href="index.html" class="icon icon-home"> WOLAND
           
 
           
@@ -85,9 +85,20 @@
 <li class="toctree-l1"><a class="reference internal" href="README.html">README</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="">Using</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#scripts">Scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#scripts">Scripts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#woland-anno-pl">woland-anno.pl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#woland-report-pl">woland-report.pl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#woland-batch-pl">woland-batch.pl</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#inputs">Inputs</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">woland-anno.pl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">woland-report.pl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">woland-batch.pl</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#woland-bed-pl">woland-bed.pl</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#outputs">Outputs</a></li>
 </ul>
 </li>
@@ -104,7 +115,7 @@
       
       <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
         <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-        <a href="index.html">woland</a>
+        <a href="index.html">WOLAND</a>
       </nav>
 
 
@@ -137,42 +148,66 @@
             
   <div class="section" id="using">
 <h1>Using<a class="headerlink" href="#using" title="Permalink to this headline">¶</a></h1>
-<p>Woland has three main scripts (woland-anno.pl, woland-report.pl and woland-batch.pl) plus a acessory script (woland-bed.pl). Please observe descriptions of each script, input file file requirements, usage and outputs.</p>
+<p>WOLAND has three main scripts: <tt class="docutils literal"><span class="pre">woland-anno.pl</span></tt>, <tt class="docutils literal"><span class="pre">woland-report.pl</span></tt> and <tt class="docutils literal"><span class="pre">woland-batch.pl</span></tt>) plus a acessory script <tt class="docutils literal"><span class="pre">woland-bed.pl</span></tt>. Please observe descriptions of each script, input file file requirements, usage and outputs.</p>
 <div class="section" id="scripts">
 <h2>Scripts<a class="headerlink" href="#scripts" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>woland-anno.pl: Script used to calculate mutational patterns of a single annotated variant file.</li>
-<li>woland-report.pl: Script used to build a report of multiple annotated variant files assigned as groups.</li>
-<li>woland-batch.pl: Script which automatically runs multiple instances of woland-anno.pl and build a single report using woland-report.pl</li>
-</ul>
+<div class="section" id="woland-anno-pl">
+<h3>woland-anno.pl<a class="headerlink" href="#woland-anno-pl" title="Permalink to this headline">¶</a></h3>
+<p>Script used to calculate mutational patterns of a single annotated variant file. Uses a single <tt class="docutils literal"><span class="pre">&lt;variant_function&gt;</span></tt> to calculate all patterns in a single result folder for <tt class="docutils literal"><span class="pre">&lt;results-variant_function&gt;</span></tt> provided:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ perl woland-anno.pl &lt;variant_function&gt; &lt;chr_profile&gt; &lt;hs_window&gt; &lt;genome_version&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="woland-report-pl">
+<h3>woland-report.pl<a class="headerlink" href="#woland-report-pl" title="Permalink to this headline">¶</a></h3>
+<p>Script used to build a report of multiple annotated variant files assigned as groups.</p>
+</div>
+<div class="section" id="woland-batch-pl">
+<h3>woland-batch.pl<a class="headerlink" href="#woland-batch-pl" title="Permalink to this headline">¶</a></h3>
+<p>Script which automatically runs multiple instances of woland-anno.pl and build a single report using woland-report.pl</p>
+</div>
 </div>
 <div class="section" id="inputs">
 <h2>Inputs<a class="headerlink" href="#inputs" title="Permalink to this headline">¶</a></h2>
-<p>&lt;annovar.variant_function&gt; : Annotated .variant_function file which can be obtained using annotate-variation.pl script from ANNOVAR.</p>
-<p>&lt;chromosome_profile&gt;       : Regular tabular file without header . First column is chromosome name in chr format (e.g. chr13). Second column is chromosome length sequenced. User can build this file witth target .BED file using woland-bed-to-profile.pl</p>
-<p>&lt;hotspot_window&gt;           : A natural number N (N&gt;1), for hotspot window length. Hotspot window corresponds to N nucleotides flanking each SNV.</p>
-<p>&lt;genome_version&gt;           : Genome version of genomes/genome_&lt;genome_version&gt; and genomes/refseq_&lt;genome_version&gt; files.</p>
-<p>&lt;input.table&gt;              : Regular tabular file without header. First column is group name. Second column is file sample name of annovar annotated.variant file. Samples files MUST be located in the Woland root folder.</p>
-<p>&lt;coordinates.bed&gt;          : Coordinates of target regions used in sequencing experiment in BED format.</p>
+<ul class="simple">
+<li><tt class="docutils literal"><span class="pre">&lt;annovar.variant_function&gt;</span></tt>: Annotated .variant_function file which can be obtained using annotate-variation.pl script from ANNOVAR.</li>
+<li><tt class="docutils literal"><span class="pre">&lt;chromosome_profile&gt;</span></tt>: Regular tabular file without header . First column is chromosome name in chr format (e.g. chr13). Second column is chromosome length sequenced. User can build this file with target .BED file using <tt class="docutils literal"><span class="pre">woland-bed-to-profile.pl</span></tt>.</li>
+<li><tt class="docutils literal"><span class="pre">&lt;hotspot_window&gt;</span></tt>: A natural number N (N&gt;1), for hotspot window length. Hotspot window corresponds to N nucleotides flanking each SNV.</li>
+<li><tt class="docutils literal"><span class="pre">&lt;genome_version&gt;</span></tt>:Genome version of genomes/genome_&lt;genome_version&gt; and genomes/refseq_&lt;genome_version&gt; files.</li>
+<li><tt class="docutils literal"><span class="pre">&lt;input.table&gt;</span></tt>: Regular tabular file without header. First column is group name. Second column is file sample name of annovar annotated.variant file. Samples files MUST be located in the Woland root folder.</li>
+<li><tt class="docutils literal"><span class="pre">&lt;coordinates.bed&gt;</span></tt>:Coordinates of target regions used in sequencing experiment in BED format.</li>
+</ul>
 </div>
 <div class="section" id="usage">
 <h2>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
-<p>$ woland-anno.pl &lt;annovar.variant_function&gt; &lt;chromosome_profile&gt; &lt;hotspot_window&gt; &lt;genome_version&gt;</p>
-<ul class="simple">
-<li>woland-anno.pl uses a single &lt;annovar.variant_function&gt; to calculate all patterns in a single result folder for &lt;annovar.variant_function&gt; provided.</li>
-</ul>
-<p>$ woland-report.pl &lt;input.table&gt; &lt;chromosome_profile&gt; &lt;hotspot_window&gt; &lt;genome_version&gt;</p>
-<ul class="simple">
-<li>This script uses a group of samples to perform Woland-anno.pl script for each sample provided to build an unique grouped report output folder for the analysis. Sample names and groups are provided by &lt;input.table&gt; and one result folder is also generated for each sample provided.</li>
-</ul>
-<p>$ woland-batch.pl &lt;input.table&gt; &lt;chromosome_profile&gt; &lt;hotspot_window&gt; &lt;genome_version&gt;</p>
-<ul class="simple">
-<li>woland.batch enables batch submission of multiple samples as provided by &lt;input.table&gt; file. This script runs Woland-anno.pl for each sample followed by Woland-report.pl generating one result folder for each sample file provided and a grouped report folder for whole analysis as provided by &lt;input.table&gt;</li>
-</ul>
-<p>$ woland-bed.pl &lt;coordinates.bed&gt;</p>
-<ul class="simple">
-<li>This script generates a &lt;chromosome_profile&gt; file using a .bed file from a targeted-sequencing experiment, for example. The &lt;chromosome_profile&gt; file could be used in other Woland scripts.</li>
-</ul>
+<div class="section" id="id1">
+<h3>woland-anno.pl<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<p>Uses a single &lt;annovar.variant_function&gt; to calculate all patterns in a single result folder for &lt;annovar.variant_function&gt; provided:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ woland-anno.pl &lt;annovar.variant_function&gt; &lt;chromosome_profile&gt; &lt;hotspot_window&gt; &lt;genome_version&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h3>woland-report.pl<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
+<p>This script uses a group of samples to perform Woland-anno.pl script for each sample provided to build an unique grouped report output folder for the analysis. Sample names and groups are provided by &lt;input.table&gt; and one result folder is also generated for each sample provided:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ woland-report.pl &lt;input.table&gt; &lt;chromosome_profile&gt; &lt;hotspot_window&gt; &lt;genome_version&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="id3">
+<h3>woland-batch.pl<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<p>woland.batch enables batch submission of multiple samples as provided by &lt;input.table&gt; file. This script runs Woland-anno.pl for each sample followed by Woland-report.pl generating one result folder for each sample file provided and a grouped report folder for whole analysis as provided by &lt;input.table&gt;:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ woland-batch.pl &lt;input.table&gt; &lt;chromosome_profile&gt; &lt;hotspot_window&gt; &lt;genome_version&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="woland-bed-pl">
+<h3>woland-bed.pl<a class="headerlink" href="#woland-bed-pl" title="Permalink to this headline">¶</a></h3>
+<p>This script generates a &lt;chromosome_profile&gt; file using a .bed file from a targeted-sequencing experiment, for example. The &lt;chromosome_profile&gt; file could be used in other Woland scripts:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ woland-bed.pl &lt;coordinates.bed&gt;
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="outputs">
 <h2>Outputs<a class="headerlink" href="#outputs" title="Permalink to this headline">¶</a></h2>

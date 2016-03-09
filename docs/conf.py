@@ -43,7 +43,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'woland'
+project = u'WOLAND'
 copyright = u'2016, Tiago de Souza, Alexandre Defelicibus, Carlos Menck'
 
 # The version info for the project you're documenting, acts as replacement for
@@ -196,7 +196,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-  ('index', 'woland.tex', u'woland Documentation',
+  ('index', 'woland.tex', u'WOLAND Documentation',
    u'Tiago de Souza, Alexandre Defelicibus, Carlos Menck', 'manual'),
 ]
 
@@ -226,7 +226,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'woland', u'woland Documentation',
+    ('index', 'WOLAND', u'WOLAND Documentation',
      [u'Tiago de Souza, Alexandre Defelicibus, Carlos Menck'], 1)
 ]
 
@@ -240,7 +240,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'woland', u'woland Documentation',
+  ('index', 'WOLAND', u'WOLAND Documentation',
    u'Tiago de Souza, Alexandre Defelicibus, Carlos Menck', 'woland', 'One line description of project.',
    'Miscellaneous'),
 ]

@@ -1,11 +1,34 @@
-Install
+Tutorial
 ========
 
-WOLAND is a multiplatform tool based on Perl and R. Please observe prerequisites and modules and libraries need. 
-They must be installed before WOLAND installation. 
+The easiest way to perform a WOLAND analysis is through a single batch submission using ``woland-batch.pl``. 
 
-Prerequisites
--------------
+First Step - Preparing VCF files
+--------------------------------
+
+Filtering
+~~~~~~~~~
+
+In most cases, a raw .vcf file containing SNVs from a resequencing pipeline is not suitable for a point mutation analysis. First, you have to filter polymorphisms and false-positives from each sample using, for example, ``vcftools`` (<http://vcftools.sourceforge.net/>) and/or ``ANNOVAR`` (<http://annovar.openbioinformatics.org/en/>).
+
+Annotating
+~~~~~~~~~~
+
+Several tools are available to annotate .vcf files. However, WOLAND accepts only ``ANNOVAR`` (<http://annovar.openbioinformatics.org/en/>) gene annotation. It is easy to use ANNOVAR and you can find information about downloading, installing and using it at its website. Here is an example how to use annovar to annotate a .vcf file using ''annotate_variation.pl``from ANNOVAR::
+
+	$ perl annotate_variation.pl -geneanno -buildver hg19 example/ex1.avinput humandb/
+
+.. warning:: WOLAND accepts ONLY ``.variant_function``files from ANNOVAR. It is not possible to use ``exonic_variant_function``output.
+
+At this time you have a ``.variant_function`` for each sample to be analyzed. Now you have to build a tabular ``input-table``file to assign samples into a group name - a "Control" or a "Treated" group, for example.
+
+Second Step - Grouping samples
+------------------------------
+
+At this step you must create a simple tabular file (``input-table``). Each line must corresponds to each file sample name in the first column and its group in the second column. Let's see an example:
+
+ 
+
 
 The following software must be present before installing Woland:
 
