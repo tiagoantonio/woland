@@ -1,5 +1,5 @@
 Install
-========
+=======
 
 WOLAND is a multiplatform tool based on Perl and R. Please observe prerequisites and modules and libraries need. 
 They must be installed before WOLAND installation. 
@@ -85,7 +85,9 @@ Woland needs genome reference sequence and its gene annotation for each organism
 	$install_dir/genomes/genome_<genome_version>.fa
 	$install_dir/genomes/refseq_<genome_version>.txt
 
-.. warning:: You must rename ``<genome_version>.fa`` and refGene.txt according to ``<genome_version>``. For example:
+.. warning:: You must rename ``<genome_version>.fa`` and ``refGene.txt`` according to ``<genome_version>``. 
+
+For example:
 
 - hg19::
 

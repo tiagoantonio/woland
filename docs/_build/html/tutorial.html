@@ -1,0 +1,391 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Tutorial &mdash; WOLAND 0.1.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="WOLAND 0.1.1 documentation" href="index.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> WOLAND
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <!-- Local TOC -->
+                <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">Tutorial</a><ul>
+<li><a class="reference internal" href="#first-step-preparing-input-table">First Step - Preparing input-table</a><ul>
+<li><a class="reference internal" href="#filtering">Filtering</a></li>
+<li><a class="reference internal" href="#annotating">Annotating</a></li>
+<li><a class="reference internal" href="#grouping-samples">Grouping samples</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#second-step-chromosome-profile">Second Step - Chromosome profile</a></li>
+<li><a class="reference internal" href="#third-step-genome-information">Third Step - Genome information</a><ul>
+<li><a class="reference internal" href="#genome-sequence-in-fasta-format">Genome sequence in FASTA format</a></li>
+<li><a class="reference internal" href="#refseq-annotation">RefSeq annotation</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#fourth-step-choosing-hotspot-window-length-and-running">Fourth Step - Choosing hotspot window length and running!</a></li>
+</ul>
+</li>
+</ul>
+</div>
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">WOLAND</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Tutorial</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="_sources/tutorial.txt" rel="nofollow"> View page source</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="tutorial">
+<h1>Tutorial<a class="headerlink" href="#tutorial" title="Permalink to this headline">¶</a></h1>
+<p>The easiest way to perform a WOLAND analysis is through a single batch submission using <tt class="docutils literal"><span class="pre">woland-batch.pl</span></tt>. This will envolve initial 4-step preparation but in the next-time that you will use WOLAND with other samples (and we believe that you do!) you will use only the first step. It is easy no? Each step will prepare the inputs for this script:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ perl woland-batch.pl &lt;input-table&gt; &lt;chr_profile&gt; &lt;hs_window&gt; &lt;genome_version&gt;
+</pre></div>
+</div>
+<div class="section" id="first-step-preparing-input-table">
+<h2>First Step - Preparing input-table<a class="headerlink" href="#first-step-preparing-input-table" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="filtering">
+<h3>Filtering<a class="headerlink" href="#filtering" title="Permalink to this headline">¶</a></h3>
+<p>In most cases, a raw .vcf file containing SNVs from a resequencing pipeline is not suitable for a point mutation analysis. First, you have to filter polymorphisms and false-positives from each sample using, for example, <tt class="docutils literal"><span class="pre">vcftools</span></tt> (&lt;<a class="reference external" href="http://vcftools.sourceforge.net/">http://vcftools.sourceforge.net/</a>&gt;) and/or <tt class="docutils literal"><span class="pre">ANNOVAR</span></tt> (&lt;<a class="reference external" href="http://annovar.openbioinformatics.org/en/">http://annovar.openbioinformatics.org/en/</a>&gt;).</p>
+</div>
+<div class="section" id="annotating">
+<h3>Annotating<a class="headerlink" href="#annotating" title="Permalink to this headline">¶</a></h3>
+<p>Several tools are available to annotate .vcf files. However, WOLAND accepts only <tt class="docutils literal"><span class="pre">ANNOVAR</span></tt> (&lt;<a class="reference external" href="http://annovar.openbioinformatics.org/en/">http://annovar.openbioinformatics.org/en/</a>&gt;) gene annotation. It is easy to use ANNOVAR and you can find information about downloading, installing and using it at its website. Here is an example how to use annovar to annotate a .vcf file using <tt class="docutils literal"><span class="pre">annotate_variation.pl</span></tt> from ANNOVAR:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ perl annotate_variation.pl -geneanno -buildver hg19 example/ex1.avinput humandb/
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">WOLAND accepts ONLY <tt class="docutils literal"><span class="pre">.variant_function</span></tt> files from ANNOVAR. It is not possible to use <tt class="docutils literal"><span class="pre">exonic_variant_function</span></tt> output.</p>
+</div>
+<p>At this time you have a <tt class="docutils literal"><span class="pre">.variant_function</span></tt> for each sample to be analyzed. You can manually annotate a file (think twice before) or force annotation when gene information are not avaialble (or not necessary). Let&#8217;s take a look at a <tt class="docutils literal"><span class="pre">variant-function</span></tt> file from annovar:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="24%" />
+<col width="16%" />
+<col width="12%" />
+<col width="18%" />
+<col width="18%" />
+<col width="6%" />
+<col width="6%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>exonic</td>
+<td>Lrp1b</td>
+<td>chr2</td>
+<td>3432131</td>
+<td>3432131</td>
+<td>A</td>
+<td>G</td>
+</tr>
+<tr class="row-even"><td>intergenic</td>
+<td>Rbpj</td>
+<td>chr5</td>
+<td>25465</td>
+<td>25465</td>
+<td>T</td>
+<td>A</td>
+</tr>
+<tr class="row-odd"><td>intronic</td>
+<td>Cmklr1</td>
+<td>chr5</td>
+<td>4234231</td>
+<td>4234231</td>
+<td>C</td>
+<td>T</td>
+</tr>
+<tr class="row-even"><td>intronic</td>
+<td>Setd8</td>
+<td>chr5</td>
+<td>8423415</td>
+<td>8423415</td>
+<td>G</td>
+<td>C</td>
+</tr>
+<tr class="row-odd"><td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>...</td>
+<td>.</td>
+<td>.</td>
+</tr>
+</tbody>
+</table>
+<p>Now you have to build a tabular <tt class="docutils literal"><span class="pre">input-table</span></tt> file to assign samples into a group name - a &#8220;Control&#8221; or a &#8220;Treated&#8221; group, for example.</p>
+</div>
+<div class="section" id="grouping-samples">
+<h3>Grouping samples<a class="headerlink" href="#grouping-samples" title="Permalink to this headline">¶</a></h3>
+<p>At this step you must create a simple tabular file (<tt class="docutils literal"><span class="pre">input-table</span></tt>). Each line must corresponds to each file sample name in the first column and its group in the second column. Let&#8217;s see an example:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="25%" />
+<col width="75%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>Control</td>
+<td>Sample1.txt.variant_function</td>
+</tr>
+<tr class="row-even"><td>Control</td>
+<td>Sample2.txt.variant_function</td>
+</tr>
+<tr class="row-odd"><td>Treated</td>
+<td>Sample3.txt.variant_function</td>
+</tr>
+<tr class="row-even"><td>Treated</td>
+<td>Sample4.txt.variant_function</td>
+</tr>
+<tr class="row-odd"><td>Treated</td>
+<td>Sample5.txt.variant_function</td>
+</tr>
+</tbody>
+</table>
+<p>This file <tt class="docutils literal"><span class="pre">input-table</span></tt> must be saved as a tabular text file and it will be used as the first argument in <tt class="docutils literal"><span class="pre">woland-batch.pl</span></tt> script.</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You can provide a path for each file in <tt class="docutils literal"><span class="pre">input-table</span></tt> if it does not rely on WOLAND <tt class="docutils literal"><span class="pre">$install_dir</span></tt>.</p>
+</div>
+</div>
+</div>
+<div class="section" id="second-step-chromosome-profile">
+<h2>Second Step - Chromosome profile<a class="headerlink" href="#second-step-chromosome-profile" title="Permalink to this headline">¶</a></h2>
+<p>At this step you must check you chromosome profile file. This file contains the length of each chromosome of your genome and it is used to calculate frequency of mutational changes. You can manually create your own chromosome profile or use the <tt class="docutils literal"><span class="pre">woland-bed.pl</span></tt> script if you have a .BED file from you targeted resequencing experiment (exome, for example). Let&#8217;s see an example of a <tt class="docutils literal"><span class="pre">chr_profile</span></tt> file:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="35%" />
+<col width="65%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td>chr1</td>
+<td>195471971</td>
+</tr>
+<tr class="row-even"><td>chr2</td>
+<td>182113224</td>
+</tr>
+<tr class="row-odd"><td>chr3</td>
+<td>160039680</td>
+</tr>
+<tr class="row-even"><td>chr4</td>
+<td>156508116</td>
+</tr>
+<tr class="row-odd"><td>...</td>
+<td>...</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p>If you have a .BED file from you experiment you can use <tt class="docutils literal"><span class="pre">woland-bed.pl</span></tt>. For example:</p>
+<div class="last highlight-python"><div class="highlight"><pre>$ perl woland-bed.pl hg19-exome-enrichment.bed
+</pre></div>
+</div>
+</div>
+<p>This will create a <tt class="docutils literal"><span class="pre">WOLAND-BED-PROFILE-hg19-exome-enrichment.bed</span></tt> file which can be used as <tt class="docutils literal"><span class="pre">chr_profile</span></tt> argument.</p>
+</div>
+<div class="section" id="third-step-genome-information">
+<h2>Third Step - Genome information<a class="headerlink" href="#third-step-genome-information" title="Permalink to this headline">¶</a></h2>
+<p>WOLAND uses genome sequences in FASTA format to extract context sequences and RefSeq annotation to obtain gene and transcriptional information. So you must provide two files for each genome. It is easy to obtain them and you MUST rename the according to &lt;genome_version&gt; parameter and move them to <tt class="docutils literal"><span class="pre">$install_dir/genomes/</span></tt> folder.</p>
+<p>A lot of genome sequences are avaialble nowadays. We advise you to use UCSC genome database to obtain your genome sequence and your RefSeq annotation file. Please check <a class="reference external" href="http://hgdownload.cse.ucsc.edu/downloads.html">http://hgdownload.cse.ucsc.edu/downloads.html</a>.</p>
+<div class="section" id="genome-sequence-in-fasta-format">
+<h3>Genome sequence in FASTA format<a class="headerlink" href="#genome-sequence-in-fasta-format" title="Permalink to this headline">¶</a></h3>
+<p>The genome sequence must contain all chromosomes in <tt class="docutils literal"><span class="pre">chr</span></tt> format. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt;chr1
+AGCATCGATCGGCATGCATGCTAGCTAGCTACGATGCTAGCAT (...)
+&gt;chr2
+GCATGCATCGTACGTACGATCGATCGATCGATCGATCGATCGA (...)
+(...)
+</pre></div>
+</div>
+<p>Please rename the FASTA file to <tt class="docutils literal"><span class="pre">genome_&lt;genome_version&gt;.fa</span></tt> and move it to <tt class="docutils literal"><span class="pre">$install_dir/genomes/</span></tt>. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ mv hg19.fa $install_dir/genomes/genome_hg19.fa
+</pre></div>
+</div>
+</div>
+<div class="section" id="refseq-annotation">
+<h3>RefSeq annotation<a class="headerlink" href="#refseq-annotation" title="Permalink to this headline">¶</a></h3>
+<p>The RefSeq annotation can be obtained through <a class="reference external" href="http://hgdownload.cse.ucsc.edu/downloads.html">http://hgdownload.cse.ucsc.edu/downloads.html</a> .</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">You MUST download the RefGene file - usually provided as <tt class="docutils literal"><span class="pre">refGene.txt</span></tt>.</p>
+</div>
+<p>Please rename the RefGene file to <tt class="docutils literal"><span class="pre">refseq_&lt;genome_version&gt;.txt`</span> <span class="pre">and</span> <span class="pre">move</span> <span class="pre">it</span> <span class="pre">to</span> <span class="pre">``$install_dir/genomes/</span></tt>. For example:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ mv RefGene $install_dir/genomes/refseq_hg19.txt
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="fourth-step-choosing-hotspot-window-length-and-running">
+<h2>Fourth Step - Choosing hotspot window length and running!<a class="headerlink" href="#fourth-step-choosing-hotspot-window-length-and-running" title="Permalink to this headline">¶</a></h2>
+<p>Now you can choose a natural number &gt;1 for the hotspot window length <tt class="docutils literal"><span class="pre">&lt;hotspot_window&gt;</span></tt>, for example: 1000. Now, voilà, you can run <tt class="docutils literal"><span class="pre">woland-batch.pl</span></tt>!:</p>
+<div class="highlight-python"><div class="highlight"><pre>$ perl woland-batch.pl input.table.txt chr_profile.txt 1000 hg19
+</pre></div>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Tiago de Souza, Alexandre Defelicibus, Carlos Menck.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

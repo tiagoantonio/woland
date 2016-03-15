@@ -85,6 +85,8 @@
 <li class="toctree-l1"><a class="reference internal" href="README.html">README</a></li>
 <li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
 <li class="toctree-l1"><a class="reference internal" href="using.html">Using</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outputs.html">Outputs</a></li>
 </ul>
 
             
@@ -131,12 +133,20 @@
             
   <div class="section" id="welcome-to-woland-s-documentation">
 <h1>Welcome to WOLAND&#8217;s documentation!<a class="headerlink" href="#welcome-to-woland-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>Contents:</p>
+<p>WOLAND is a tool to analyze point mutation patterns using resequencing data from any organism or cell. There are many suitable applications for WOLAND such as the study of the genome-wide impact of both endogenous and exogenous mutagens on organisms and cells and analysis of mutagenic profiles of DNA repair-associated diseases. Also, mechanisms of molecular mutational processes involving specific target proteins and identification of potential hazardous mutagens in environmental samples can be profiled using WOLAND.</p>
+<p>WOLAND retrieves a comprehensive visual report with R-based graphics to enable fast and reliable interpretation by user.</p>
+<p>Given one or more list of SNVs in ANNOVAR variant_function format, WOLAND can perform:</p>
+<ul class="simple">
+<li><strong>Nucleotide type changes identification and context-sequence extration</strong>: identify frequency of nucleotide type changes and extract context-sequences around each point mutation.</li>
+<li><strong>Search for mutagen-associated motifs</strong>: Retrieve the number, frequency and localization of mutagen-associated motif sequences such as UV-light, 8-oxoguanine, 6-4 photoproducts, ENU, among others.</li>
+<li><strong>Search for mutational hotspots</strong>: Identifty mutational hotspots using a user-defined sliding window which considers each SNV as the window center.</li>
+<li><strong>Transcriptional strand bias</strong>: Retrieve scores associated with the strand of each mutational motif found using RefSeq annotation data.</li>
+</ul>
+<p>The documentation of WOLAND is organized into:</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="README.html">README</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="README.html#features">Features</a></li>
-<li class="toctree-l2"><a class="reference internal" href="README.html#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="README.html#contribute">Contribute</a></li>
 <li class="toctree-l2"><a class="reference internal" href="README.html#support">Support</a></li>
 <li class="toctree-l2"><a class="reference internal" href="README.html#license">License</a></li>
@@ -151,20 +161,26 @@
 <li class="toctree-l2"><a class="reference internal" href="using.html#scripts">Scripts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#inputs">Inputs</a></li>
 <li class="toctree-l2"><a class="reference internal" href="using.html#usage">Usage</a></li>
-<li class="toctree-l2"><a class="reference internal" href="using.html#outputs">Outputs</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#first-step-preparing-input-table">First Step - Preparing input-table</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#second-step-chromosome-profile">Second Step - Chromosome profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#third-step-genome-information">Third Step - Genome information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tutorial.html#fourth-step-choosing-hotspot-window-length-and-running">Fourth Step - Choosing hotspot window length and running!</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="outputs.html">Outputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="outputs.html#woland-anno-pl-outputs">woland-anno.pl outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="outputs.html#woland-report-pl-outputs">woland-report.pl outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="outputs.html#woland-batch-pl-outputs">woland-batch.pl outputs</a></li>
 </ul>
 </li>
 </ul>
 </div>
-<p>Information about development is also available:</p>
 </div>
-<div class="section" id="indices-and-tables">
-<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
-<ul class="simple">
-<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
-<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
-<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
-</ul>
+<div class="section" id="references">
+<h1>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h1>
 </div>
 
 

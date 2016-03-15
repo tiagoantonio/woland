@@ -22,13 +22,6 @@ WOLAND can provide:
 - count established mutational motifs associated with environmental mutagens and DNA-repair mechanisms
 - calculation of transcriptional strand bias of mutations linked to the mutational motifs found.
 
-Installation
-------------
-
-Install WOLAND by running:
-
-    tar xvzf woland-0.1.tar.gz
-
 Contribute
 ----------
 
