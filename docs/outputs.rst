@@ -57,9 +57,15 @@ Nucleotide type-changes and frequency
 
 ``nucleotide_type_changeF-$input_table.tmp``:
 
+.. image:: /img/nucleotide_freq.svg
+
 ``mutfreq-$input_table.tmp``:
 
+.. image:: /img/mutfreq.svg
+
 ``transitiontransversionF-$input_table.tmp``:
+
+.. image:: /img/barplot_trans_transv.svg
 
 Extracted context sequences
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -75,6 +81,8 @@ Mutational motifs
 ``motif_number-$input_table.tmp`` :
 
 ``motif_numberNorm-$input_table.tmp`` :
+
+.. image:: /img/motif_norm.svg
 
 Transcriptional strand bias
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~

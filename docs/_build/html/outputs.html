@@ -30,7 +30,8 @@
   
 
   
-    <link rel="top" title="WOLAND 0.1.1 documentation" href="index.html"/> 
+    <link rel="top" title="WOLAND 0.1.1 documentation" href="index.html"/>
+        <link rel="prev" title="Tutorial" href="tutorial.html"/> 
 
   
   <script src="_static/js/modernizr.min.js"></script>
@@ -80,30 +81,33 @@
           
             
             
-                <!-- Local TOC -->
-                <div class="local-toc"><ul>
-<li><a class="reference internal" href="#">Outputs</a><ul>
-<li><a class="reference internal" href="#woland-anno-pl-outputs">woland-anno.pl outputs</a><ul>
-<li><a class="reference internal" href="#nucleotide-type-changes-and-frequency">Nucleotide type-changes and frequency</a></li>
-<li><a class="reference internal" href="#extracted-context-sequences">Extracted context sequences</a></li>
-<li><a class="reference internal" href="#hotspots">Hotspots</a></li>
-<li><a class="reference internal" href="#mutational-motifs">Mutational motifs</a></li>
-<li><a class="reference internal" href="#transcriptional-strand-bias">Transcriptional strand bias</a></li>
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using.html">Using</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Outputs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#woland-anno-pl-outputs">woland-anno.pl outputs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nucleotide-type-changes-and-frequency">Nucleotide type-changes and frequency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#extracted-context-sequences">Extracted context sequences</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hotspots">Hotspots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mutational-motifs">Mutational motifs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#transcriptional-strand-bias">Transcriptional strand bias</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#woland-report-pl-outputs">woland-report.pl outputs</a><ul>
-<li><a class="reference internal" href="#id1">Nucleotide type-changes and frequency</a></li>
-<li><a class="reference internal" href="#id2">Extracted context sequences</a></li>
-<li><a class="reference internal" href="#id3">Hotspots</a></li>
-<li><a class="reference internal" href="#id4">Mutational motifs</a></li>
-<li><a class="reference internal" href="#id5">Transcriptional strand bias</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#woland-report-pl-outputs">woland-report.pl outputs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#id1">Nucleotide type-changes and frequency</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id2">Extracted context sequences</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id3">Hotspots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id4">Mutational motifs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id5">Transcriptional strand bias</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#woland-batch-pl-outputs">woland-batch.pl outputs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#woland-batch-pl-outputs">woland-batch.pl outputs</a></li>
 </ul>
 </li>
 </ul>
-</div>
+
             
           
         </div>
@@ -195,9 +199,9 @@
 <h3>Nucleotide type-changes and frequency<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
 <p><tt class="docutils literal"><span class="pre">nucleotide_type_change-$input_table.tmp</span></tt>:</p>
 <p><tt class="docutils literal"><span class="pre">nucleotide_type_changeF-$input_table.tmp</span></tt>:</p>
-<p><tt class="docutils literal"><span class="pre">mutfreq-$input_table.tmp</span></tt>:</p>
-<p><tt class="docutils literal"><span class="pre">transitiontransversionF-$input_table.tmp</span></tt>:</p>
-</div>
+<img src="_images/nucleotide_freq.svg" /><p><tt class="docutils literal"><span class="pre">mutfreq-$input_table.tmp</span></tt>:</p>
+<img src="_images/mutfreq.svg" /><p><tt class="docutils literal"><span class="pre">transitiontransversionF-$input_table.tmp</span></tt>:</p>
+<img src="_images/barplot_trans_transv.svg" /></div>
 <div class="section" id="id2">
 <h3>Extracted context sequences<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h3>
 </div>
@@ -209,7 +213,7 @@
 <h3>Mutational motifs<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h3>
 <p><tt class="docutils literal"><span class="pre">motif_number-$input_table.tmp</span></tt> :</p>
 <p><tt class="docutils literal"><span class="pre">motif_numberNorm-$input_table.tmp</span></tt> :</p>
-</div>
+<img src="_images/motif_norm.svg" /></div>
 <div class="section" id="id5">
 <h3>Transcriptional strand bias<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <p><tt class="docutils literal"><span class="pre">SC_concordance_ratio-$input_table.tmp</span></tt>:</p>
@@ -224,6 +228,13 @@
            </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="tutorial.html" class="btn btn-neutral" title="Tutorial" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
