@@ -40,7 +40,7 @@ sub BoxPlotGroup{
 
 	$R->send(qq'WOLAND.$_[0].boxplot<-read.table("$_[0]-$inputTable.tmp", sep = "\t", header=TRUE)');
 	$R->send(qq'WOLAND.$_[0].boxplot.m <- melt (WOLAND.$_[0].boxplot)');
-	$R->send(qq'pdf(file="$_[0]_number_boxplot_$inputTable.pdf", width=11.692, height=8.267)');
+	$R->send(qq'svg("$_[0]_number_boxplot_$inputTable.svg", width=11.692, height=8.267)');
 	$R->send(qq'ggplot (WOLAND.$_[0].boxplot.m, aes(x=variable, y=value, fill = X))+
 	ggtitle("$_[0]_$inputTable")+
 	theme(plot.title = element_text(size=16, vjust=1.1))+
@@ -102,28 +102,31 @@ sub SCRatioGroup{
 
 sub GaussGraphPlot{
 
-	$R->send(qq'pdf(file="gauss_$_[0]-$inputTable.pdf", width=11.692, height=8.267)');
+	$R->send(qq'pdf("gauss_$_[0]-$inputTable.pdf", width=11.692, height=8.267)');
 	$R->send(qq'plot(5,
 			5,
 			main="Kernel Density Estimation for SC score of $_[0]-$inputTable",
 			xlab="SC score",
 			ylab="SC score for bw=0.05",
 			xlim=c(-1.25, 1.25),
-			ylim = c(0,5))'
+			ylim = c(0,15))'
 			);
 	$pick=0;
+
 	foreach $uniqGroupLine(@uniqgroup){
 
 		$colorGausspick=$colorGauss[$pick];
 
 		for my $i3 (0..$#sampleName){
-			if($Group[$i3] eq $uniqGroupLine){
-				$R->send(qq'FirstPlot <- read.delim("../results-$sampleName[$i3]/WOLAND-bias_$_[0]-$sampleName[$i3]", header=FALSE)');
-				$R->send(q'fp<-density (FirstPlot$V3, bw=0.05)');
-				$R->send(qq'lines (fp, col=$colorGausspick, lwd=2, ylim=c(0,5))');
+
+			unless (-z "results-$sampleName[$i3]/WOLAND-bias_$_[0]-$sampleName[$i3]"){
+				if($Group[$i3] eq $uniqGroupLine){
+					$R->send(qq'FirstPlot <- read.table("../results-$sampleName[$i3]/WOLAND-bias_$_[0]-$sampleName[$i3]", header=FALSE)');
+					$R->send(q'fp<-density (FirstPlot$V3, bw=0.05)');
+					$R->send(qq'lines (fp, col=$colorGausspick, lwd=2, ylim=c(0,5))');
+				}
 			}
 		}
-
 		$pick++;
 	}
 
@@ -419,7 +422,7 @@ $R->send(qq'setwd(dir = "./report-$inputTable/")');
 foreach $uniqGroupLine (@uniqgroup){
 	$R->send(qq'WOLAND.hotspot.manhattan.$uniqGroupLine <- read.delim ("hotspot-$uniqGroupLine.tmp", comment.char="#", header=FALSE)');
 	$R->send(qq'pdf("manhattan.hotspot.$uniqGroupLine-$inputTable.pdf")');
-	$R->send(qq'manhattan.$uniqGroupLine <- manhattan(x = WOLAND.hotspot.manhattan.$uniqGroupLine, chr="V3", bp="V4", p = "V5", logp = FALSE, ylab= "Mutations per bp in the hotspot window", genomewideline = FALSE, suggestiveline = FALSE, main = "Sample:$uniqGroupLine", ylim = c(0,10), col = c("blue4", "orange3"))');
+	$R->send(qq'manhattan.$uniqGroupLine <- manhattan(x = WOLAND.hotspot.manhattan.$uniqGroupLine, chr="V3", bp="V4", p = "V5", logp = FALSE, ylab= "Mutations per bp in the hotspot window", genomewideline = FALSE, suggestiveline = FALSE, main = "Sample:$uniqGroupLine", ylim = c(0,50), col = c("blue4", "orange3"))');
 	$R->send(q'dev.off()');
 }
 
@@ -458,14 +461,15 @@ $R->send('ggplot(data=means, aes(x = V1, y = mean, fill=V3))+
 $R->send('dev.off()');
 
 ## transition and traversion barplot pie
-$R->send(qq'pdf(file="barplot_pie_TransTransv-$inputTable.pdf", width=11.692, height=8.267)');
+$R->send(qq'svg("barplot_pie_TransTransv-$inputTable.svg", width=11.692, height=8.267)');
 $R->send(qq'transitiontransversion <- read.delim("transitiontransversionF-$inputTable.tmp", header=FALSE)');
 $R->send(qq'ggplot(transitiontransversion, aes(x=V3, y=V1, fill=V2))+
 		ggtitle("Transversion & Transition frequency-$inputTable")+
 		theme(plot.title = element_text(size=16, vjust=1.1))+
-		xlab("Sample") + ylab("Frequency") +
-		theme(axis.text.x = element_text(size=8))+
+		xlab("Samples") + ylab("Frequency") +
 		geom_bar(position="fill", stat = "identity")+
+		theme(axis.ticks = element_blank(), axis.text.x = element_blank())+
+		facet_grid(.~ V4, scales = "free_x")+
 		scale_fill_brewer(name="Type", palette="Spectral")');
 $R->send(q'dev.off()');
 
