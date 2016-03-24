@@ -7,6 +7,13 @@ WOLAND has three main scripts: ``woland-anno.pl``, ``woland-report.pl`` and ``wo
 Scripts
 --------
 
+woland-batch.pl
+~~~~~~~~~~~~~~~
+
+Script which automatically runs multiple instances of woland-anno.pl and build a single report using woland-report.pl::
+
+	$ perl woland-batch.pl <input_table> <chr_profile> <hs_window> <genome_version>
+
 woland-anno.pl
 ~~~~~~~~~~~~~~
 
@@ -21,15 +28,13 @@ Script used to build a report of multiple annotated variant files assigned as gr
 
 	$ perl woland-report.pl <input_table>
 
-woland-batch.pl
-~~~~~~~~~~~~~~~
-
-Script which automatically runs multiple instances of woland-anno.pl and build a single report using woland-report.pl::
-
-	$ perl woland-batch.pl <input_table> <chr_profile> <hs_window> <genome_version>
-
 Inputs
---------
+------
+
+<input.table>
+~~~~~~~~~~~~~
+
+Regular tabular file without header. First column is group name. Second column is file sample name of annovar annotated.variant file. Samples files MUST be located in the Woland install folder. 
 
 <annovar.variant_function>
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -51,10 +56,6 @@ A natural number N (N>1), for hotspot window length. Hotspot window corresponds 
 
 Genome version of ``genomes/genome_<genome_version>`` and ``genomes/refseq_<genome_version>`` files.
 
-<input.table>
-~~~~~~~~~~~~~
-
-Regular tabular file without header. First column is group name. Second column is file sample name of annovar annotated.variant file. Samples files MUST be located in the Woland install folder. 
 
 <coordinates.bed>
 ~~~~~~~~~~~~~~~~~
@@ -63,7 +64,14 @@ Coordinates of target regions used in sequencing experiment in BED format.
 
 
 Usage
---------
+-----
+
+woland-batch.pl
+~~~~~~~~~~~~~~~
+
+woland.batch enables batch submission of multiple samples as provided by <input.table> file. This script runs Woland-anno.pl for each sample followed by Woland-report.pl generating one result folder for each sample file provided and a grouped report folder for whole analysis as provided by ``<input.table>`` ::
+
+	$ perl woland-batch.pl <input.table> <chromosome_profile> <hotspot_window> <genome_version>
 
 woland-anno.pl
 ~~~~~~~~~~~~~~
@@ -79,12 +87,6 @@ This script uses a group of samples to perform Woland-anno.pl script for each sa
 
 	$ perl woland-report.pl <input.table> <chromosome_profile> <hotspot_window> <genome_version>
 
-woland-batch.pl
-~~~~~~~~~~~~~~~
-
-woland.batch enables batch submission of multiple samples as provided by <input.table> file. This script runs Woland-anno.pl for each sample followed by Woland-report.pl generating one result folder for each sample file provided and a grouped report folder for whole analysis as provided by ``<input.table>`` ::
-
-	$ perl woland-batch.pl <input.table> <chromosome_profile> <hotspot_window> <genome_version>
 
 woland-bed.pl
 ~~~~~~~~~~~~~ 

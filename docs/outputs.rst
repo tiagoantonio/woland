@@ -5,8 +5,8 @@ WOLAND provide different set of outputs depending on the script used - and how f
 
 .. note:: ``woland-batch.pl`` provides the faster and straighforward way to analyze samples. It runs ``woland-anno.pl`` for each sample then runs ``woland-report.pl``.
 
-woland-anno.pl outputs
-----------------------
+woland-anno.pl basic outputs
+----------------------------
 
 This script will analyze each ANNOVAR ``variant_function`` files and will provide a total of 13 tabular text files + 1 log file. We consider these output files as the most raw type of WOLAND analysis. Let's take a look at each class and its output files explanations:
 
@@ -42,44 +42,3 @@ Transcriptional strand bias
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 ``WOLAND-bias_motif-$sample_name``: 
-
-woland-report.pl outputs
-------------------------
-
-``woland-report.pl``uses outputs from ``woland-anno.pl`` to build a comprehensive grouped analysis with some graphical data. Those outputs are saved as tabular text files (``.tmp``) and graphical data as .SVG files.
-
-.. note:: All ``woland-report.pl`` outputs were saved in a ``report-$input_table/`` folder.
-
-Nucleotide type-changes and frequency
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-``nucleotide_type_change-$input_table.tmp``:
-
-``nucleotide_type_changeF-$input_table.tmp``:
-
-``mutfreq-$input_table.tmp``:
-
-``transitiontransversionF-$input_table.tmp``:
-
-Extracted context sequences
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Hotspots
-~~~~~~~~
-
-``hotspots-$group.tmp``:
-
-Mutational motifs
-~~~~~~~~~~~~~~~~~
-
-``motif_number-$input_table.tmp`` :
-
-``motif_numberNorm-$input_table.tmp`` :
-
-Transcriptional strand bias
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-``SC_concordance_ratio-$input_table.tmp``:
-
-woland-batch.pl outputs
------------------------
