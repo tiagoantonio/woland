@@ -1,0 +1,284 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Report &mdash; WOLAND 0.1.1 documentation</title>
+  
+
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+    <link rel="top" title="WOLAND 0.1.1 documentation" href="index.html"/>
+        <link rel="next" title="FAQ" href="faq.html"/>
+        <link rel="prev" title="Outputs" href="outputs.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> WOLAND
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+                <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="README.html">README</a></li>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Install</a></li>
+<li class="toctree-l1"><a class="reference internal" href="using.html">Using</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorial.html">Tutorial</a></li>
+<li class="toctree-l1"><a class="reference internal" href="outputs.html">Outputs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="">Report</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#graphical-report">Graphical report</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#nucleotide-type-changes">Nucleotide type-changes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hotspots">Hotspots</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#mutational-motifs">Mutational motifs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#transcriptional-strand-bias">Transcriptional strand bias</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">FAQ</a></li>
+<li class="toctree-l1"><a class="reference internal" href="galaxy.html">Galaxy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contact.html">Contact</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="index.html">WOLAND</a>
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="index.html">Docs</a> &raquo;</li>
+      
+    <li>Report</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        
+          <a href="_sources/report.txt" rel="nofollow"> View page source</a>
+        
+      
+    </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="report">
+<h1>Report<a class="headerlink" href="#report" title="Permalink to this headline">¶</a></h1>
+<p>WOLAND provide different set of outputs depending on the script used - and how far you want to go in your mutational pattern analysis. <tt class="docutils literal"><span class="pre">woland-batch.pl</span></tt> runs the most complete analysis but you must have at least two groups of samples (a control and a treated group, for example).</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last"><tt class="docutils literal"><span class="pre">woland-batch.pl</span></tt> provides the faster and straighforward way to analyze samples. It runs <tt class="docutils literal"><span class="pre">woland-anno.pl</span></tt> for each sample then runs <tt class="docutils literal"><span class="pre">woland-report.pl</span></tt> to build the report.</p>
+</div>
+<div class="section" id="graphical-report">
+<h2>Graphical report<a class="headerlink" href="#graphical-report" title="Permalink to this headline">¶</a></h2>
+<p><tt class="docutils literal"><span class="pre">woland-report.pl</span></tt> uses outputs from <tt class="docutils literal"><span class="pre">woland-anno.pl</span></tt> to build a comprehensive grouped analysis with some R graphical data. Those outputs are saved as graphical data as .SVG and .PDF files and a tabular text file (<tt class="docutils literal"><span class="pre">.tmp</span></tt>) for each graphic;</p>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<p class="last">All <tt class="docutils literal"><span class="pre">woland-report.pl</span></tt> outputs were saved in the folder <tt class="docutils literal"><span class="pre">report-$input_table/</span></tt>. You can use <tt class="docutils literal"><span class="pre">.tmp</span></tt> files to build your own graphic or use a statistical approach to test your hypothesis.</p>
+</div>
+<div class="section" id="nucleotide-type-changes">
+<h3>Nucleotide type-changes<a class="headerlink" href="#nucleotide-type-changes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Point mutation frequency across chromosomes:</li>
+</ul>
+<img src="_images/mutfreq.svg" /><p>This barplot shows mutation frequency of each group in all chromosomes with standard deviation as error bars. It also shows an average line point mutation frequency for each group.</p>
+<div class="admonition warning">
+<p class="first admonition-title">Warning</p>
+<p class="last">Woland uses the <tt class="docutils literal"><span class="pre">&lt;chromosome_profile&gt;</span></tt> file to calculate mutational frequency. If <tt class="docutils literal"><span class="pre">&lt;chromosome_profile&gt;</span></tt> was build using a targeted-enriched .bed file only those regions were used in the frequency calculation, for example.</p>
+</div>
+<p>Tabular text file:<tt class="docutils literal"><span class="pre">mutfreq-$input_table.tmp</span></tt></p>
+<ul class="simple">
+<li>Number of nucleotide type changes:</li>
+</ul>
+<img src="_images/nucleotide_number.svg" /><p>This box-plot graph show the absolute number of each nucleotide type change of grouped samples.</p>
+<p>Tabular text file:<tt class="docutils literal"><span class="pre">nucleotide_type_change-$input_table.tmp</span></tt></p>
+<ul class="simple">
+<li>Frequency of nucleotide type changes:</li>
+</ul>
+<img src="_images/nucleotide_freq.svg" /><p>This box-plot graphic shows the frequency of each nucleotide type change of the grouped samples. Y-label &#8220;value&#8221; means the number of each nucleotide type change in each sample divided by the total number of point mutations detected in each sample.</p>
+<p>Tabular text file:<tt class="docutils literal"><span class="pre">nucleotide_type_changeF-$input_table.tmp</span></tt></p>
+<ul class="simple">
+<li>Transversion &amp; transition rate:</li>
+</ul>
+<img src="_images/barplot_trans_transv.svg" /><p>This stacked barplot graphic shows the frequency of transversion &amp; transition rate of each sample analyzed grouped by name.</p>
+<p>Tabular text file: <tt class="docutils literal"><span class="pre">transitiontransversionF-$input_table.tmp</span></tt></p>
+</div>
+<div class="section" id="hotspots">
+<h3>Hotspots<a class="headerlink" href="#hotspots" title="Permalink to this headline">¶</a></h3>
+<img alt="_images/hotspot.jpg" src="_images/hotspot.jpg" />
+<p>A manhattan plot-like graphic is provided for each group analyzed. Y-axis means the number of mutation in the <tt class="docutils literal"><span class="pre">&lt;hotspot_window&gt;</span></tt> parameter provided in <tt class="docutils literal"><span class="pre">&lt;woland-batch.pl&gt;</span></tt> or <tt class="docutils literal"><span class="pre">&lt;woland-anno.pl&gt;</span></tt>. Gene names must be checked in the tabular text file <tt class="docutils literal"><span class="pre">hotspots-$group.tmp</span></tt>.</p>
+<p>Tabular text file: <tt class="docutils literal"><span class="pre">hotspots-$group.tmp</span></tt>:</p>
+</div>
+<div class="section" id="mutational-motifs">
+<h3>Mutational motifs<a class="headerlink" href="#mutational-motifs" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Number of motifs associated with mutagens:</li>
+</ul>
+<img src="_images/motif_number.svg" /><p>Box-plot graph showing the absolute number of each mutational motif sequence analyzed.</p>
+<p>Tabular text file: <tt class="docutils literal"><span class="pre">motif_number-$input_table.tmp</span></tt></p>
+<ul class="simple">
+<li>Number of normalized motifs associated with mutagens:</li>
+</ul>
+<img src="_images/motif_norm.svg" /><p>Box-plot graphic of each mutational motif sequence found normalized by the total number of point mutations of each sample file grouped by name. A value of 1.00 means that all point mutations contains the mutational motif.</p>
+<p>Tabular text file: <tt class="docutils literal"><span class="pre">motif_numberNorm-$input_table.tmp</span></tt></p>
+</div>
+<div class="section" id="transcriptional-strand-bias">
+<h3>Transcriptional strand bias<a class="headerlink" href="#transcriptional-strand-bias" title="Permalink to this headline">¶</a></h3>
+<img src="_images/sc_concordance.svg" /><p>Box-plot graphic of strand score (SC) concordance/discordance ratio for each mutational motif. Values = 1 means that there is no transcription associated strand bias. Values &gt; 1 means more motifs in the same transcribed strand and values &lt;1 means more motifs not in transcribed strand. Only SC scores equal to -1, 0, 1 are considered.</p>
+<p>Tabular text file: <tt class="docutils literal"><span class="pre">SC_concordance_ratio-$input_table.tmp</span></tt>:</p>
+</div>
+</div>
+</div>
+
+
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="faq.html" class="btn btn-neutral float-right" title="FAQ" accesskey="n">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="outputs.html" class="btn btn-neutral" title="Outputs" accesskey="p"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2016, Tiago de Souza, Alexandre Defelicibus, Carlos Menck.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'0.1.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>

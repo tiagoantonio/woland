@@ -38,4 +38,4 @@ License
 -------
 
 Woland is released under GNU Lesser General Public License version 3.0 (LGPLv3) for academic and research use only. Commercial licenses are available to legal entities, including companies and organizations (both for-profit and non-profit), requiring the software for general commercial use. To obtain a commercial license
-please, contact author at the address below.
+please, contact author **tiagoantonio[at]gmail.com**
