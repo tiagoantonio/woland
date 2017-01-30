@@ -1,10 +1,8 @@
 ########################################################################################################################################
-## WOLAND Beta 0.1 (03-08-2016)
+## WOLAND Beta 0.2 (01-28-2016)
 ## woland-batch.pl
 ##
 ## WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell. 
-## It is implemented as a Perl and R tool using as inputs filtered unannotated or annotated SNV lists, combined with its 
-## correspondent genome sequences.
 ## 
 ## For more details please read README file.
 ## 
@@ -23,78 +21,82 @@ use File::Copy;
 use strict;
 use warnings;
 
-## variables
-my ($inputTable, $inputTableLine); 
-my @inputTableArray;  
-my @i; my $i;
-my @Group; my @sampleName;
-my @time;
-my ($profile, $hotspot, $genomeVersion);
-my ($pm,$pid, $MAX_PROCESSES);
-my @ARGS;
-my @time1;
+our $REVISION = '$Revision:  $';
+our $DATE =	'$Date: 2017-01-28 00:11:04 -0800 (Sat,  28 Jan 2017) $';  
+our $AUTHOR =	'$Author: Tiago A. de Souza <tiagoantonio@gmail.com> $';
 
-## main warning
-unless (@ARGV){
-	die "\nERROR : Usage: $0 <input.table> <chromosome_profile_file> <hotspot_window_length> <genome_version> \n";	
+## global variables
+our ($inputtable, $tableline); our (@tablearray,@group,@sample); #input table and sample/group parsing
+our ($profile, $hotspot, $genome); #arguments
+our (@starttime,@endtime); #time tracking
+
+## confi variables
+my $MAXPROCESSES=30; #threads
+my $pm; #parallel fork manager process
+
+## warnings and checks
+unless ($#ARGV==3){
+	die "\nERROR : Incorrect number of arguments - Usage: $0 <input.table> <chromosome_profile_file> <hotspot_window_length> <genome_version> \n\n";	
+}
+for my $i (0..1) {
+	unless (-r -e -f $ARGV[$i]){
+    	die "\nERROR: $ARGV[$i] not exists or is not readable or not properly formatted. Please check file.\n\n";
+    }
 }
 
-@time=localtime; #time characters for analysis folder name
+@starttime=localtime; #time characters for analysis folder name
 
 ## parsing input table
-$inputTable = $ARGV[0]; #<input_table>
-open (inputTable, $inputTable);
-@inputTableArray=<inputTable>;
+$inputtable = $ARGV[0]; #<input_table>
+open (INPUT, $inputtable);
+@tablearray=<INPUT>;
 
-foreach $inputTableLine (@inputTableArray){ #two arrays for each category (group & sample results folder)
-	@i = split (/\t/, $inputTableLine);
+foreach $tableline (@tablearray){ #two arrays for each category (group & sample results folder)
+	my @i = split (/\t/, $tableline);
 	chomp (@i);
-	push (@Group, "$i[0]"); # array for group definition
-	push (@sampleName, "$i[1]"); # array for sample folder definition
+	push (@group, "$i[0]"); #array for group definition
+	push (@sample, "$i[1]"); #array for sample folder definition
 }
 
-@i=();
-$i=0;
-
-
-mkdir("results-batch-$inputTable-$time[0].$time[1].$time[2].$time[3].$time[4].$time[5]", 0755) || die "Cannot create results folder - check if it already exists";
-mkdir("results-batch-$inputTable-$time[0].$time[1].$time[2].$time[3].$time[4].$time[5]/samples-$inputTable", 0755) || die "Cannot create results folder- check if it already exists";
-
-# executing batch woland_anno.pl:
+## arguments to woland_anno.pl:
 $profile= $ARGV[1]; #chromosome profile <chromosome_length_profile>
 $hotspot= $ARGV[2]; #natural number for hotspot window <hotspot_window_length> 
-$genomeVersion = $ARGV[3]; #genome version as in genomes/genome_<genome_version>.fa and genomes/refseq_<genome_version>.txt
+$genome = $ARGV[3]; #genome version as in genomes/genome_<genome_version>.fa and genomes/refseq_<genome_version>.txt
 
-$pm = Parallel::ForkManager->new(30);
+## creating output directories
+mkdir("results-batch-$inputtable-$starttime[0].$starttime[1].$starttime[2].$starttime[3].$starttime[4].$starttime[5]", 0755) || die "Cannot create results folder - check if it already exists";
+mkdir("results-batch-$inputtable-$starttime[0].$starttime[1].$starttime[2].$starttime[3].$starttime[4].$starttime[5]/samples-$inputtable", 0755) || die "Cannot create results folder- check if it already exists";
 
+## woland-anno.pl multi-threading
+$pm = Parallel::ForkManager->new($MAXPROCESSES);
 
-for my $i (0..$#sampleName){ #execution of woland-anno.pl for each sample
-	@ARGS=();
-	push (@ARGS, $sampleName[$i]);
-	push (@ARGS, $profile);
-	push (@ARGS, $hotspot);
-	push (@ARGS, $genomeVersion);
+for my $i (0..$#sample){ #execution of woland-anno.pl for each sample
+	my @arguments;
+	push (@arguments, $sample[$i]);
+	push (@arguments, $profile);
+	push (@arguments, $hotspot);
+	push (@arguments, $genome);
 
-	$pid=$pm->start and next;
-	system ($^X, "woland-anno.pl", @ARGS);
+	my $pid=$pm->start and next;
+	system ($^X, "woland-anno.pl", @arguments);
 	$pm->finish;
 }
+$pm->wait_all_children; #wait woland-anno.pl
 
-$pm->wait_all_children;
-
+## woland-report.pl
 system ($^X, "woland-report.pl", $ARGV[0]);
 
-# moving report folder and files to results-batch
-move ("report-$inputTable", "results-batch-$inputTable-$time[0].$time[1].$time[2].$time[3].$time[4].$time[5]/report-$inputTable");
+## moving report folder and files to results-batch
+move ("report-$inputtable", "results-batch-$inputtable-$starttime[0].$starttime[1].$starttime[2].$starttime[3].$starttime[4].$starttime[5]/report-$inputtable");
 
-# moving each result sample folder and files to results-batch/results
-for my $i (0..$#inputTableArray){
-	move ("results-$sampleName[$i]", "results-batch-$inputTable-$time[0].$time[1].$time[2].$time[3].$time[4].$time[5]/samples-$inputTable/results-$sampleName[$i]");
+## moving each result sample folder and files to results-batch/results
+for my $i (0..$#tablearray){
+	move ("results-$sample[$i]", "results-batch-$inputtable-$starttime[0].$starttime[1].$starttime[2].$starttime[3].$starttime[4].$starttime[5]/samples-$inputtable/results-$sample[$i]");
 }
 
-@time1=localtime;
+@endtime=localtime;
 
-print "@time\n";
-print "@time1\n";
+print "Start Time: @starttime\n";
+print "End Time: @endtime\n";
 
 exit;

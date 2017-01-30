@@ -38,13 +38,12 @@ To check R version type (in R)::
 
 The following R packages must be installed:
 
+	* plyr	
 	* reshape2
 	* ggplot2
 	* qqman
 	* RColorBrewer
-	* plyr
-
-
+	
 Installation
 -------------
 

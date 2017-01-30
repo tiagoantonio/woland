@@ -1,10 +1,8 @@
 #####################################################################################################################################
-## WOLAND Beta 0.1 (03-08-2016)
+## WOLAND Beta 0.2 (01-28-2016)
 ## woland-bed.pl
 ##
 ## WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell. 
-## It is implemented as a Perl and R tool using as inputs filtered unannotated or annotated SNV lists, combined with its 
-## correspondent genome sequences.
 ##
 ## For more details please read README file.
 ##
@@ -21,266 +19,77 @@
 ## 
 ## <file.bed> : Coordinate bed file. IDs must be in the format: chr1, chr2, chr3 ...
 ##
-##
 ######################################################################################################################################
 
 #! /usr/bin/perl
 use List::Util qw(sum); #module for sum of chromosome coordinates
+use List::MoreUtils qw(uniq);
 use strict;
 use warnings;
 
-# variables
-my @ARGV;
-my ($input, @rawfile);
-my $datestring;
-my ($rawline, @rawfile);
-my (@i, @i2);
-my (@chrbed, @pos1, @pos2);
-my (@res, @tam_1, @tam_2, @tam_3, @tam_4, @tam_5, @tam_6, @tam_7, @tam_8, @tam_9, @tam_10, @tam_11, @tam_12, @tam_13, @tam_14, @tam_15, @tam_16, @tam_17, @tam_18, @tam_19, @tam_20, @tam_21, @tam_22, @tam_X, @tam_Y, @tam_M);
-my ($total);
+our $REVISION = '$Revision:  $';
+our $DATE =	'$Date: 2017-01-28 00:11:04 -0800 (Sat,  28 Jan 2017) $';  
+our $AUTHOR =	'$Author: Tiago A. de Souza <tiagoantonio@gmail.com> $';
 
-# main warning
-unless (@ARGV){
-	die "ERROR: USAGE: $0 filename.bed \n";	
-}
+our (@chrbed,@pos1,@pos2, @sumlength,@uniquechr);
+our $bedfile;
 
-# loading files
-$input = $ARGV[0];
-open (INPUT, $input);
-@rawfile=<INPUT>;
-close (INPUT);
+sub parse_bedfile{ # loading bed file
+	$bedfile = $ARGV[0];
+	open (BEDFILE, $bedfile);
+	my @bedfilearray=<BEDFILE>;
+	close (BEDFILE);
 
-unless (@rawfile){
-	die "ERROR: Could not load .bed file\n";
-}
+	my $rawbedline;
 
-# start screen
-$datestring = localtime();
-print "\n\nWOLAND BETA 1 - 01-12-2015\n";
-print "Analysis started at $datestring\n";
-print "Coordinate bed file           : $input\n";
-print "\nOpening file .bed\n";
-
-
-# loading outputs
-open (OUTPUT, ">>WOLAND-BED-PROFILE-$input");
-
-# conversion of each column in a dedicated array
-foreach $rawline (@rawfile){
-	@i = split (/\t/, $rawline);
-	chomp (@i);
-	push (@chrbed, "$i[0]");
-	push (@pos1, $i[1]);
-	push (@pos2, $i[2]);
-}
-
-# calculating lengths of fragments in the .bed file
-print "Calculating length (bp)...\n";
-
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr1"){
-		$tam_1[$i]=$pos2[$i]-$pos1[$i];
+	foreach $rawbedline (@bedfilearray){
+		my @i = split (/\t/, $rawbedline);
+		chomp (@i);
+		push (@chrbed, "$i[0]");
+		push (@pos1, $i[1]);
+		push (@pos2, $i[2]);
 	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr2"){
-		$tam_2[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr3"){
-		$tam_3[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-	for my $i (0 .. $#pos1){
-		if($chrbed[$i] eq "chr4"){
-			$tam_4[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-	for my $i (0 .. $#pos1){
-		if($chrbed[$i] eq "chr5"){
-			$tam_5[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr6"){
-		$tam_6[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr7"){
-		$tam_7[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr8"){
-		$tam_8[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr9"){
-		$tam_9[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr10"){
-		$tam_10[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr11"){
-		$tam_11[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr12"){
-		$tam_12[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr13"){
-		$tam_13[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr14"){
-		$tam_14[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr15"){
-		$tam_15[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr16"){
-		$tam_16[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr17"){
-		$tam_17[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr18"){
-		$tam_18[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr19"){
-		$tam_19[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr20"){
-		$tam_20[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr21"){
-		$tam_21[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chr22"){
-		$tam_22[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chrX"){
-		$tam_X[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chrY"){
-		$tam_Y[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
-for my $i (0 .. $#pos1){
-	if($chrbed[$i] eq "chrM"){
-		$tam_M[$i]=$pos2[$i]-$pos1[$i];
-	}
-}
+	shift(@chrbed);
+	@uniquechr = uniq @chrbed; #unique chromosome names
 	
-# array for sum of fragment length for each chromosome.
-push @res, sum(@tam_1);
-push @res, sum(@tam_2);
-push @res, sum(@tam_3);
-push @res, sum(@tam_4);
-push @res, sum(@tam_5);
-push @res, sum(@tam_6);
-push @res, sum(@tam_7);
-push @res, sum(@tam_8);
-push @res, sum(@tam_9);
-push @res, sum(@tam_10);
-push @res, sum(@tam_11);
-push @res, sum(@tam_12);
-push @res, sum(@tam_13);
-push @res, sum(@tam_14);
-push @res, sum(@tam_15);
-push @res, sum(@tam_16);
-push @res, sum(@tam_17);
-push @res, sum(@tam_18);
-push @res, sum(@tam_19);
-push @res, sum(@tam_20);
-push @res, sum(@tam_21);
-push @res, sum(@tam_22);
-push @res, sum(@tam_X);
-push @res, sum(@tam_Y);
-push @res, sum(@tam_M);
-
-$total=sum(@res);
-$i2=1;
-
-##### screen stats
-print "\nSaving file WOLAND-BED-PROFILE-$input \n";
-print "\n";
-print "Total target nucleotide length\(bp\)\=$total"; 
-print "\n";
-
-##### saving chromosome profile file
-foreach $res (@res){
-	if ($i2<=22){
-		print OUTPUT "chr$i2\t";
-		if ($res ne 0){
-	    	print OUTPUT "$res\n";
-	    }
-	    else{
-	    	print OUTPUT "\0\n";
-		}
-	    ++$i2;
-	}
-	if ($i2==23){
-		print OUTPUT "chrX\t";
-		if ($res ne 0){
-			print OUTPUT "$res[22]\n";
-		}
-		else{
-			print OUTPUT"\0\n";
-		}
-		++$i2;
-	}
-	if ($i2==24){
-		print OUTPUT "chrY\t";
-		if ($res ne 0){
-			print OUTPUT "$res[23]\n";
-		}
-		else{
-			print OUTPUT "\0\n";
-		}
-		++$i2;
-	}
-	if ($i2==25){
-		print OUTPUT "chrM\t";
-		if ($res ne 0){
-			print OUTPUT "$res[24]\n";
-		}
-		else{
-			print OUTPUT "\1\n";
-		}
-		++$i2;
+	for my $i (0..$#uniquechr){
+		&calculate_length($uniquechr[$i]);
 	}
 }
+
+sub calculate_length{ #absolute subtraction of pos values
+	my @length;
+	for my $i(0..$#chrbed){
+		if($chrbed[$i] eq "$_[0]"){
+			$length[$i]=abs($pos2[$i]-$pos1[$i]);
+		}
+		if($chrbed[$i] ne "$_[0]"){
+			$length[$i]=0;
+		}
+	}
+	push (@sumlength, sum(@length));
+}
+
+## main warning
+unless ($#ARGV==0){
+	die "\nERROR : Incorrect number of arguments - Usage: $0 <file.bed> \n\n";	
+}
+unless (-r -e -f $ARGV[0]){
+    die "\nERROR: $ARGV[0] not exists or is not readable or not properly formatted. Please check file.\n\n";
+}
+
+&parse_bedfile;
+
+open (PROFILE, ">>woland-bed-profile-$bedfile"); # printing profile file
+for my $i (0..$#uniquechr){
+	print PROFILE "$uniquechr[$i]\t";
+	if ($sumlength[$i] ne 0){
+		print PROFILE "$sumlength[$i]\n";
+	}
+	else{
+		print PROFILE "\1\n";
+	}
+}
+close(PROFILE);
 
 exit;
