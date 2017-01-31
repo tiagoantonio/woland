@@ -35,6 +35,7 @@ use Bio::DB::Fasta; # bioperl module for the extraction of sequences.
 use Cwd;
 use warnings;
 use strict;
+use List::MoreUtils qw(uniq);
 
 our $REVISION = '$Revision:  $';
 our $DATE =	'$Date: 2017-01-28 00:11:04 -0800 (Sat,  28 Jan 2017) $';  
@@ -43,7 +44,7 @@ our $AUTHOR =	'$Author: Tiago A. de Souza <tiagoantonio@gmail.com> $';
 # global variables
 our ($variantfile,$chrlengthprofile,$hotspotwindowlength,$genomeversion,$datestring,$contextsequencelength, $genomesequenceinstance);
 our (@geneclass,@genename,@chrstart,@chrend,@pos,@ref,@alt,@refalt,@chrnames,@chrpos,@chrlength,@chrnormalizedlist, @chrcountfreq,@hotspotsdetected,@chrnameformatted);
-our (@extractedsequenceformotifsearch,@chrrefseq, @strandrefseq,@txstartrefseq,@txtendrefseq);
+our (@extractedsequenceformotifsearch,@chrrefseq, @strandrefseq,@txstartrefseq,@txtendrefseq,@uniquechrinsamples);
 
 # subroutines
 sub parse_inputs { #parsing .variant.function file
@@ -222,18 +223,31 @@ sub search_for_hotspots{ #hotspot search
 			if ($chrwithoutletters eq "Y"){
 				$chrwithoutletters=24;
 			}
-			if ($chrwithoutletters eq "M"){
+			if ($chrwithoutletters eq "M" || $chrwithoutletters eq "MT"){
 				$chrwithoutletters=25;
+			}
+			if ($chrwithoutletters =~ /^[0-9]+$/){
+			}
+			else{
+				$chrwithoutletters="30";
 			}
 			push (@hotspotsdetected, $counthotspot);
 			push (@chrnameformatted, $chrwithoutletters);
 		}
+		else{
+
+		}
 	}
 }
 sub extract_contextsequences{ #context sequences n=3
-	my $downstreamcoordinate=$_[1]-$contextsequencelength;
-	my $upstreamcoordinate=$_[1]+$contextsequencelength;
-	my $extractedsequence=$_[2]->seq($_[0], $downstreamcoordinate=>$upstreamcoordinate);
+	my $extractedsequence;
+	if (grep(/^$_[0]$/, @chrnames)){
+		my $downstreamcoordinate=$_[1]-$contextsequencelength;
+		my $upstreamcoordinate=$_[1]+$contextsequencelength;
+		$extractedsequence=$_[2]->seq($_[0], $downstreamcoordinate=>$upstreamcoordinate);
+	}else{
+		$extractedsequence="NNNNNNN";
+	}
 	push (@extractedsequenceformotifsearch, $extractedsequence);
 	print CONTEXTSEQ ">$_[0]_$_[1]\n$extractedsequence\n";
 	print CONTEXTSEQANNO ">$_[0]_$_[1]\n$extractedsequence\t$_[3]\t$_[4]\n";
@@ -648,8 +662,10 @@ for my $i (0..$#chrnames){
 
 #hotspots 
 print "\nCalculating hotspots and saving hotspots-$variantfile.txt ...\n";
-for my $i(0..$#chrnames){
-	&search_for_hotspots($chrnames[$i]);
+@uniquechrinsamples = uniq @chrstart;
+
+for my $i(0..$#uniquechrinsamples){
+	&search_for_hotspots($uniquechrinsamples[$i]);
 }
 
 open (HOTSPOTS, ">>results-$variantfile/WOLAND-hotspots-$variantfile");
