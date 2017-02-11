@@ -23,6 +23,7 @@ use File::Copy;
 use IO::Handle;
 use strict;
 use warnings;
+use Getopt::ArgParse;
 
 our $REVISION = '$Revision:  $';
 our $DATE =	'$Date: 2017-01-28 00:11:04 -0800 (Sat,  28 Jan 2017) $';  
@@ -143,59 +144,118 @@ sub select_onlyexonic_or_onlysplicing {
 	}	
 }
 
+my $ap = Getopt::ArgParse->new_parser(
+	prog => 'woland-isectoannovar.pl',
+	description => 'WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell.',
+	epilog => 'If you used Woland in your research, we would appreciate your citation:
+	de Souza TA, Defelicibus A, Menck CF',
+ );
+
+$ap->add_arg(
+	'--type-of-change',
+	'-c',
+	required => 1,
+	choices => [ 'all', 'CT', 'CG', 'CA', 'AT', 'AG', 'AC' ],
+	help => 'Help of type of change');
+$ap->add_arg(
+	'--vcf-files',
+	'-f',
+	required => 1,
+	type => 'Array',
+	split => ',',
+	help => 'Input VCF files separated by common (,).');
+$ap->add_arg(
+	'--annovar-path',
+	'-a',
+	required => 1,
+	help => 'Annovar path');
+$ap->add_arg(
+	'--htslib-path',
+	'-l',
+	required => 1,
+	help => 'HTSLib path');
+$ap->add_arg(
+	'--threads',
+	'-t',
+	default => 30,
+	help => 'Help of Threads');
+
+my $args = $ap->parse_args();
+
 ## main warning
-unless ($#ARGV>=2){
-	die "\nERROR : Incorrect number of arguments/files - Usage: $0 <typeofchange> <file1.vcf> <file2.vcf> <file3.vcf>... \n\n";	
+# unless ($#ARGV>=2){
+# 	die "\nERROR : Incorrect number of arguments/files - Usage: $0 <typeofchange> <file1.vcf> <file2.vcf> <file3.vcf>... \n\n";	
+# }
+
+# unless ($ARGV[0] eq "all" || $ARGV[0] eq "CT" || $ARGV[0] eq "CG" || $ARGV[0] eq "CA" || $ARGV[0] eq "AT" || $ARGV[0] eq "AG" || $ARGV[0] eq "AC"){
+# 	die "\nERROR : Incorrect <typeofchange>. Please use all,CT,CG,CA,AT,AG or AC.\n\n";	
+# }
+# print $args->vcf_files->[2];
+
+# for my $i (1..$#ARGV) {
+# 	unless (-r -e -f $ARGV[$i]){
+#     	die "\nERROR: $ARGV[$i] not exists or is not readable or not properly formatted. Please check file.\n\n";
+#     }
+# }
+
+my @vcf_files = $args->vcf_files;
+for my $i (0..$#vcf_files) {
+	unless (-r -e -f $vcf_files[$i]){
+		die "\nERROR: $vcf_files[$i] not exists or is not readable or not properly formatted. Please check file.\n\n";
+	}
 }
 
-unless ($ARGV[0] eq "all" || $ARGV[0] eq "CT" || $ARGV[0] eq "CG" || $ARGV[0] eq "CA" || $ARGV[0] eq "AT" || $ARGV[0] eq "AG" || $ARGV[0] eq "AC"){
-	die "\nERROR : Incorrect <typeofchange>. Please use all,CT,CG,CA,AT,AG or AC.\n\n";	
+unless (-r -e -f sprintf("%s/htscmd", $args->htslib_path)){
+	die sprintf("\nERROR: htscmd not found at %s.\n\n",
+		$args->htslib_path);
 }
-for my $i (1..$#ARGV) {
-	unless (-r -e -f $ARGV[$i]){
-    	die "\nERROR: $ARGV[$i] not exists or is not readable or not properly formatted. Please check file.\n\n";
-    }
+
+unless (-r -e -f sprintf("%s/annotate_variation.pl", $args->annovar_path)){
+	die sprintf("\nERROR: annotate_variation.pl not found at %s.\n\n",
+		$args->annovar_path);
 }
 
 #parse nucleotide change option
-$nucleotidechangeoption=$ARGV[0];
+# $nucleotidechangeoption=$ARGV[0];
+$nucleotidechangeoption=$args->type_of_change;;
 
 #processing vcf files
-for my $i (1..$#ARGV){
-	system ("bgzip $ARGV[$i]"); #bgzip
+# TODO: validade if the input files are bgzip
+for my $i (0..$#vcf_files){
+	system ("bgzip $vcf_files[$i]"); #bgzip
 }
 
-for my $i (1..$#ARGV){
-	system ("tabix $ARGV[$i].gz"); #index using tabix
+for my $i (0..$#vcf_files){
+	system ("tabix $vcf_files[$i].gz"); #index using tabix
 }
 
-for my $i (1..$#ARGV){
-	push (@variantfilelist, "$ARGV[$i].gz"); # variant file list
+for my $i (0..$#vcf_files){
+	push (@variantfilelist, "$vcf_files[$i].gz"); # variant file list
 }
 
-#
 for my $i (0..$#variantfilelist){ #perform htscmd vcfisec using a vcf file and the other all files to intersect.
 	@variantfilelisttoisec=@variantfilelist;
 	splice @variantfilelisttoisec,$i,1;
-	system ("~/tools/htslib-master/htscmd vcfisec -C $variantfilelist[$i] @variantfilelisttoisec > $variantfilelist[$i]-exclusive.txt");
+	system (sprintf("%s/htscmd vcfisec -C $variantfilelist[$i] @variantfilelisttoisec > $variantfilelist[$i]-exclusive.txt",
+		$args->htslib_path));
 	@variantfilelisttoisec=@variantfilelist;
-
 }
 
-for my $i (1..$#ARGV){ #converting to annovar format
-	&convert_to_annovarformat ("$ARGV[$i].gz-exclusive.txt");
+for my $i (0..$#vcf_files){ #converting to annovar format
+	&convert_to_annovarformat ("$vcf_files[$i].gz-exclusive.txt");
 }
 
-$pm = Parallel::ForkManager->new(30); #annotation using annovar
-for my $i (1..$#ARGV){
+$pm = Parallel::ForkManager->new($args->threads); #annotation using annovar
+for my $i (0..$#vcf_files){
 	$pid=$pm->start and next;
-	system ("perl ~/tools/annovar/annotate_variation.pl $ARGV[$i].gz-exclusive.txt-private-annovar.txt --geneanno --buildver hg19 ~/tools/annovar/humandb/");
+	system (sprintf("perl %s/annotate_variation.pl $vcf_files[$i].gz-exclusive.txt-private-annovar.txt --geneanno --buildver hg19 ~/tools/annovar/humandb/",
+		$args->annovar_path));
 	$pm->finish;
 }
 $pm->wait_all_children;
 
-for my $i (1..$#ARGV){ #selecting only exonic or splicing site for exomes
-	&select_onlyexonic_or_onlysplicing ("$ARGV[$i].gz-exclusive.txt-private-annovar.txt.variant_function");
+for my $i (0..$#vcf_files){ #selecting only exonic or splicing site for exomes
+	&select_onlyexonic_or_onlysplicing ("$vcf_files[$i].gz-exclusive.txt-private-annovar.txt.variant_function");
 }
 
 exit;
