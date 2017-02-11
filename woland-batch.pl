@@ -32,7 +32,6 @@ our ($profile, $hotspot, $genome); #arguments
 our (@starttime,@endtime); #time tracking
 
 ## confi variables
-# my $MAXPROCESSES=30; #threads
 my $pm; #parallel fork manager process
 
 my $ap = Getopt::ArgParse->new_parser(
@@ -41,25 +40,29 @@ my $ap = Getopt::ArgParse->new_parser(
 	epilog => '',
  );
 
-$ap->add_arg('--input_table', '-i', required => 1, help => 'Help of Input table');
+$ap->add_arg('--input-table', '-i', required => 1, help => 'Help of Input table');
 ## It is possible to set a value as default?? default => 10
-$ap->add_arg('--chromosome_length_profile', '-c', dest => 'chr_length', required => 1, help => 'Help of Chromosome length profile');
+$ap->add_arg('--chromosome-length-profile', '-c', dest => 'chr_length', required => 1, help => 'Help of Chromosome length profile');
 ## It is possible to set a value as default?? default => 10
-$ap->add_arg('--hotspot_window_length', '-w', dest => 'hotspot', required => 1, help => 'Help of Hotspot Window Length');
-$ap->add_arg('--genome_version', '-g', dest => 'genome', required => 1, help => 'Help of Genome Version');
+$ap->add_arg('--hotspot-window-length', '-w', dest => 'hotspot', required => 1, help => 'Help of Hotspot Window Length');
+$ap->add_arg('--genome-version', '-g', dest => 'genome', required => 1, help => 'Help of Genome Version');
 $ap->add_arg('--threads', '-t', default => 30, help => 'Help of Threads');
 
 my $args = $ap->parse_args();
 
-## warnings and checks
-# unless ($#ARGV==3){
-# 	die "\nERROR : Incorrect number of arguments - Usage: $0 <input.table> <chromosome_profile_file> <hotspot_window_length> <genome_version> \n\n";	
-# }
-# for my $i (0..1) {
-unless (-r -e -f $args->input_table){
-	die "\nERROR: $args->input_table not exists or is not readable or not properly formatted. Please check file.\n\n";
+my $fastagenomeversion=sprintf("genomes/genome_%s.fa", $args->genome);
+unless (-r -e -f $fastagenomeversion){
+	die "\nERROR : Please check if a genome fasta file exists in genomes\/folder for <genome_version>\n"
 }
-# }
+
+unless ($args->hotspot>0){
+	die "\nERROR : Please specify a natural number >0 for <hotspot_window_length>\n";
+}
+
+unless (-r -e -f $args->input_table){
+	die sprintf("\nERROR: %s not exists or is not readable or not properly formatted. Please check file.\n\n",
+		$args->input_table);
+}
 
 @starttime=localtime; #time characters for analysis folder name
 
@@ -101,7 +104,7 @@ for my $i (0..$#sample){ #execution of woland-anno.pl for each sample
 $pm->wait_all_children; #wait woland-anno.pl
 
 ## woland-report.pl
-system ($^X, "woland-report.pl", $ARGV[0]);
+system ($^X, "woland-report.pl", $args->input_table);
 
 ## moving report folder and files to results-batch
 move ("report-$inputtable", "results-batch-$inputtable-$starttime[0].$starttime[1].$starttime[2].$starttime[3].$starttime[4].$starttime[5]/report-$inputtable");
