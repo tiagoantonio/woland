@@ -36,6 +36,7 @@ use Cwd;
 use warnings;
 use strict;
 use List::MoreUtils qw(uniq);
+use Getopt::ArgParse;
 
 our $REVISION = '$Revision:  $';
 our $DATE =	'$Date: 2017-01-28 00:11:04 -0800 (Sat,  28 Jan 2017) $';  
@@ -48,10 +49,13 @@ our (@extractedsequenceformotifsearch,@chrrefseq, @strandrefseq,@txstartrefseq,@
 
 # subroutines
 sub parse_inputs { #parsing .variant.function file
-	$variantfile=$_[0];
+	# $variantfile=$_[0];
+	my $args = $_[0];
+	$variantfile=$args->input_table;
 	open (VARIANTFILE, $variantfile);
 	my @rawvariantarray=<VARIANTFILE>;
 	close (VARIANTFILE);
+
 	foreach my $rawvariantarrayline (@rawvariantarray){ #of each column in a dedicated array
 		my @i = split (/\t/, $rawvariantarrayline);
 		chomp (@i);
@@ -74,7 +78,9 @@ sub parse_inputs { #parsing .variant.function file
 	foreach my $key (sort keys %posref){ # Array for a single entry for each SNP containing a single REFALT string value. Considering  A->T # & T->A; A->G & T->C; A->C & T->G; C->G & G->C; C->T & G->A; C->A & G->T.
 		push (@refalt,"$posref{$key}$posalt{$key}");
 	}
-	$chrlengthprofile=$_[1]; #parsing chromosome profile file
+
+	# $chrlengthprofile=$_[1]; #parsing chromosome profile file
+	$chrlengthprofile=$args->chr_length; #parsing chromosome profile file
 	open (CHRLENGTHPROFILEFILE, $chrlengthprofile);
 	my @chrprofilearray=<CHRLENGTHPROFILEFILE>;
 	close (CHRLENGTHPROFILEFILE);
@@ -86,19 +92,20 @@ sub parse_inputs { #parsing .variant.function file
 		push (@chrlength, "$i[1]");
 	}
 
-	$hotspotwindowlength=$_[2]; #parsing hotspot window length
-	unless ($hotspotwindowlength>0){
-		die "\nERROR : Please specify a natural number >0 for <hotspot_window_length>\n";
-	}
+	$hotspotwindowlength=$args->hotspot; #parsing hotspot window length
+	# $hotspotwindowlength=$_[2]; #parsing hotspot window length
+	# unless ($hotspotwindowlength>0){
+	# 	die "\nERROR : Please specify a natural number >0 for <hotspot_window_length>\n";
+	# }
 	
-	$genomeversion = $_[3]; #parsing genome version
-	my $fastagenomeversion="genomes/genome_$genomeversion.fa";
-	unless ($genomeversion){
-		die "\nERROR : Please specify a genome version in genomes\/folder for <genome_version>\n";
-	}
-	unless (-r -e -f $fastagenomeversion){
-		die "\nERROR : Please check if a genome fasta file exists in genomes\/folder for <genome_version>\n"
-	}
+	# $genomeversion = $_[3]; #parsing genome version
+	# my $fastagenomeversion="genomes/genome_$genomeversion.fa";
+	# unless ($genomeversion){
+	# 	die "\nERROR : Please specify a genome version in genomes\/folder for <genome_version>\n";
+	# }
+	# unless (-r -e -f $fastagenomeversion){
+	# 	die "\nERROR : Please check if a genome fasta file exists in genomes\/folder for <genome_version>\n"
+	# }
 }
 
 sub process_refseq{ #parsing refseq info for transcriptional strand concordance
@@ -628,23 +635,55 @@ sub motif_search{ #motif search counting, normalized, strand concordance
 
 }
 
-# start Screen & log file
-$datestring = localtime();
+my $ap = Getopt::ArgParse->new_parser(
+	prog => 'Woland',
+	description => 'WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell.',
+	epilog => 'If you used Woland in your research, we would appreciate your citation:
+	de Souza TA, Defelicibus A, Menck CF',
+ );
+
+$ap->add_arg('--input-table', '-i', required => 1, help => 'Help of Input table');
+## It is possible to set a value as default?? default => 10
+$ap->add_arg('--chromosome-length-profile', '-c', dest => 'chr_length', required => 1, help => 'Help of Chromosome length profile');
+## It is possible to set a value as default?? default => 10
+$ap->add_arg('--hotspot-window-length', '-w', dest => 'hotspot', required => 1, help => 'Help of Hotspot Window Length');
+$ap->add_arg('--genome-version', '-g', dest => 'genome', required => 1, help => 'Help of Genome Version');
+$ap->add_arg('--threads', '-t', default => 30, help => 'Help of Threads');
+
+my $args = $ap->parse_args();
 
 #main warning
-unless ($#ARGV==3){
-	die "\nERROR : Incorrect number of arguments - Usage: $0 <tabular_snp_file> <chromosome_length_profile> <hotspot_window_length> <genome_version>  \n\n";	
+# unless ($#ARGV==3){
+# 	die "\nERROR : Incorrect number of arguments - Usage: $0 <tabular_snp_file> <chromosome_length_profile> <hotspot_window_length> <genome_version>  \n\n";	
+# }
+# for my $i (0,1) {
+# 	unless (-r -e -f $ARGV[$i]){
+#     	die "\nERROR: $ARGV[$i] not exists or is not readable or not properly formatted. Please check file.\n\n";
+#     }
+# }
+
+my $fastagenomeversion=sprintf("genomes/genome_%s.fa", $args->genome);
+unless (-r -e -f $fastagenomeversion){
+	die "\nERROR : Please check if a genome fasta file exists in genomes\/folder for <genome_version>\n"
 }
-for my $i (0,1) {
-	unless (-r -e -f $ARGV[$i]){
-    	die "\nERROR: $ARGV[$i] not exists or is not readable or not properly formatted. Please check file.\n\n";
-    }
+
+unless ($args->hotspot>0){
+	die "\nERROR : Please specify a natural number >0 for <hotspot_window_length>\n";
 }
+
+unless (-r -e -f $args->input_table){
+	die sprintf("\nERROR: %s not exists or is not readable or not properly formatted. Please check file.\n\n",
+		$args->input_table);
+}
+
+# start Screen & log file
+$datestring = localtime();
 
 #loading files and parameters
 print "\nLoading SNP file...\n";
 $contextsequencelength=3; #<context_sequence_length> #default=3nt downstream & 3nt upstream
-&parse_inputs (@ARGV);
+# &parse_inputs (@ARGV);
+&parse_inputs ($args);
 &process_refseq;
 
 #creating results folder
