@@ -324,7 +324,11 @@ my $ap = Getopt::ArgParse->new_parser(
 	de Souza TA, Defelicibus A, Menck CF',
  );
 
-$ap->add_arg('--input-table', '-i', required => 1, help => 'Help of Input table');
+$ap->add_arg(
+	'--input-table',
+	'-i',
+	required => 1,
+	help => 'Help of Input table');
 
 my $args = $ap->parse_args();
 

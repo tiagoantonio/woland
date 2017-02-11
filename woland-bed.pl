@@ -80,7 +80,11 @@ my $ap = Getopt::ArgParse->new_parser(
 	de Souza TA, Defelicibus A, Menck CF',
  );
 
-$ap->add_arg('--bed-file', '-b', required => 1, help => 'Help of Input BED File');
+$ap->add_arg(
+	'--bed-file',
+	'-b',
+	required => 1,
+	help => 'Help of Input BED File');
 
 my $args = $ap->parse_args();
 

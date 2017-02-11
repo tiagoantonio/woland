@@ -636,19 +636,42 @@ sub motif_search{ #motif search counting, normalized, strand concordance
 }
 
 my $ap = Getopt::ArgParse->new_parser(
-	prog => 'Woland',
+	prog => 'woland-anno.pl',
 	description => 'WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell.',
 	epilog => 'If you used Woland in your research, we would appreciate your citation:
 	de Souza TA, Defelicibus A, Menck CF',
  );
 
-$ap->add_arg('--input-table', '-i', required => 1, help => 'Help of Input table');
+$ap->add_arg(
+	'--input-table',
+	'-i',
+	required => 1,
+	help => 'Help of Input table');
 ## It is possible to set a value as default?? default => 10
-$ap->add_arg('--chromosome-length-profile', '-c', dest => 'chr_length', required => 1, help => 'Help of Chromosome length profile');
+$ap->add_arg(
+	'--chromosome-length-profile',
+	'-c',
+	dest => 'chr_length',
+	required => 1,
+	help => 'Help of Chromosome length profile');
 ## It is possible to set a value as default?? default => 10
-$ap->add_arg('--hotspot-window-length', '-w', dest => 'hotspot', required => 1, help => 'Help of Hotspot Window Length');
-$ap->add_arg('--genome-version', '-g', dest => 'genome', required => 1, help => 'Help of Genome Version');
-$ap->add_arg('--threads', '-t', default => 30, help => 'Help of Threads');
+$ap->add_arg(
+	'--hotspot-window-length',
+	'-w',
+	dest => 'hotspot',
+	required => 1,
+	help => 'Help of Hotspot Window Length');
+$ap->add_arg(
+	'--genome-version',
+	'-g',
+	dest => 'genome',
+	required => 1,
+	help => 'Help of Genome Version');
+$ap->add_arg(
+	'--threads',
+	'-t',
+	default => 30,
+	help => 'Help of Threads');
 
 my $args = $ap->parse_args();
 
