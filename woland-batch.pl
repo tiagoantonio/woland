@@ -37,7 +37,8 @@ my $pm; #parallel fork manager process
 my $ap = Getopt::ArgParse->new_parser(
 	prog => 'Woland',
 	description => 'WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell.',
-	epilog => '',
+	epilog => 'If you used Woland in your research, we would appreciate your citation:
+	de Souza TA, Defelicibus A, Menck CF',
  );
 
 $ap->add_arg('--input-table', '-i', required => 1, help => 'Help of Input table');
