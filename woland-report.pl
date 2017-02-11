@@ -18,6 +18,7 @@
 use Statistics::R; # module for the bridge between Perl and R.
 use strict;
 use warnings;
+use Getopt::ArgParse;
 
 our $REVISION = '$Revision:  $';
 our $DATE =	'$Date: 2017-01-28 00:11:04 -0800 (Sat,  28 Jan 2017) $';  
@@ -180,7 +181,6 @@ sub calculate_strandscore{ #strand score calculation
 
 }
 
-
 sub plot_boxplot_pvalue{ #box plot graph for nucleotide changes and motifs
 	$Rbridge->send(qq'WOLAND.$_[0].boxplot<-read.table("$_[0]-$table.txt", sep = "\t", header=TRUE)');
 	$Rbridge->send(qq'WOLAND.$_[0].boxplot.m <- melt (WOLAND.$_[0].boxplot)');
@@ -317,16 +317,31 @@ sub plot_gaussian{ #kernel density estimation ofr strand scores
 	$Rbridge->send(q'dev.off()');
 }
 
+my $ap = Getopt::ArgParse->new_parser(
+	prog => 'woland-report.pl',
+	description => 'WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell.',
+	epilog => 'If you used Woland in your research, we would appreciate your citation:
+	de Souza TA, Defelicibus A, Menck CF',
+ );
+
+$ap->add_arg('--input-table', '-i', required => 1, help => 'Help of Input table');
+
+my $args = $ap->parse_args();
+
 ## main warning
-unless ($#ARGV==0){
-	die "\nERROR : Incorrect number of arguments - Usage: $0 <input.table> \n\n";	
-}
-unless (-r -e -f $ARGV[0]){
-    die "\nERROR: $ARGV[0] not exists or is not readable or not properly formatted. Please check file.\n\n";
+# unless ($#ARGV==0){
+# 	die "\nERROR : Incorrect number of arguments - Usage: $0 <input.table> \n\n";	
+# }
+# unless (-r -e -f $ARGV[0]){
+#     die "\nERROR: $ARGV[0] not exists or is not readable or not properly formatted. Please check file.\n\n";
+# }
+unless (-r -e -f $args->input_table){
+	die sprintf("\nERROR: %s not exists or is not readable or not properly formatted. Please check file.\n\n",
+		$args->input_table);
 }
 
 ## parsing input table
-$table = $ARGV[0]; # <input.table>
+$table = $args->input_table; # <input.table>
 open (TABLE, $table);
 @tablearray=<TABLE>;
 
