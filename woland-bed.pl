@@ -26,6 +26,7 @@ use List::Util qw(sum); #module for sum of chromosome coordinates
 use List::MoreUtils qw(uniq);
 use strict;
 use warnings;
+use Getopt::ArgParse;
 
 our $REVISION = '$Revision:  $';
 our $DATE =	'$Date: 2017-01-28 00:11:04 -0800 (Sat,  28 Jan 2017) $';  
@@ -35,7 +36,9 @@ our (@chrbed,@pos1,@pos2, @sumlength,@uniquechr);
 our $bedfile;
 
 sub parse_bedfile{ # loading bed file
-	$bedfile = $ARGV[0];
+	my $args = $_[0];
+	# $bedfile = $ARGV[0];
+	$bedfile = $args->bed_file;
 	open (BEDFILE, $bedfile);
 	my @bedfilearray=<BEDFILE>;
 	close (BEDFILE);
@@ -70,15 +73,27 @@ sub calculate_length{ #absolute subtraction of pos values
 	push (@sumlength, sum(@length));
 }
 
+my $ap = Getopt::ArgParse->new_parser(
+	prog => 'woland-bed.pl',
+	description => 'WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell.',
+	epilog => 'If you used Woland in your research, we would appreciate your citation:
+	de Souza TA, Defelicibus A, Menck CF',
+ );
+
+$ap->add_arg('--bed-file', '-b', required => 1, help => 'Help of Input BED File');
+
+my $args = $ap->parse_args();
+
 ## main warning
-unless ($#ARGV==0){
-	die "\nERROR : Incorrect number of arguments - Usage: $0 <file.bed> \n\n";	
-}
-unless (-r -e -f $ARGV[0]){
-    die "\nERROR: $ARGV[0] not exists or is not readable or not properly formatted. Please check file.\n\n";
+# unless ($#ARGV==0){
+# 	die "\nERROR : Incorrect number of arguments - Usage: $0 <file.bed> \n\n";	
+# }
+unless (-r -e -f $args->bed_file){
+    die sprintf("\nERROR: %s not exists or is not readable or not properly formatted. Please check file.\n\n",
+    	$args->bed_file);
 }
 
-&parse_bedfile;
+&parse_bedfile($args);
 
 open (PROFILE, ">>woland-bed-profile-$bedfile"); # printing profile file
 for my $i (0..$#uniquechr){
