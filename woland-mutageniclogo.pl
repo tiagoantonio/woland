@@ -16,10 +16,10 @@
 ##
 ########################################################################################################################################
 
-
 #! /usr/bin/perl
 use strict;
 use warnings;
+use Getopt::ArgParse;
 
 our $REVISION = '$Revision:  $';
 our $DATE =	'$Date: 2017-01-28 00:11:04 -0800 (Sat,  28 Jan 2017) $';  
@@ -115,20 +115,42 @@ sub to_reversecomplement{ #reversecomplement based on sense-change
 	return $revcomp;
 }
 
+my $ap = Getopt::ArgParse->new_parser(
+	prog => 'woland-mutageniclogo.pl',
+	description => 'WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell.',
+	epilog => 'If you used Woland in your research, we would appreciate your citation:
+	de Souza TA, Defelicibus A, Menck CF',
+ );
+
+$ap->add_arg(
+	'--sense-change',
+	'-s',
+	required => 1,
+	choices => [ 'CT', 'GT', 'GC' ],
+	help => 'Help of sense change');
+$ap->add_arg(
+	'--input-table',
+	'-i',
+	required => 1,
+	help => 'Input table.');
+
+my $args = $ap->parse_args();
+
 ## main warning
-unless ($#ARGV>=1){
-	die "\nERROR : Incorrect number of arguments/files - Usage: $0 <sensechange> <input-table> \n\n";	
+# unless ($#ARGV>=1){
+# 	die "\nERROR : Incorrect number of arguments/files - Usage: $0 <sensechange> <input-table> \n\n";	
+# }
+
+# unless ($ARGV[0] eq "GT" || $ARGV[0] eq "CT" || $ARGV[0] eq "GC"){
+# 	die "\nERROR : Incorrect <typeofchange>. Please use CT,GT or GC\n\n";	
+# }
+unless (-r -e -f $args->input_table){
+	die sprintf("\nERROR: %s not exists or is not readable or not properly formatted. Please check file.\n\n",
+		$args->input_table);	
 }
 
-unless ($ARGV[0] eq "GT" || $ARGV[0] eq "CT" || $ARGV[0] eq "GC"){
-	die "\nERROR : Incorrect <typeofchange>. Please use CT,GT or GC\n\n";	
-}
-unless (-r -e -f $ARGV[1]){
-	die "\nERROR: $ARGV[1] not exists or is not readable or not properly formatted. Please check file.\n\n";	
-}
-
-$sensechange=$ARGV[0]; #sense change
-$table = $ARGV[1]; # <input.table>
+$sensechange = $args->sense_change;
+$table = $args->input_table;
 
 &parse_inputtable_to_sensechanges;
 
