@@ -116,9 +116,13 @@ $pm = Parallel::ForkManager->new($args->threads);
 
 for my $i (0..$#sample){ #execution of woland-anno.pl for each sample
 	my @arguments;
+	push (@arguments, "-i");
 	push (@arguments, $sample[$i]);
+	push (@arguments, "-c");
 	push (@arguments, $profile);
+	push (@arguments, "-w");
 	push (@arguments, $hotspot);
+	push (@arguments, "-g");
 	push (@arguments, $genome);
 
 	my $pid=$pm->start and next;
@@ -128,7 +132,7 @@ for my $i (0..$#sample){ #execution of woland-anno.pl for each sample
 $pm->wait_all_children; #wait woland-anno.pl
 
 ## woland-report.pl
-system ($^X, "woland-report.pl", $args->input_table);
+system ($^X, "woland-report.pl", "-i", $args->input_table);
 
 ## moving report folder and files to results-batch
 move ("report-$inputtable", "results-batch-$inputtable-$starttime[0].$starttime[1].$starttime[2].$starttime[3].$starttime[4].$starttime[5]/report-$inputtable");

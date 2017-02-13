@@ -98,7 +98,7 @@ sub parse_inputs { #parsing .variant.function file
 	# 	die "\nERROR : Please specify a natural number >0 for <hotspot_window_length>\n";
 	# }
 	
-	# $genomeversion = $_[3]; #parsing genome version
+	$genomeversion = $args->genome; #parsing genome version
 	# my $fastagenomeversion="genomes/genome_$genomeversion.fa";
 	# unless ($genomeversion){
 	# 	die "\nERROR : Please specify a genome version in genomes\/folder for <genome_version>\n";
