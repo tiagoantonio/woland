@@ -61,6 +61,7 @@ The following R packages must be installed:
 -qqman
 -RColorBrewer
 -plyr
+-gtools
 
 If you do not have them you can use this following command in R to install each library.
 	$R install.packages("packagename")
