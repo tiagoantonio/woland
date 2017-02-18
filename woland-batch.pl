@@ -47,19 +47,18 @@ $ap->add_arg(
 	'-i',
 	required => 1,
 	help => 'Tab-delimited file with samples in the 1st column and groups in the 2nd column');
-## It is possible to set a value as default?? default => 10
 $ap->add_arg(
 	'--chromosome-length-profile',
 	'-c',
 	dest => 'chr_length',
 	required => 1,
 	help => 'Tab-delimited file with chr names in the 1st column and target sequenced length in the 2nd column');
-## It is possible to set a value as default?? default => 10
 $ap->add_arg(
 	'--hotspot-window-length',
 	'-w',
 	dest => 'hotspot',
 	required => 1,
+	default => 1000,
 	help => 'Natural number for hotspot window-length');
 $ap->add_arg(
 	'--genome-version',

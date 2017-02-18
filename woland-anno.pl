@@ -660,6 +660,7 @@ $ap->add_arg(
 	'-w',
 	dest => 'hotspot',
 	required => 1,
+	default => 1000,
 	help => 'Natural number for hotspot window-length');
 $ap->add_arg(
 	'--genome-version',
