@@ -117,7 +117,8 @@ sub to_reversecomplement{ #reversecomplement based on sense-change
 
 my $ap = Getopt::ArgParse->new_parser(
 	prog => 'woland-mutageniclogo.pl',
-	description => 'WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell.',
+	description => 'WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing SNV data.
+	Use woland-mutageniclogo to extract stranded context sequences FASTA files specific for C>T, G>T and G>C changes AFTER woland-report. For more details please read README',
 	epilog => 'If you used Woland in your research, we would appreciate your citation:
 	de Souza TA, Defelicibus A, Menck CF',
  );
@@ -127,12 +128,12 @@ $ap->add_arg(
 	'-s',
 	required => 1,
 	choices => [ 'CT', 'GT', 'GC' ],
-	help => 'Help of sense change');
+	help => 'Type of sense-nucleotide change to filter in extracted sequences');
 $ap->add_arg(
 	'--input-table',
 	'-i',
 	required => 1,
-	help => 'Input table.');
+	help => 'Tab-delimited file with samples in the 1st column and groups in the 2nd column');
 
 my $args = $ap->parse_args();
 
