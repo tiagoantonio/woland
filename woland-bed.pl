@@ -75,7 +75,8 @@ sub calculate_length{ #absolute subtraction of pos values
 
 my $ap = Getopt::ArgParse->new_parser(
 	prog => 'woland-bed.pl',
-	description => 'WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell.',
+	description => 'WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing SNV data. 
+	Use woland-bed.pl to calculate nucleotide length using a .BED coordinate file as input and to build <chromosome_length_profile> for other woland scripts.For more details please read README',
 	epilog => 'If you used Woland in your research, we would appreciate your citation:
 	de Souza TA, Defelicibus A, Menck CF',
  );
@@ -84,7 +85,7 @@ $ap->add_arg(
 	'--bed-file',
 	'-b',
 	required => 1,
-	help => 'Help of Input BED File');
+	help => 'BED-formatted file of targeted-sequencing regions');
 
 my $args = $ap->parse_args();
 

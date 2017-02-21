@@ -146,7 +146,8 @@ sub select_onlyexonic_or_onlysplicing {
 
 my $ap = Getopt::ArgParse->new_parser(
 	prog => 'woland-isectoannovar.pl',
-	description => 'WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell.',
+	description => 'WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing SNV data.
+	Use woland-isectoannovar to perform multiple intersections between VCF files from targeted resequencing experiments to select private variants and annotate them with ANNOVAR. For more details please read README',
 	epilog => 'If you used Woland in your research, we would appreciate your citation:
 	de Souza TA, Defelicibus A, Menck CF',
  );
@@ -156,7 +157,7 @@ $ap->add_arg(
 	'-c',
 	required => 1,
 	choices => [ 'all', 'CT', 'CG', 'CA', 'AT', 'AG', 'AC' ],
-	help => 'Help of type of change');
+	help => 'The type of nucleotide change to filter');
 $ap->add_arg(
 	'--vcf-files',
 	'-f',
@@ -168,17 +169,17 @@ $ap->add_arg(
 	'--annovar-path',
 	'-a',
 	required => 1,
-	help => 'Annovar path');
+	help => 'ANNOVAR folder path');
 $ap->add_arg(
 	'--htslib-path',
 	'-l',
 	required => 1,
-	help => 'HTSLib path');
+	help => 'HTSLib-VCFTools folder path');
 $ap->add_arg(
 	'--threads',
 	'-t',
 	default => 30,
-	help => 'Help of Threads');
+	help => 'Set a number for the maximum number of threads');
 
 my $args = $ap->parse_args();
 

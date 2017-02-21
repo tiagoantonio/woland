@@ -319,7 +319,8 @@ sub plot_gaussian{ #kernel density estimation ofr strand scores
 
 my $ap = Getopt::ArgParse->new_parser(
 	prog => 'woland-report.pl',
-	description => 'WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell.',
+	description => 'WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing SNV data.
+	Use woland-report to build a grouped report using results-folder of each woland-anno.pl analyzed sample. For more details please read README',
 	epilog => 'If you used Woland in your research, we would appreciate your citation:
 	de Souza TA, Defelicibus A, Menck CF',
  );
@@ -328,7 +329,7 @@ $ap->add_arg(
 	'--input-table',
 	'-i',
 	required => 1,
-	help => 'Help of Input table');
+	help => 'Tab-delimited file with samples in the 1st column and groups in the 2nd column');
 
 my $args = $ap->parse_args();
 
