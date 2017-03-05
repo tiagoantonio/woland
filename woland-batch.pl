@@ -18,6 +18,7 @@
 use IPC::System::Simple qw(system capture);
 use Parallel::ForkManager;
 use File::Copy;
+use File::Spec;
 use strict;
 use warnings;
 use Getopt::ArgParse;
@@ -67,6 +68,10 @@ $ap->add_arg(
 	required => 1,
 	help => 'String for genome version for genome and annotation files in genomes/ folder');
 $ap->add_arg(
+	'--output',
+	'-o',
+	help => 'Output folder where all files will be created.');
+$ap->add_arg(
 	'--threads',
 	'-t',
 	default => 30,
@@ -108,8 +113,9 @@ $hotspot= $args->hotspot; #natural number for hotspot window <hotspot_window_len
 $genome = $args->genome; #genome version as in genomes/genome_<genome_version>.fa and genomes/refseq_<genome_version>.txt
 
 ## creating output directories
-mkdir("results-batch-$inputtable-$starttime[0].$starttime[1].$starttime[2].$starttime[3].$starttime[4].$starttime[5]", 0755) || die "Cannot create results folder - check if it already exists";
-mkdir("results-batch-$inputtable-$starttime[0].$starttime[1].$starttime[2].$starttime[3].$starttime[4].$starttime[5]/samples-$inputtable", 0755) || die "Cannot create results folder- check if it already exists";
+my $output_folder = File::Spec->catfile($args->output, "results-batch-$inputtable-$starttime[0].$starttime[1].$starttime[2].$starttime[3].$starttime[4].$starttime[5]");
+mkdir($output_folder, 0755) || die "Cannot create results folder - check if it already exists";
+mkdir(File::Spec->catfile($output_folder, "samples-$inputtable"), 0755) || die "Cannot create results folder- check if it already exists";
 
 ## woland-anno.pl multi-threading
 $pm = Parallel::ForkManager->new($args->threads);
@@ -124,6 +130,8 @@ for my $i (0..$#sample){ #execution of woland-anno.pl for each sample
 	push (@arguments, $hotspot);
 	push (@arguments, "-g");
 	push (@arguments, $genome);
+	push (@arguments, "-o");
+	push (@arguments, $args->output);
 
 	my $pid=$pm->start and next;
 	system ($^X, "woland-anno.pl", @arguments);
@@ -135,11 +143,11 @@ $pm->wait_all_children; #wait woland-anno.pl
 system ($^X, "woland-report.pl", "-i", $args->input_table);
 
 ## moving report folder and files to results-batch
-move ("report-$inputtable", "results-batch-$inputtable-$starttime[0].$starttime[1].$starttime[2].$starttime[3].$starttime[4].$starttime[5]/report-$inputtable");
+move ("report-$inputtable", File::Spec->catfile($output_folder, "report-$inputtable"));
 
 ## moving each result sample folder and files to results-batch/results
 for my $i (0..$#tablearray){
-	move ("results-$sample[$i]", "results-batch-$inputtable-$starttime[0].$starttime[1].$starttime[2].$starttime[3].$starttime[4].$starttime[5]/samples-$inputtable/results-$sample[$i]");
+	move ("results-$sample[$i]", File::Spec->catfile($output_folder, "samples-$inputtable", "results-$sample[$i]"));
 }
 
 @endtime=localtime;

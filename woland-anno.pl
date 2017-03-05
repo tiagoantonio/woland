@@ -36,6 +36,7 @@ use Cwd;
 use warnings;
 use strict;
 use List::MoreUtils qw(uniq);
+use File::Spec;
 use Getopt::ArgParse;
 
 our $REVISION = '$Revision:  $';
@@ -668,6 +669,10 @@ $ap->add_arg(
 	dest => 'genome',
 	required => 1,
 	help => 'String for genome version for genome and annotation files in genomes/ folder');
+$ap->add_arg(
+	'--output',
+	'-o',
+	help => 'Output folder where all files will be created.');
 $ap->add_arg(
 	'--threads',
 	'-t',
