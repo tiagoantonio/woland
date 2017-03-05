@@ -62,26 +62,33 @@ $ap->add_arg(
 	default => 1000,
 	help => 'Natural number for hotspot window-length');
 $ap->add_arg(
-	'--genome-version',
+	'--genome-path',
 	'-g',
 	dest => 'genome',
 	required => 1,
-	help => 'String for genome version for genome and annotation files in genomes/ folder');
+	help => 'String for genome path for genome and annotation files.');
 $ap->add_arg(
-	'--output',
-	'-o',
-	help => 'Output folder where all files will be created.');
+	'--genome-name',
+	'-n',
+	dest => 'genome_name',
+	required => 1,
+	help => 'String for genome name for genome and annotation files.');
 $ap->add_arg(
 	'--threads',
 	'-t',
 	default => 30,
 	help => 'Set a number for the maximum number of threads');
+$ap->add_arg(
+	'--output',
+	'-o',
+	help => 'Output folder where all files will be created.');
 
 my $args = $ap->parse_args();
 
-my $fastagenomeversion=sprintf("genomes/genome_%s.fa", $args->genome);
+# my $fastagenomeversion=sprintf("genomes/genome_%s.fa", $args->genome);
+my $fastagenomeversion = File::Spec->catfile($args->genome, sprintf("%s.fa", $args->genome_name));
 unless (-r -e -f $fastagenomeversion){
-	die "\nERROR : Please check if a genome fasta file exists in genomes\/folder for <genome_version>\n"
+	die "\nERROR : Please check if a genome fasta file exists in $fastagenomeversion.\n"
 }
 
 unless ($args->hotspot>0){
@@ -111,6 +118,7 @@ foreach $tableline (@tablearray){ #two arrays for each category (group & sample 
 $profile= $args->chr_length; #chromosome profile <chromosome_length_profile>
 $hotspot= $args->hotspot; #natural number for hotspot window <hotspot_window_length> 
 $genome = $args->genome; #genome version as in genomes/genome_<genome_version>.fa and genomes/refseq_<genome_version>.txt
+my $genome_name = $args->genome_name;
 
 ## creating output directories
 my $output_folder = File::Spec->catfile($args->output, "results-batch-$inputtable-$starttime[0].$starttime[1].$starttime[2].$starttime[3].$starttime[4].$starttime[5]");
@@ -130,6 +138,8 @@ for my $i (0..$#sample){ #execution of woland-anno.pl for each sample
 	push (@arguments, $hotspot);
 	push (@arguments, "-g");
 	push (@arguments, $genome);
+	push (@arguments, "-n");
+	push (@arguments, $genome_name);
 	push (@arguments, "-o");
 	push (@arguments, $args->output);
 
