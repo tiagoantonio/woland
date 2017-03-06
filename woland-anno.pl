@@ -112,11 +112,11 @@ sub parse_inputs { #parsing .variant.function file
 sub process_refseq{ #parsing refseq info for transcriptional strand concordance
 	# my $refseqdata = "genomes/refseq_$genomeversion.txt";
 	my $args = $_[0];
-	my $refseqdata = File::Spec->catfile($args->genome, "refseq_$genomeversion.txt");
+	my $refseqdata = $args->refseq;
 	my @refseqprocessedarrayline;
 	my $refseqarrayline;
 	unless (-r -e -f $refseqdata){
-		die "\nERROR : Could not load <refseq_$genomeversion.txt>. Please review RefSeq annotation.\n";
+		die sprintf("\nERROR : Could not load %s. Please review RefSeq annotation.\n", $args->refseq);
 	}
 	open (REFSEQDATA, $refseqdata);
 	my @refseqrawarray=<REFSEQDATA>;
@@ -677,6 +677,12 @@ $ap->add_arg(
 	dest => 'genome_name',
 	required => 1,
 	help => 'String for genome name for genome and annotation files.');
+$ap->add_arg(
+	'--refseq',
+	'-r',
+	dest => 'refseq',
+	required => 1,
+	help => 'String for complete path and file of refseq.');
 $ap->add_arg(
 	'--threads',
 	'-t',

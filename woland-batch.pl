@@ -74,6 +74,12 @@ $ap->add_arg(
 	required => 1,
 	help => 'String for genome name for genome and annotation files.');
 $ap->add_arg(
+	'--refseq',
+	'-r',
+	dest => 'refseq',
+	required => 1,
+	help => 'String for complete path and file of refseq.');
+$ap->add_arg(
 	'--threads',
 	'-t',
 	default => 30,
@@ -140,6 +146,8 @@ for my $i (0..$#sample){ #execution of woland-anno.pl for each sample
 	push (@arguments, $genome);
 	push (@arguments, "-n");
 	push (@arguments, $genome_name);
+	push (@arguments, "-r");
+	push (@arguments, $args->refseq);
 	push (@arguments, "-o");
 	push (@arguments, $args->output);
 
