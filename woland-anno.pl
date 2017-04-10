@@ -36,6 +36,7 @@ use Cwd;
 use warnings;
 use strict;
 use List::MoreUtils qw(uniq);
+use File::Spec;
 use Getopt::ArgParse;
 
 our $REVISION = '$Revision:  $';
@@ -98,7 +99,7 @@ sub parse_inputs { #parsing .variant.function file
 	# 	die "\nERROR : Please specify a natural number >0 for <hotspot_window_length>\n";
 	# }
 	
-	$genomeversion = $args->genome; #parsing genome version
+	$genomeversion = $args->genome_name; #parsing genome version
 	# my $fastagenomeversion="genomes/genome_$genomeversion.fa";
 	# unless ($genomeversion){
 	# 	die "\nERROR : Please specify a genome version in genomes\/folder for <genome_version>\n";
@@ -109,11 +110,13 @@ sub parse_inputs { #parsing .variant.function file
 }
 
 sub process_refseq{ #parsing refseq info for transcriptional strand concordance
-	my $refseqdata = "genomes/refseq_$genomeversion.txt";
+	# my $refseqdata = "genomes/refseq_$genomeversion.txt";
+	my $args = $_[0];
+	my $refseqdata = $args->refseq;
 	my @refseqprocessedarrayline;
 	my $refseqarrayline;
 	unless (-r -e -f $refseqdata){
-		die "\nERROR : Could not load <refseq_$genomeversion.txt>. Please review RefSeq annotation.\n";
+		die sprintf("\nERROR : Could not load %s. Please review RefSeq annotation.\n", $args->refseq);
 	}
 	open (REFSEQDATA, $refseqdata);
 	my @refseqrawarray=<REFSEQDATA>;
@@ -663,16 +666,32 @@ $ap->add_arg(
 	default => 1000,
 	help => 'Natural number for hotspot window-length');
 $ap->add_arg(
-	'--genome-version',
+	'--genome-path',
 	'-g',
 	dest => 'genome',
 	required => 1,
-	help => 'String for genome version for genome and annotation files in genomes/ folder');
+	help => 'String for genome path for genome and annotation files.');
+$ap->add_arg(
+	'--genome-name',
+	'-n',
+	dest => 'genome_name',
+	required => 1,
+	help => 'String for genome name for genome and annotation files.');
+$ap->add_arg(
+	'--refseq',
+	'-r',
+	dest => 'refseq',
+	required => 1,
+	help => 'String for complete path and file of refseq.');
 $ap->add_arg(
 	'--threads',
 	'-t',
 	default => 30,
 	help => 'Set a number for the maximum number of threads');
+$ap->add_arg(
+	'--output',
+	'-o',
+	help => 'Output folder where all files will be created.');
 
 my $args = $ap->parse_args();
 
@@ -686,9 +705,10 @@ my $args = $ap->parse_args();
 #     }
 # }
 
-my $fastagenomeversion=sprintf("genomes/genome_%s.fa", $args->genome);
+# my $fastagenomeversion=sprintf("genomes/genome_%s.fa", $args->genome);
+my $fastagenomeversion = File::Spec->catfile($args->genome, sprintf("%s.fa", $args->genome_name));
 unless (-r -e -f $fastagenomeversion){
-	die "\nERROR : Please check if a genome fasta file exists in genomes\/folder for <genome_version>\n"
+	die "\nERROR : Please check if a genome fasta file exists in $fastagenomeversion.\n"
 }
 
 unless ($args->hotspot>0){
@@ -708,7 +728,7 @@ print "\nLoading SNP file...\n";
 $contextsequencelength=3; #<context_sequence_length> #default=3nt downstream & 3nt upstream
 # &parse_inputs (@ARGV);
 &parse_inputs ($args);
-&process_refseq;
+&process_refseq ($args);
 
 #creating results folder
 mkdir("results-$variantfile", 0755) || die "Cannot mkdir results-$variantfile - folder already exists, please delete it or change samplename";
@@ -738,7 +758,7 @@ for my $i (0 .. $#chrstart){
 }
 
 #module for extraction of context sequences in reference genomes of each SNP.
-$genomesequenceinstance = Bio::DB::Fasta->new("genomes/genome_$genomeversion.fa");
+$genomesequenceinstance = Bio::DB::Fasta->new(File::Spec->catfile($args->genome, sprintf("%s.fa", $args->genome_name)));
 open (CONTEXTSEQ, ">>results-$variantfile/WOLAND-contextsequences-$variantfile");
 open (CONTEXTSEQANNO, ">>results-$variantfile/WOLAND-contextsequencesanno-$variantfile");
 print "\nExtracting context sequences and saving extracted_sequences-$variantfile ..\n";
