@@ -1,32 +1,10 @@
 ########################################################################################################################################
-## WOLAND Beta 0.2 (01-28-2017)
+## WOLAND Beta 1.01 (09-30-2017)
 ## woland-anno.pl
 ##
 ## WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell. .
 ## 
 ## For more details please read README file.
-##
-## USAGE
-##
-## perl woland.pl <annnovar_variant_file> <chromosome_length_profile> <hotspot_window_length> <genome_version>
-## 
-## e.g.: perl woland.pl sample1_exome.tab mouse_chromosome.tab 1000
-##
-## INPUT FILE REQUIREMENTS
-## 
-## <annnovar_variant_file> : ANNOVAR variant file output.
-##
-## <chromosome_length_profile> : Tab-delimited file without header. First colum is the chromosome name; chr1. Second column is the 
-## chromosome length; 45000000. WARNING: This file must contain, in the first column: chr1-chr21, chrX, chrY and chr M, in a total of
-## 24 columns. If any chromosome is absent, please use 1 as chromosome length. 
-##
-## <hotspot_window_length> : Any natural X number correspondent to the nucleotide hotspot window length; X nucleotides distant in each
-## way of SNP position in <tabular_snp_file>.
-## 
-## <genome_version> : Genome version as found in genomes/genome_<genome_version>.fa and genomes/refseq_<genome_version>.txt
-##
-## WARNING: You must save a genome FASTA file as "genome.fa" for context sequence extraction. This genome file must be chromosome divided;
-## >chr1, >chr2 ... as IDs.
 ##
 ###########################################################################################################################################
 
@@ -40,7 +18,7 @@ use File::Spec;
 use Getopt::ArgParse;
 
 our $REVISION = '$Revision:  $';
-our $DATE =	'$Date: 2017-01-28 00:11:04 -0800 (Sat,  28 Jan 2017) $';  
+our $DATE =	'$Date: 2017-09-30 00:11:04 -0800 (Sat,  30 Sep 2017) $';  
 our $AUTHOR =	'$Author: Tiago A. de Souza <tiagoantonio@gmail.com> $';
 
 # global variables

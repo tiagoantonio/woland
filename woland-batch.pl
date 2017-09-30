@@ -1,17 +1,11 @@
 ########################################################################################################################################
-## WOLAND Beta 0.2 (01-28-2016)
+## WOLAND Beta 1.01 (09-30-2017)
 ## woland-batch.pl
 ##
 ## WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell. 
 ## 
 ## For more details please read README file.
 ## 
-## Use woland-batch to run multiple samples as in <input-table> using woland-anno.pl and build a grouped report using woland-report.pl.
-##
-## USAGE:
-##
-## woland-batch.pl <input_table> <chromosome_length_profile> <hotspot_window_length> <genome_version>
-##
 ########################################################################################################################################
 
 #! /usr/bin/perl
@@ -23,8 +17,9 @@ use strict;
 use warnings;
 use Getopt::ArgParse;
 
+
 our $REVISION = '$Revision:  $';
-our $DATE =	'$Date: 2017-01-28 00:11:04 -0800 (Sat,  28 Jan 2017) $';  
+our $DATE =	'$Date: 2017-09-30 00:11:04 -0800 (Sat,  30 Sep 2017) $';  
 our $AUTHOR =	'$Author: Tiago A. de Souza <tiagoantonio@gmail.com> $';
 
 ## global variables
@@ -132,6 +127,7 @@ mkdir($output_folder, 0755) || die "Cannot create results folder - check if it a
 mkdir(File::Spec->catfile($output_folder, "samples-$inputtable"), 0755) || die "Cannot create results folder- check if it already exists";
 
 ## woland-anno.pl multi-threading
+
 $pm = Parallel::ForkManager->new($args->threads);
 
 for my $i (0..$#sample){ #execution of woland-anno.pl for each sample
@@ -151,9 +147,15 @@ for my $i (0..$#sample){ #execution of woland-anno.pl for each sample
 	push (@arguments, "-o");
 	push (@arguments, $args->output);
 
-	my $pid=$pm->start and next;
-	system ($^X, "woland-anno.pl", @arguments);
-	$pm->finish;
+	if ($i==0){
+		system ($^X, "woland-anno.pl", @arguments);
+	}
+
+	else{
+		my $pid=$pm->start and next;
+		system ($^X, "woland-anno.pl", @arguments);
+		$pm->finish;
+	}
 }
 $pm->wait_all_children; #wait woland-anno.pl
 

@@ -17,7 +17,7 @@ Given one or more list of SNVs in ANNOVAR variant_function format, WOLAND can pe
 - **Search for mutational hotspots**: Identify mutational hotspots using a user-defined sliding window which considers each SNV as the window center.
 - **Transcriptional strand bias**: Retrieve scores associated with the strand of each mutational motif found using RefSeq annotation data.
 
-You can use Galaxy-WOLAND directly through your web navigator or install a local WOLAND version. Galaxy-WOLAND is a friendly and easy interface and a local version will allow you to customize your analysis. Please see docs for further information!
+You can use Galaxy-WOLAND directly through your web navigator or install a local version. Galaxy-WOLAND is a friendly and easy interface while installing a local version will allow you to customize all analyses steps. Please see docs for further information!
 
 The documentation of WOLAND is organized into:
 

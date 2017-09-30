@@ -60,6 +60,12 @@ echo -n "INSTALLING Text::Wrap... "
 cpanm Text::Wrap
 echo -n "INSTALLING Statistics::R... "
 cpanm Statistics::R
+echo -n "INSTALLING Getopt::ArgParse... "
+cpanm Getopt::ArgParse
+echo -n "INSTALLING Moo... "
+cpanm Moo
+echo -n "INSTALLING List::MoreUtils.. "
+cpanm List::MoreUtils
 
 # installing R & libraries
 echo -n "INSTALLING R Packages... "

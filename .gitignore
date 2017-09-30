@@ -1,5 +1,4 @@
 *.pl~
 *~
-genomes/
 *.variant_function
 *.txt

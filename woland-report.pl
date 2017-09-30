@@ -1,16 +1,10 @@
 ########################################################################################################################
-## WOLAND Beta 0.2 (01-28-2017)
+## WOLAND Beta 1.01 (09-30-2017)
 ## woland-report.pl 
 ##
 ## WOLAND is a multiplatform tool to analyze point mutation patterns using resequencing data from any organism or cell. 
 ## 
 ## For more details please read README file.
-##
-## Use woland-report to build a grouped report using results-folder of each woland-anno.pl analyzed sample
-##
-## USAGE:
-##
-## woland-report.pl <input_table> 
 ##
 ######################################################################################################################## 
 
@@ -21,7 +15,7 @@ use warnings;
 use Getopt::ArgParse;
 
 our $REVISION = '$Revision:  $';
-our $DATE =	'$Date: 2017-01-28 00:11:04 -0800 (Sat,  28 Jan 2017) $';  
+our $DATE =	'$Date: 2017-09-30 00:11:04 -0800 (Sat,  30 Sep 2017) $';  
 our $AUTHOR =	'$Author: Tiago A. de Souza <tiagoantonio@gmail.com> $';
 
 ## variables

@@ -39,6 +39,12 @@ To check Perl version type:
 ```sh
 $ perl -v 
 ```
+Set your perl environment variable PERL5LIB for modules:
+
+```sh
+$ export PERL5LIB=/home/user/perl5/lib
+```
+Edit ~/.bashrc to include PERL5LIB variable.
 
 ### R
 You also need R in order to generate reports.
@@ -78,6 +84,9 @@ $ cpanm Text::Balanced
 (Text::Balanced version should be higher than 1.97)
 $ cpanm Text::Wrap
 $ cpanm Statistics::R
+$ cpanm Moo
+$ cpanm Getopt::ArgParse
+$ cpanm List::MoreUtils
 ```
  R packages:
 ```sh
@@ -94,9 +103,9 @@ $R q();
 ### Copying genome sequences and annotation
 Woland needs genome reference sequence and its gene annotation for each organism. User should download two files in order to perform its analysis.
 
-Download genome reference sequence, move to genomes/ folder and rename it:
+Download genome reference sequence, move to genomes/ folder and rename it (if necessary):
 ```sh
-$ mv hg19.fa woland/genomes/genome_hg19.fa
+$ mv hg19.fa woland/genomes/hg19.fa
 ```
 Download annotation, move to genomes/ folder and rename it:
 ```sh
@@ -126,7 +135,7 @@ chromosome.profile file: Path for a regular tabular file without header . First 
 genomes.folder: Path for genome folder where FASTA sequences are located.
 
 * -n
-genome.version: Genome version of genomes.folder/genome_[genome.version] and genomes/refseq_[genome.version] files.
+genome.version: Genome version of genomes.folder/[genome.version].fa and genomes/refseq_[genome.version].txt files.
 
 * -r 
 refseq.file: Complete path and file of refseq annotation.
@@ -183,7 +192,7 @@ $ perl woland-mutageniclogo.pl -s <type of 5'3' change> -i <input.table file>
 # WOLAND OUTPUTS
 
 * results-samplename folder : All results from a single sample file.
-* report-samplename folder  : Grouped report files [.tmp] and graphic reports from a single [input.table].
+* report-samplename folder  : Grouped report files [.txt] and graphic reports from a single [input.table].
 
 # CITATION
 
