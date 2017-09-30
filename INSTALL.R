@@ -1,0 +1,6 @@
+install.packages("reshape2",repos='http://cran.us.r-project.org')
+install.packages("ggplot2",repos='http://cran.us.r-project.org')
+install.packages("qqman",repos='http://cran.us.r-project.org')
+install.packages("RColorBrewer",repos='http://cran.us.r-project.org')
+install.packages("plyr",repos='http://cran.us.r-project.org')
+install.packages("gtools",repos='http://cran.us.r-project.org')
