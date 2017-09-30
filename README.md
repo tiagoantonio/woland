@@ -53,7 +53,7 @@ Using Git, clone woland repo:
 ```sh
 $ git clone https://github.com/tiagoantonio/woland
 ```
-###Option 2: Download last Woland source release [here](https://github.com/tiagoantonio/woland/blob/master/woland-source.1.01.tar.gz). Woland is provided as a tar.gz file which could be extracted using:
+### Option 2: Download last Woland source release [here](https://github.com/tiagoantonio/woland/blob/master/woland-source.1.01.tar.gz). Woland is provided as a tar.gz file which could be extracted using:
 ```sh
 $ tar vxzf woland-source.1.01.tar.gz
 ```
@@ -114,7 +114,7 @@ Woland.batch enables batch submission of multiple samples as provided by `input.
 ```sh
 $ woland-batch.pl -i <input.table file> -c <chromosome.profile file> -g <genomes.folder> -n <genome.version> -r <refseq.file> -w <hotspot.window length> -t <number.of.threads> -o <target.output folder>
 ```
-####Parameters explained:
+### Parameters explained:
 
 * -i 
 input.table file: Path for a regular tabular file without header. First column is group name. Second column is file sample name of annovar annotated.variant file. Samples files MUST be located in the woland folder . 
@@ -137,7 +137,7 @@ hotspot.window: A natural number N (N>1), for hotspot window length. Hotspot win
 * -t 
 number.of.threads: Default is 30.
 
-####Example:
+### Example:
 ```sh
 $ perl woland-batch.pl -i input.table.tgca.csv -c profiles/chromosome.profile.hg19.bed.exons.txt -w 1000 -g genomes/ -n hg19 -r genomes/refseq_hg19.txt -o .
 ```
