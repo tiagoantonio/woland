@@ -3,7 +3,7 @@ Tutorial
 
 The easiest way to perform a WOLAND analysis is through a single batch submission using ``woland-batch.pl``. This will envolve initial 4-step preparation but in the next-time that you will use WOLAND with other samples (and we believe that you do!) you will use only the first step. It is easy no? Each step will prepare the inputs for this script::
 
-$ perl woland-batch.pl <input-table> <chr_profile> <hs_window> <genome_version>
+$ perl woland-batch.pl -i <input.table file> -c <chromosome.profile file> -g <genomes.folder> -n <genome.version> -r <refseq.file> -w <hotspot.window length> -t <number.of.threads> -o <target.output folder>
 
 First Step - Preparing input-table
 ----------------------------------
