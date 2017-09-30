@@ -104,7 +104,7 @@ The genome sequence must contain all chromosomes in ``chr`` format. For example:
 
 Please rename the FASTA file to ``genome_<genome_version>.fa`` and move it to ``$install_dir/genomes/``. For example::
 
-	$ mv hg19.fa $install_dir/genomes/genome_hg19.fa
+	$ mv hg19.fa $install_dir/genomes/hg19.fa
 
 RefSeq annotation
 ~~~~~~~~~~~~~~~~~
@@ -122,5 +122,5 @@ Fourth Step - Choosing hotspot window length and running!
 
 Now you can choose a natural number >1 for the hotspot window length ``<hotspot_window>``, for example: 1000. Now, voilà, you can run ``woland-batch.pl``!::
 
-	$ perl woland-batch.pl input.table.txt chr_profile.txt 1000 hg19
+	$ perl woland-batch.pl -i input.table.tgca.csv -c profiles/chromosome.profile.hg19.bed.exons.txt -w 1000 -g genomes/ -n hg19 -r genomes/refseq_hg19.txt -o .
 
