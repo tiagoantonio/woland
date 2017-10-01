@@ -17,7 +17,6 @@ use strict;
 use warnings;
 use Getopt::ArgParse;
 
-
 our $REVISION = '$Revision:  $';
 our $DATE =	'$Date: 2017-09-30 00:11:04 -0800 (Sat,  30 Sep 2017) $';  
 our $AUTHOR =	'$Author: Tiago A. de Souza <tiagoantonio@gmail.com> $';
@@ -127,7 +126,6 @@ mkdir($output_folder, 0755) || die "Cannot create results folder - check if it a
 mkdir(File::Spec->catfile($output_folder, "samples-$inputtable"), 0755) || die "Cannot create results folder- check if it already exists";
 
 ## woland-anno.pl multi-threading
-
 $pm = Parallel::ForkManager->new($args->threads);
 
 for my $i (0..$#sample){ #execution of woland-anno.pl for each sample
@@ -146,11 +144,10 @@ for my $i (0..$#sample){ #execution of woland-anno.pl for each sample
 	push (@arguments, $args->refseq);
 	push (@arguments, "-o");
 	push (@arguments, $args->output);
-
+	
 	if ($i==0){
 		system ($^X, "woland-anno.pl", @arguments);
 	}
-
 	else{
 		my $pid=$pm->start and next;
 		system ($^X, "woland-anno.pl", @arguments);
