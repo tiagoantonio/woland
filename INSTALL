@@ -59,7 +59,7 @@ cpanm Text::Balanced
 echo -n "INSTALLING Text::Wrap... "
 cpanm Text::Wrap
 echo -n "INSTALLING Statistics::R... "
-cpanm Statistics::R
+cpanm Statistics::R --force
 echo -n "INSTALLING Getopt::ArgParse... "
 cpanm Getopt::ArgParse
 echo -n "INSTALLING Moo... "
